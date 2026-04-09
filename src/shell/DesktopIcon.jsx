@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
+import { motion } from 'framer-motion'
 
-export function DesktopIcon({ app, onOpen }) {
+export function DesktopIcon({ app, onOpen, index = 0 }) {
   const [selected, setSelected] = useState(false)
   const [pressing, setPressing] = useState(false)
   const clickTimer = useRef(null)
@@ -9,11 +10,9 @@ export function DesktopIcon({ app, onOpen }) {
     e.stopPropagation()
     setSelected(true)
 
-    // Clear any pending double-click timer
     if (clickTimer.current) {
       clearTimeout(clickTimer.current)
       clickTimer.current = null
-      // This is the second click — trigger press animation then open
       setPressing(true)
       setTimeout(() => {
         setPressing(false)
@@ -22,22 +21,23 @@ export function DesktopIcon({ app, onOpen }) {
       return
     }
 
-    // Wait to see if a second click follows
     clickTimer.current = setTimeout(() => {
       clickTimer.current = null
     }, 300)
   }, [app.id, onOpen])
 
   return (
-    <button
+    <motion.button
       className="desktop-icon flex flex-col items-center gap-1 p-2 rounded w-20 border-none bg-transparent"
       onClick={handleClick}
       onBlur={() => setSelected(false)}
       title={app.label}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.15, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
       style={{
         cursor: 'var(--cursor-pointer)',
         transform: pressing ? 'scale(0.92)' : undefined,
-        transition: 'transform 120ms ease-out',
       }}
     >
       <span
@@ -65,6 +65,6 @@ export function DesktopIcon({ app, onOpen }) {
           filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
         }
       `}</style>
-    </button>
+    </motion.button>
   )
 }

@@ -1,14 +1,35 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { motion, useAnimationControls } from 'framer-motion'
 import Draggable from 'react-draggable'
+
+const EXPO_OUT = [0.16, 1, 0.3, 1]
 
 export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize, onFocus, children }) {
   const nodeRef = useRef(null)
   const [position, setPosition] = useState(app.defaultPosition ?? { x: 100, y: 100 })
   const [dragging, setDragging] = useState(false)
+  const glowControls = useAnimationControls()
+  const prevZRef = useRef(windowState.zIndex)
 
   const isMaximized = windowState.maximized
+  const isMinimized = windowState.minimized
 
-  const style = isMaximized
+  // Focus glow: detect zIndex increase (brought to front)
+  useEffect(() => {
+    if (windowState.zIndex > prevZRef.current && !isMinimized) {
+      glowControls.start({
+        boxShadow: [
+          '0 0 0px 0px rgba(192, 57, 43, 0)',
+          '0 0 12px 4px rgba(192, 57, 43, 0.4)',
+          '0 0 0px 0px rgba(192, 57, 43, 0)',
+        ],
+        transition: { duration: 0.25, times: [0, 0.4, 1] },
+      })
+    }
+    prevZRef.current = windowState.zIndex
+  }, [windowState.zIndex, isMinimized, glowControls])
+
+  const positionStyle = isMaximized
     ? { position: 'absolute', inset: 0, zIndex: windowState.zIndex }
     : {
         position: 'absolute',
@@ -17,16 +38,30 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
         zIndex: windowState.zIndex,
       }
 
+  // Minimize: shrink toward taskbar (bottom center of screen)
+  const minimizeTarget = {
+    scale: 0.3,
+    y: typeof window !== 'undefined' ? window.innerHeight - 40 : 700,
+    opacity: 0,
+  }
+
   const frame = (
-    <div
+    <motion.div
       ref={nodeRef}
-      style={style}
+      style={positionStyle}
       className="flex flex-col"
       onMouseDown={onFocus}
+      initial={{ scale: 0.85, opacity: 0 }}
+      animate={isMinimized
+        ? minimizeTarget
+        : { scale: 1, opacity: 1, y: 0 }
+      }
+      exit={{ scale: 0.88, opacity: 0, transition: { duration: 0.12, ease: 'easeIn' } }}
+      transition={{ duration: 0.18, ease: EXPO_OUT }}
     >
-      {/* Outer bevel */}
-      <div
+      <motion.div
         className="flex flex-col h-full"
+        animate={glowControls}
         style={{
           background: 'var(--color-surface)',
           borderTop: '2px solid var(--color-bevel-light)',
@@ -67,8 +102,8 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
         >
           {children}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 
   if (isMaximized) return frame
