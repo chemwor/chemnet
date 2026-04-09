@@ -43,7 +43,7 @@ export function Meltdown({ onDone }) {
       style={{
         zIndex: 50000,
         background: '#000',
-        color: '#C0392B',
+        color: '#FF6B35',
       }}
       initial={{ opacity: 0 }}
       animate={{
@@ -56,7 +56,7 @@ export function Meltdown({ onDone }) {
       transition={phase === 'glitch' ? { duration: 1.5, times: [0, 0.2, 0.4, 0.7, 1] } : { duration: 0.15 }}
     >
       {LINES.slice(0, visibleLines).map((line, i) => (
-        <div key={i} style={{ color: i >= LINES.length - 2 ? '#4ADE80' : '#C0392B' }}>
+        <div key={i} style={{ color: i >= LINES.length - 2 ? '#4ADE80' : '#FF6B35' }}>
           {line}
         </div>
       ))}

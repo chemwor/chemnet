@@ -34,7 +34,7 @@ function AppIcon({ app, onOpen }) {
   return (
     <button
       className="flex flex-col items-center gap-1 p-3 rounded-lg cursor-pointer
-                 active:bg-black/5 transition-colors border-none bg-transparent"
+                 active:bg-white/10 transition-colors border-none bg-transparent"
       onClick={() => onOpen(app.id)}
     >
       <span className="text-4xl select-none">{app.icon}</span>

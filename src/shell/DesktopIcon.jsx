@@ -52,6 +52,7 @@ export function DesktopIcon({ app, onOpen, index = 0 }) {
         className="text-xs text-center leading-tight break-words w-full px-1 rounded-sm"
         style={{
           color: 'var(--color-text-primary)',
+          textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
           background: selected ? 'color-mix(in srgb, var(--color-accent) 30%, transparent)' : 'transparent',
           transition: 'background 80ms ease-out',
         }}

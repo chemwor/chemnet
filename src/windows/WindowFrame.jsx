@@ -19,9 +19,9 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
     if (windowState.zIndex > prevZRef.current && !isMinimized) {
       glowControls.start({
         boxShadow: [
-          '0 0 0px 0px rgba(192, 57, 43, 0)',
-          '0 0 12px 4px rgba(192, 57, 43, 0.4)',
-          '0 0 0px 0px rgba(192, 57, 43, 0)',
+          '0 0 0px 0px rgba(255, 107, 53, 0)',
+          '0 0 12px 4px rgba(255, 107, 53, 0.4)',
+          '0 0 0px 0px rgba(255, 107, 53, 0)',
         ],
         transition: { duration: 0.25, times: [0, 0.4, 1] },
       })

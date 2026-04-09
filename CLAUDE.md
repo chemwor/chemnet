@@ -28,47 +28,47 @@ Desktop on large screens. Launcher/panel UI on mobile. Same app components power
 
 ---
 
-## Color Theme — "Bone & Rust"
+## Color Theme — "Warm Slate"
 
-Editorial, calm, anti-tech. Light bone background with deep red accents and warm grey chrome.
+Moody, artisan, personal. Dark purple-grey background with burnt orange accents and muted lavender.
 Override react95's default teal with this palette. Apply via `ThemeProvider` and CSS variables.
 
 ```css
 :root {
-  /* Desktop — Bone & Rust */
-  --color-desktop-bg: #E8E2D6;           /* warm bone wallpaper */
+  /* Desktop — Warm Slate */
+  --color-desktop-bg: #1E1C28;           /* deep purple-grey wallpaper */
 
   /* Window chrome */
-  --color-titlebar-active: #C0392B;      /* deep rust red */
-  --color-titlebar-inactive: #B8B0A0;    /* muted warm grey */
-  --color-titlebar-text: #F0EBE1;        /* off-white on rust */
+  --color-titlebar-active: #3D2B1F;      /* deep brown-orange */
+  --color-titlebar-inactive: #2C2A35;    /* muted purple-grey */
+  --color-titlebar-text: #F0EBE1;        /* warm off-white */
 
   /* Win95 bevel system */
-  --color-surface: #F0EBE1;             /* bone — window body / button face */
-  --color-bevel-light: #FAF7F2;         /* lighter bone highlight */
-  --color-bevel-dark: #B8B0A0;          /* warm grey shadow */
-  --color-border: #A89F8F;              /* deeper warm grey */
+  --color-surface: #2C2A35;             /* window body / button face */
+  --color-bevel-light: #4A4555;         /* top-left bevel highlight */
+  --color-bevel-dark: #110F18;          /* bottom-right bevel shadow */
+  --color-border: #1A1820;
 
   /* Accent */
-  --color-accent: #C0392B;              /* deep rust red */
-  --color-accent-hover: #D4453A;        /* lighter rust on hover */
+  --color-accent: #FF6B35;              /* burnt orange — used sparingly */
+  --color-accent-hover: #FF8C5A;
 
   /* Text */
-  --color-text-primary: #2C2826;         /* near-black warm charcoal */
-  --color-text-secondary: #6B6560;       /* warm grey prose */
-  --color-text-disabled: #B8B0A0;        /* faded warm grey */
+  --color-text-primary: #F0EBE1;         /* warm off-white */
+  --color-text-secondary: #A09AB0;       /* muted lavender-grey */
+  --color-text-disabled: #5A5465;
 
   /* Selection / focus */
-  --color-selection-bg: #C0392B;
+  --color-selection-bg: #FF6B35;
   --color-selection-text: #F0EBE1;
 
   /* Taskbar */
-  --color-taskbar-bg: #DDD7CB;           /* slightly darker bone */
-  --color-taskbar-border: #B8B0A0;
+  --color-taskbar-bg: #221F2E;
+  --color-taskbar-border: #4A4555;
 
   /* Start button */
-  --color-start-bg: #F0EBE1;
-  --color-start-hover: #C0392B;
+  --color-start-bg: #2C2A35;
+  --color-start-hover: #FF6B35;
 }
 ```
 

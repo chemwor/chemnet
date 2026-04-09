@@ -1,46 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  /* Desktop — Bone & Rust */
-  --color-desktop-bg: #E8E2D6;           /* warm bone wallpaper */
+  /* Desktop — Warm Slate */
+  --color-desktop-bg: #1E1C28;           /* deep purple-grey wallpaper */
 
   /* Window chrome */
-  --color-titlebar-active: #C0392B;      /* deep rust red */
-  --color-titlebar-inactive: #B8B0A0;    /* muted warm grey */
-  --color-titlebar-text: #F0EBE1;        /* off-white on rust */
+  --color-titlebar-active: #3D2B1F;      /* deep brown-orange */
+  --color-titlebar-inactive: #2C2A35;    /* muted purple-grey */
+  --color-titlebar-text: #F0EBE1;        /* warm off-white */
 
   /* Win95 bevel system */
-  --color-surface: #F0EBE1;             /* bone — window body / button face */
-  --color-bevel-light: #FAF7F2;         /* lighter bone highlight */
-  --color-bevel-dark: #B8B0A0;          /* warm grey shadow */
-  --color-border: #A89F8F;              /* deeper warm grey */
+  --color-surface: #2C2A35;             /* window body / button face */
+  --color-bevel-light: #4A4555;         /* top-left bevel highlight */
+  --color-bevel-dark: #110F18;          /* bottom-right bevel shadow */
+  --color-border: #1A1820;
 
   /* Accent */
-  --color-accent: #C0392B;              /* deep rust red */
-  --color-accent-hover: #D4453A;        /* lighter rust on hover */
+  --color-accent: #FF6B35;              /* burnt orange — used sparingly */
+  --color-accent-hover: #FF8C5A;
 
   /* Text */
-  --color-text-primary: #2C2826;         /* near-black warm charcoal */
-  --color-text-secondary: #6B6560;       /* warm grey prose */
-  --color-text-disabled: #B8B0A0;        /* faded warm grey */
+  --color-text-primary: #F0EBE1;         /* warm off-white */
+  --color-text-secondary: #A09AB0;       /* muted lavender-grey */
+  --color-text-disabled: #5A5465;
 
   /* Selection / focus */
-  --color-selection-bg: #C0392B;
+  --color-selection-bg: #FF6B35;
   --color-selection-text: #F0EBE1;
 
   /* Taskbar */
-  --color-taskbar-bg: #DDD7CB;           /* slightly darker bone */
-  --color-taskbar-border: #B8B0A0;
+  --color-taskbar-bg: #221F2E;
+  --color-taskbar-border: #4A4555;
 
   /* Start button */
-  --color-start-bg: #F0EBE1;
-  --color-start-hover: #C0392B;
+  --color-start-bg: #2C2A35;
+  --color-start-hover: #FF6B35;
 
   /* Custom cursors — Win95-style SVG data URIs */
-  --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M5 2l17 14h-10l6 12-4 2-6-12-3 8z' fill='%23F0EBE1' stroke='%232C2826' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 5 2, default;
-  --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M14 2v10h-4l7 12 7-12h-4V2z' fill='%23C0392B' stroke='%232C2826' stroke-width='1.2' stroke-linejoin='round'/%3E%3Ccircle cx='17' cy='8' r='2' fill='%23F0EBE1'/%3E%3C/svg%3E") 14 2, pointer;
-  --cursor-busy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8 6h16l-3 10 3 10H8l3-10z' fill='%23F0EBE1' stroke='%232C2826' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M12 16h8M11 12h10M11 20h10' stroke='%23C0392B' stroke-width='1'/%3E%3C/svg%3E") 16 16, wait;
-  --cursor-grab: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 14v-4a2 2 0 014 0v-2a2 2 0 014 0v-1a2 2 0 014 0v10c0 5-3 9-8 9s-7-3-7-7v-3a2 2 0 013 0z' fill='%23F0EBE1' stroke='%232C2826' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 16 8, grab;
+  --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M5 2l17 14h-10l6 12-4 2-6-12-3 8z' fill='%23F0EBE1' stroke='%231A1820' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 5 2, default;
+  --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M14 2v10h-4l7 12 7-12h-4V2z' fill='%23FF6B35' stroke='%231A1820' stroke-width='1.2' stroke-linejoin='round'/%3E%3Ccircle cx='17' cy='8' r='2' fill='%23F0EBE1'/%3E%3C/svg%3E") 14 2, pointer;
+  --cursor-busy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8 6h16l-3 10 3 10H8l3-10z' fill='%23F0EBE1' stroke='%231A1820' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M12 16h8M11 12h10M11 20h10' stroke='%23FF6B35' stroke-width='1'/%3E%3C/svg%3E") 16 16, wait;
+  --cursor-grab: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 14v-4a2 2 0 014 0v-2a2 2 0 014 0v-1a2 2 0 014 0v10c0 5-3 9-8 9s-7-3-7-7v-3a2 2 0 013 0z' fill='%23F0EBE1' stroke='%231A1820' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 16 8, grab;
 }
 
 * {

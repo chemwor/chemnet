@@ -67,7 +67,7 @@ export default function Terminal() {
       className="flex flex-col h-full"
       style={{
         background: '#0a0a0a',
-        color: '#C0392B',
+        color: '#FF6B35',
         fontFamily: '"Courier New", monospace',
         fontSize: 13,
       }}
@@ -78,7 +78,7 @@ export default function Terminal() {
           <div
             key={i}
             className="whitespace-pre-wrap"
-            style={{ color: line.type === 'input' ? '#F0EBE1' : '#C0392B' }}
+            style={{ color: line.type === 'input' ? '#F0EBE1' : '#FF6B35' }}
           >
             {line.text}
           </div>
@@ -94,7 +94,7 @@ export default function Terminal() {
               color: '#F0EBE1',
               fontFamily: 'inherit',
               fontSize: 'inherit',
-              caretColor: '#C0392B',
+              caretColor: '#FF6B35',
             }}
             autoComplete="off"
             spellCheck={false}
