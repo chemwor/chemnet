@@ -6,6 +6,30 @@ import { Wallpaper } from './Wallpaper'
 import { CRTOverlay } from './CRTOverlay'
 import { WindowFrame } from '../windows/WindowFrame'
 
+function BusyCursor() {
+  // Adds cursor-busy class to body while this component is mounted (during Suspense)
+  if (typeof document !== 'undefined') {
+    document.body.classList.add('cursor-busy')
+  }
+  return (
+    <BusyCursorCleanup>
+      <div style={{ padding: 16, color: 'var(--color-text-secondary)' }}>
+        Loading...
+      </div>
+    </BusyCursorCleanup>
+  )
+}
+
+// Separate component to handle cleanup via useEffect
+import { useEffect } from 'react'
+function BusyCursorCleanup({ children }) {
+  useEffect(() => {
+    document.body.classList.add('cursor-busy')
+    return () => document.body.classList.remove('cursor-busy')
+  }, [])
+  return children
+}
+
 export function DesktopShell({ windowManager }) {
   const { windows, openApp, closeApp, minimizeApp, maximizeApp, focusApp } = windowManager
 
@@ -19,7 +43,15 @@ export function DesktopShell({ windowManager }) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="relative flex-1 overflow-hidden">
+      <div
+        className="relative flex-1 overflow-hidden"
+        onClick={(e) => {
+          // Deselect icons when clicking empty desktop
+          if (e.target === e.currentTarget) {
+            document.activeElement?.blur()
+          }
+        }}
+      >
         {/* Layer 0 — Animated gradient mesh */}
         <Wallpaper />
 
@@ -49,11 +81,7 @@ export function DesktopShell({ windowManager }) {
               onMaximize={() => maximizeApp(w.id)}
               onFocus={() => focusApp(w.id)}
             >
-              <Suspense fallback={
-                <div style={{ padding: 16, color: 'var(--color-text-secondary)' }}>
-                  Loading...
-                </div>
-              }>
+              <Suspense fallback={<BusyCursor />}>
                 <AppComponent />
               </Suspense>
             </WindowFrame>

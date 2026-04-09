@@ -34,14 +34,11 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
     >
       {/* Start button */}
       <button
-        className="flex items-center gap-1 px-3 py-1 mr-2 text-sm font-bold border-none cursor-pointer"
+        className="bevel-button flex items-center gap-1 px-3 py-1 mr-2 text-sm font-bold cursor-pointer"
         style={{
           background: 'var(--color-start-bg)',
           color: 'var(--color-text-primary)',
-          borderTop: '1px solid var(--color-bevel-light)',
-          borderLeft: '1px solid var(--color-bevel-light)',
-          borderBottom: '1px solid var(--color-bevel-dark)',
-          borderRight: '1px solid var(--color-bevel-dark)',
+          cursor: 'var(--cursor-pointer)',
         }}
       >
         <span>⊞</span> Start
@@ -53,14 +50,14 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
           <button
             key={w.id}
             onClick={() => onFocusApp(w.id)}
-            className="px-3 py-1 text-xs truncate max-w-[140px] border-none cursor-pointer"
+            className="bevel-button px-3 py-1 text-xs truncate max-w-[140px] cursor-pointer"
             style={{
               background: w.minimized ? 'var(--color-surface)' : 'var(--color-bevel-light)',
               color: 'var(--color-text-primary)',
-              borderTop: '1px solid var(--color-bevel-light)',
-              borderLeft: '1px solid var(--color-bevel-light)',
-              borderBottom: '1px solid var(--color-bevel-dark)',
-              borderRight: '1px solid var(--color-bevel-dark)',
+              cursor: 'var(--cursor-pointer)',
+              borderBottom: !w.minimized
+                ? '2px solid var(--color-accent)'
+                : '1px solid var(--color-bevel-dark)',
             }}
           >
             {w.label}

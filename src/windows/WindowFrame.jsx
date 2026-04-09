@@ -4,6 +4,7 @@ import Draggable from 'react-draggable'
 export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize, onFocus, children }) {
   const nodeRef = useRef(null)
   const [position, setPosition] = useState(app.defaultPosition ?? { x: 100, y: 100 })
+  const [dragging, setDragging] = useState(false)
 
   const isMaximized = windowState.maximized
 
@@ -36,9 +37,10 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
       >
         {/* Title bar */}
         <div
-          className="flex items-center justify-between px-2 py-1 select-none shrink-0 cursor-grab active:cursor-grabbing"
+          className="titlebar flex items-center justify-between px-2 py-1 select-none shrink-0"
           style={{
             background: 'linear-gradient(90deg, var(--color-titlebar-active), #1E1C28)',
+            cursor: dragging ? 'var(--cursor-grab)' : 'var(--cursor-grab)',
           }}
         >
           <span
@@ -74,9 +76,13 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
   return (
     <Draggable
       nodeRef={nodeRef}
-      handle=".cursor-grab"
+      handle=".titlebar"
       position={position}
-      onStop={(_, data) => setPosition({ x: data.x, y: data.y })}
+      onStart={() => setDragging(true)}
+      onStop={(_, data) => {
+        setDragging(false)
+        setPosition({ x: data.x, y: data.y })
+      }}
     >
       {frame}
     </Draggable>
@@ -90,15 +96,15 @@ function TitleButton({ onClick, children }) {
         e.stopPropagation()
         onClick()
       }}
-      className="w-5 h-5 flex items-center justify-center text-xs leading-none border-none cursor-pointer"
+      className="title-btn bevel-button w-5 h-5 flex items-center justify-center text-xs leading-none cursor-pointer"
       style={{
         background: 'var(--color-surface)',
         color: 'var(--color-text-primary)',
-        borderTop: '1px solid var(--color-bevel-light)',
-        borderLeft: '1px solid var(--color-bevel-light)',
-        borderBottom: '1px solid var(--color-bevel-dark)',
-        borderRight: '1px solid var(--color-bevel-dark)',
+        cursor: 'var(--cursor-pointer)',
+        transition: 'transform 80ms ease-out',
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
     >
       {children}
     </button>
