@@ -26,6 +26,8 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
     <div
       className="flex items-center h-10 px-1 shrink-0"
       style={{
+        position: 'relative',
+        zIndex: 100,
         background: 'var(--color-taskbar-bg)',
         borderTop: '1px solid var(--color-taskbar-border)',
       }}

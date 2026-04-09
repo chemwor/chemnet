@@ -2,6 +2,8 @@ import { Suspense, lazy, useMemo } from 'react'
 import { APP_REGISTRY } from '../apps/registry'
 import { DesktopIcon } from './DesktopIcon'
 import { Taskbar } from './Taskbar'
+import { Wallpaper } from './Wallpaper'
+import { CRTOverlay } from './CRTOverlay'
 import { WindowFrame } from '../windows/WindowFrame'
 
 export function DesktopShell({ windowManager }) {
@@ -17,19 +19,21 @@ export function DesktopShell({ windowManager }) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      {/* Wallpaper + icon grid + windows */}
-      <div
-        className="relative flex-1 overflow-hidden"
-        style={{ background: 'var(--color-desktop-bg)' }}
-      >
-        {/* Desktop icon grid */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2 z-0">
+      <div className="relative flex-1 overflow-hidden">
+        {/* Layer 0 — Animated gradient mesh */}
+        <Wallpaper />
+
+        {/* Layer 1 — CRT scanlines + noise + vignette */}
+        <CRTOverlay />
+
+        {/* Layer 2 — Desktop icons */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2" style={{ zIndex: 2 }}>
           {APP_REGISTRY.map(app => (
             <DesktopIcon key={app.id} app={app} onOpen={openApp} />
           ))}
         </div>
 
-        {/* Window layer */}
+        {/* Layer 10+ — Windows */}
         {windowsWithMeta.map(w => {
           if (w.minimized) return null
 
@@ -57,7 +61,7 @@ export function DesktopShell({ windowManager }) {
         })}
       </div>
 
-      {/* Taskbar */}
+      {/* Layer 100 — Taskbar */}
       <Taskbar
         windows={windowsWithMeta.map(w => ({
           id: w.id,
