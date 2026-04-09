@@ -10,42 +10,42 @@ const GlobalStyles = createGlobalStyle`
   ${styleReset}
 `
 
-const warmSlate = {
+const boneRust = {
   ...original,
-  desktopBackground: '#1E1C28',
-  headerBackground: 'linear-gradient(90deg, #3D2B1F, #2C2A35)',
-  headerNotActiveBackground: 'linear-gradient(90deg, #2C2A35, #1A1820)',
-  headerNotActiveText: '#5A5465',
+  desktopBackground: '#E8E2D6',
+  headerBackground: 'linear-gradient(90deg, #C0392B, #A03020)',
+  headerNotActiveBackground: 'linear-gradient(90deg, #B8B0A0, #A89F8F)',
+  headerNotActiveText: '#6B6560',
   headerText: '#F0EBE1',
-  material: '#2C2A35',
-  materialDark: '#110F18',
-  materialText: '#F0EBE1',
-  materialTextDisabled: '#5A5465',
-  materialTextDisabledShadow: '#110F18',
-  materialTextInvert: '#1E1C28',
-  borderDark: '#110F18',
-  borderDarkest: '#1A1820',
-  borderLight: '#4A4555',
-  borderLightest: '#5A5465',
-  canvas: '#1E1C28',
-  canvasText: '#F0EBE1',
-  canvasTextDisabled: '#5A5465',
-  canvasTextDisabledShadow: '#110F18',
+  material: '#F0EBE1',
+  materialDark: '#B8B0A0',
+  materialText: '#2C2826',
+  materialTextDisabled: '#B8B0A0',
+  materialTextDisabledShadow: '#FAF7F2',
+  materialTextInvert: '#F0EBE1',
+  borderDark: '#B8B0A0',
+  borderDarkest: '#A89F8F',
+  borderLight: '#FAF7F2',
+  borderLightest: '#FFFFFF',
+  canvas: '#F0EBE1',
+  canvasText: '#2C2826',
+  canvasTextDisabled: '#B8B0A0',
+  canvasTextDisabledShadow: '#FAF7F2',
   canvasTextInvert: '#F0EBE1',
-  checkmark: '#F0EBE1',
-  checkmarkDisabled: '#5A5465',
-  flatDark: '#2C2A35',
-  flatLight: '#4A4555',
-  focusSecondary: '#110F18',
-  hoverBackground: '#FF6B35',
-  progress: '#FF6B35',
-  tooltip: '#2C2A35',
+  checkmark: '#2C2826',
+  checkmarkDisabled: '#B8B0A0',
+  flatDark: '#DDD7CB',
+  flatLight: '#FAF7F2',
+  focusSecondary: '#B8B0A0',
+  hoverBackground: '#C0392B',
+  progress: '#C0392B',
+  tooltip: '#F0EBE1',
 }
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GlobalStyles />
-    <ThemeProvider theme={warmSlate}>
+    <ThemeProvider theme={boneRust}>
       <App />
     </ThemeProvider>
   </StrictMode>,
