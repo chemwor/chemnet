@@ -29,32 +29,19 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
     prevZRef.current = windowState.zIndex
   }, [windowState.zIndex, isMinimized, glowControls])
 
-  const positionStyle = isMaximized
-    ? { position: 'absolute', inset: 0, zIndex: windowState.zIndex }
-    : {
-        position: 'absolute',
-        width: app.defaultSize?.width ?? 480,
-        height: app.defaultSize?.height ?? 360,
-        zIndex: windowState.zIndex,
-      }
-
-  // Minimize: shrink toward taskbar (bottom center of screen)
-  const minimizeTarget = {
-    scale: 0.3,
-    y: typeof window !== 'undefined' ? window.innerHeight - 40 : 700,
-    opacity: 0,
+  const sizeStyle = {
+    width: app.defaultSize?.width ?? 480,
+    height: app.defaultSize?.height ?? 360,
   }
 
-  const frame = (
+  // The inner animated content — shared between maximized and normal modes
+  const innerContent = (
     <motion.div
-      ref={nodeRef}
-      style={positionStyle}
-      className="flex flex-col"
-      onMouseDown={onFocus}
+      className="flex flex-col h-full"
       initial={{ scale: 0.85, opacity: 0 }}
       animate={isMinimized
-        ? minimizeTarget
-        : { scale: 1, opacity: 1, y: 0 }
+        ? { scale: 0.3, opacity: 0 }
+        : { scale: 1, opacity: 1 }
       }
       exit={{ scale: 0.88, opacity: 0, transition: { duration: 0.12, ease: 'easeIn' } }}
       transition={{ duration: 0.18, ease: EXPO_OUT }}
@@ -106,7 +93,17 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
     </motion.div>
   )
 
-  if (isMaximized) return frame
+  if (isMaximized) {
+    return (
+      <div
+        style={{ position: 'absolute', inset: 0, zIndex: windowState.zIndex }}
+        className="flex flex-col"
+        onMouseDown={onFocus}
+      >
+        {innerContent}
+      </div>
+    )
+  }
 
   return (
     <Draggable
@@ -128,7 +125,14 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
         }
       }}
     >
-      {frame}
+      <div
+        ref={nodeRef}
+        style={{ position: 'absolute', zIndex: windowState.zIndex, ...sizeStyle }}
+        className="flex flex-col"
+        onMouseDown={onFocus}
+      >
+        {innerContent}
+      </div>
     </Draggable>
   )
 }
