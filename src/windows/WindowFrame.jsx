@@ -4,7 +4,7 @@ import Draggable from 'react-draggable'
 
 const EXPO_OUT = [0.16, 1, 0.3, 1]
 
-export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize, onFocus, children }) {
+export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize, onFocus, onOffscreen, children }) {
   const nodeRef = useRef(null)
   const [position, setPosition] = useState(app.defaultPosition ?? { x: 100, y: 100 })
   const [dragging, setDragging] = useState(false)
@@ -116,7 +116,16 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
       onStart={() => setDragging(true)}
       onStop={(_, data) => {
         setDragging(false)
-        setPosition({ x: data.x, y: data.y })
+        const w = app.defaultSize?.width ?? 480
+        const h = app.defaultSize?.height ?? 360
+        const vw = window.innerWidth
+        const vh = window.innerHeight
+        if (data.x + w < 20 || data.x > vw - 20 || data.y + h < 20 || data.y > vh - 60) {
+          onOffscreen?.()
+          setPosition(app.defaultPosition ?? { x: 100, y: 100 })
+        } else {
+          setPosition({ x: data.x, y: data.y })
+        }
       }}
     >
       {frame}

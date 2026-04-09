@@ -1,11 +1,20 @@
-import { Suspense, lazy, useMemo, useEffect } from 'react'
+import { Suspense, lazy, useMemo, useEffect, useState, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { APP_REGISTRY } from '../apps/registry'
 import { DesktopIcon } from './DesktopIcon'
 import { Taskbar } from './Taskbar'
 import { Wallpaper } from './Wallpaper'
 import { CRTOverlay } from './CRTOverlay'
+import { ContextMenu } from './ContextMenu'
+import { OffscreenToast } from './OffscreenToast'
 import { WindowFrame } from '../windows/WindowFrame'
+import { BSOD } from '../easter-eggs/BSOD'
+import { Screensaver } from '../easter-eggs/Screensaver'
+import { KonamiOverlay } from '../easter-eggs/KonamiOverlay'
+import { Meltdown } from '../easter-eggs/Meltdown'
+import { useIdleTimer } from '../hooks/useIdleTimer'
+import { useKonamiCode } from '../hooks/useKonamiCode'
+import { useSecretCode } from '../hooks/useSecretCode'
 
 function BusyCursorCleanup({ children }) {
   useEffect(() => {
@@ -28,6 +37,36 @@ function BusyCursor() {
 export function DesktopShell({ windowManager }) {
   const { windows, openApp, closeApp, minimizeApp, maximizeApp, focusApp } = windowManager
 
+  // Easter egg hooks
+  const { idle, resetIdle } = useIdleTimer(60000)
+  const konamiActive = useKonamiCode()
+  const { triggered: bsodActive, dismiss: dismissBsod } = useSecretCode('IDDQD')
+
+  // Meltdown state
+  const [meltdownActive, setMeltdownActive] = useState(false)
+
+  useEffect(() => {
+    const handler = () => setMeltdownActive(true)
+    window.addEventListener('ericOS:meltdown', handler)
+    return () => window.removeEventListener('ericOS:meltdown', handler)
+  }, [])
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState(null)
+
+  // Offscreen toast state
+  const [showOffscreenToast, setShowOffscreenToast] = useState(false)
+
+  const handleContextMenu = useCallback((e) => {
+    e.preventDefault()
+    setContextMenu({ x: e.clientX, y: e.clientY })
+  }, [])
+
+  const handleOffscreen = useCallback(() => {
+    setShowOffscreenToast(true)
+    setTimeout(() => setShowOffscreenToast(false), 3000)
+  }, [])
+
   const windowsWithMeta = useMemo(() =>
     windows.map(w => {
       const app = APP_REGISTRY.find(a => a.id === w.id)
@@ -45,6 +84,7 @@ export function DesktopShell({ windowManager }) {
             document.activeElement?.blur()
           }
         }}
+        onContextMenu={handleContextMenu}
       >
         {/* Layer 0 — Animated gradient mesh */}
         <Wallpaper />
@@ -73,6 +113,7 @@ export function DesktopShell({ windowManager }) {
                 onMinimize={() => minimizeApp(w.id)}
                 onMaximize={() => maximizeApp(w.id)}
                 onFocus={() => focusApp(w.id)}
+                onOffscreen={handleOffscreen}
               >
                 <Suspense fallback={<BusyCursor />}>
                   <AppComponent />
@@ -80,6 +121,24 @@ export function DesktopShell({ windowManager }) {
               </WindowFrame>
             )
           })}
+        </AnimatePresence>
+
+        {/* Context menu */}
+        <AnimatePresence>
+          {contextMenu && (
+            <ContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              onClose={() => setContextMenu(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Offscreen toast */}
+        <AnimatePresence>
+          {showOffscreenToast && (
+            <OffscreenToast onDismiss={() => setShowOffscreenToast(false)} />
+          )}
         </AnimatePresence>
       </div>
 
@@ -93,6 +152,21 @@ export function DesktopShell({ windowManager }) {
         onFocusApp={focusApp}
         onOpenApp={openApp}
       />
+
+      {/* Easter egg overlays */}
+      <AnimatePresence>
+        {bsodActive && <BSOD onDismiss={dismissBsod} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {idle && <Screensaver onDismiss={resetIdle} />}
+      </AnimatePresence>
+
+      {konamiActive && <KonamiOverlay />}
+
+      <AnimatePresence>
+        {meltdownActive && <Meltdown onDone={() => setMeltdownActive(false)} />}
+      </AnimatePresence>
     </div>
   )
 }
