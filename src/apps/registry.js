@@ -37,7 +37,7 @@ export const APP_REGISTRY = [
     label: 'Solitaire',
     icon: '🃏',
     component: () => import('./Solitaire/Solitaire.jsx'),
-    defaultSize: { width: 520, height: 480 },
+    defaultSize: { width: 620, height: 560 },
     defaultPosition: { x: 100, y: 40 },
     openOnBoot: false,
     pinned: false,
