@@ -156,9 +156,9 @@ export default function Pacman() {
         }
       }
 
-      // Pacman movement — every 6 frames
+      // Pacman movement — every 8 frames
       s.moveTimer++
-      if (s.moveTimer >= 6) {
+      if (s.moveTimer >= 8) {
         s.moveTimer = 0
         const p = s.pacman
 
@@ -204,9 +204,9 @@ export default function Pacman() {
         if (p.mouthAngle < 0.05) p.mouthDir = 1
       }
 
-      // Ghost movement — every 8 frames
+      // Ghost movement — every 12 frames (18 when scared)
       s.ghostMoveTimer++
-      if (s.ghostMoveTimer >= (s.powerTimer > 0 ? 12 : 8)) {
+      if (s.ghostMoveTimer >= (s.powerTimer > 0 ? 18 : 12)) {
         s.ghostMoveTimer = 0
         for (const g of s.ghosts) {
           if (!g.released) continue
