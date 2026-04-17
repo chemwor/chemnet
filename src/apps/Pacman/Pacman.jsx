@@ -156,9 +156,9 @@ export default function Pacman() {
         }
       }
 
-      // Pacman movement — every 8 frames
+      // Pacman movement — every 12 frames
       s.moveTimer++
-      if (s.moveTimer >= 8) {
+      if (s.moveTimer >= 12) {
         s.moveTimer = 0
         const p = s.pacman
 
