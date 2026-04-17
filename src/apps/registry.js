@@ -111,8 +111,8 @@ export const APP_REGISTRY = [
   },
   {
     id: 'fighter',
-    label: 'Street Brawler',
-    icon: '🥊',
+    label: "Rock'em Sock'em",
+    icon: '🤖',
     component: () => import('./Fighter/Fighter.jsx'),
     defaultSize: { width: 560, height: 420 },
     defaultPosition: { x: 100, y: 30 },
