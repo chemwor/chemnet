@@ -120,4 +120,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'chess',
+    label: 'Chess',
+    icon: '♚',
+    component: () => import('./Chess/Chess.jsx'),
+    defaultSize: { width: 540, height: 480 },
+    defaultPosition: { x: 100, y: 20 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
