@@ -32,4 +32,15 @@ export const APP_REGISTRY = [
     pinned: true,
     auth: false,
   },
+  {
+    id: 'solitaire',
+    label: 'Solitaire',
+    icon: '🃏',
+    component: () => import('./Solitaire/Solitaire.jsx'),
+    defaultSize: { width: 520, height: 480 },
+    defaultPosition: { x: 100, y: 40 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
