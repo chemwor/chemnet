@@ -65,4 +65,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'asteroids',
+    label: 'Asteroids',
+    icon: '☄️',
+    component: () => import('./Asteroids/Asteroids.jsx'),
+    defaultSize: { width: 560, height: 440 },
+    defaultPosition: { x: 120, y: 50 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
