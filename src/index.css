@@ -36,11 +36,11 @@
   --color-start-bg: #2C2A35;
   --color-start-hover: #FF6B35;
 
-  /* Custom cursors — Win95-style SVG data URIs */
-  --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M5 2l17 14h-10l6 12-4 2-6-12-3 8z' fill='%23F0EBE1' stroke='%231A1820' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 5 2, default;
-  --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M14 2v10h-4l7 12 7-12h-4V2z' fill='%23FF6B35' stroke='%231A1820' stroke-width='1.2' stroke-linejoin='round'/%3E%3Ccircle cx='17' cy='8' r='2' fill='%23F0EBE1'/%3E%3C/svg%3E") 14 2, pointer;
-  --cursor-busy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8 6h16l-3 10 3 10H8l3-10z' fill='%23F0EBE1' stroke='%231A1820' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M12 16h8M11 12h10M11 20h10' stroke='%23FF6B35' stroke-width='1'/%3E%3C/svg%3E") 16 16, wait;
-  --cursor-grab: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 14v-4a2 2 0 014 0v-2a2 2 0 014 0v-1a2 2 0 014 0v10c0 5-3 9-8 9s-7-3-7-7v-3a2 2 0 013 0z' fill='%23F0EBE1' stroke='%231A1820' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 16 8, grab;
+  /* Cursors — native defaults */
+  --cursor-default: default;
+  --cursor-pointer: pointer;
+  --cursor-busy: wait;
+  --cursor-grab: grab;
 }
 
 * {
