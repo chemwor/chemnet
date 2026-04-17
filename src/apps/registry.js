@@ -98,4 +98,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'pinball',
+    label: 'Pinball',
+    icon: '🎯',
+    component: () => import('./Pinball/Pinball.jsx'),
+    defaultSize: { width: 380, height: 560 },
+    defaultPosition: { x: 150, y: 20 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
