@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { StartMenu } from './StartMenu'
 
 function Clock() {
   const [time, setTime] = useState(new Date())
@@ -23,6 +24,8 @@ function Clock() {
 }
 
 export function Taskbar({ windows, onFocusApp, onOpenApp }) {
+  const [startOpen, setStartOpen] = useState(false)
+
   return (
     <motion.div
       className="flex items-center h-10 px-1 shrink-0"
@@ -36,17 +39,39 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
         borderTop: '1px solid var(--color-taskbar-border)',
       }}
     >
+      {/* Start Menu */}
+      <AnimatePresence>
+        {startOpen && (
+          <StartMenu
+            onOpenApp={onOpenApp}
+            onClose={() => setStartOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Start button */}
       <button
         className="bevel-button flex items-center gap-1 px-3 py-1 mr-2 text-sm font-bold cursor-pointer"
         style={{
-          background: 'var(--color-start-bg)',
+          background: startOpen ? 'var(--color-bevel-dark)' : 'var(--color-start-bg)',
           color: 'var(--color-text-primary)',
           cursor: 'var(--cursor-pointer)',
+          borderTop: startOpen ? '1px solid var(--color-bevel-dark)' : undefined,
+          borderLeft: startOpen ? '1px solid var(--color-bevel-dark)' : undefined,
+          borderBottom: startOpen ? '1px solid var(--color-bevel-light)' : undefined,
+          borderRight: startOpen ? '1px solid var(--color-bevel-light)' : undefined,
         }}
+        onClick={() => setStartOpen(prev => !prev)}
       >
-        <span>⊞</span> Start
+        <span style={{ color: 'var(--color-accent)' }}>⊞</span> Start
       </button>
+
+      {/* Divider */}
+      <div style={{
+        width: 1, height: 24, marginRight: 4,
+        borderLeft: '1px solid var(--color-bevel-dark)',
+        borderRight: '1px solid var(--color-bevel-light)',
+      }} />
 
       {/* Open window buttons */}
       <div className="flex gap-1 flex-1 overflow-hidden">
@@ -75,6 +100,13 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
           ))}
         </AnimatePresence>
       </div>
+
+      {/* System tray divider */}
+      <div style={{
+        width: 1, height: 24, marginLeft: 4,
+        borderLeft: '1px solid var(--color-bevel-dark)',
+        borderRight: '1px solid var(--color-bevel-light)',
+      }} />
 
       <Clock />
     </motion.div>
