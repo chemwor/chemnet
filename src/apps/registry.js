@@ -43,4 +43,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'pong',
+    label: 'Pong',
+    icon: '🏓',
+    component: () => import('./Pong/Pong.jsx'),
+    defaultSize: { width: 560, height: 400 },
+    defaultPosition: { x: 140, y: 60 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
