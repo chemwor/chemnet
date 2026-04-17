@@ -76,4 +76,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'pacman',
+    label: 'Pac-Man',
+    icon: '👾',
+    component: () => import('./Pacman/Pacman.jsx'),
+    defaultSize: { width: 460, height: 540 },
+    defaultPosition: { x: 130, y: 30 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
