@@ -54,4 +54,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'minesweeper',
+    label: 'Minesweeper',
+    icon: '💣',
+    component: () => import('./Minesweeper/Minesweeper.jsx'),
+    defaultSize: { width: 280, height: 380 },
+    defaultPosition: { x: 160, y: 60 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
