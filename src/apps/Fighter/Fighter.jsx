@@ -1,287 +1,233 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-// ── Constants ──
-const GROUND_Y = 310
-const MOVE_SPEED = 2.5
-const HEALTH_MAX = 100
-const ROUND_TIME = 45
-const ROUNDS_TO_WIN = 3
-const HIT_STUN = 14
-const BLOCK_STUN = 8
-const KNOCKBACK = 4
-const RING_LEFT = 40
-const RING_RIGHT_PAD = 40
+const HEALTH_MAX = 50
+const HIT_DAMAGE = 2
+const HIT_STUN = 20
+const PUNCH_COOLDOWN = 12
+const AI_PUNCH_CHANCE = 0.035
+const HEAD_POP_SPEED = 1.5
+const HEAD_POP_MAX = 60
 
 const ROBOTS = {
   red: {
     name: 'RED ROCKER',
-    body: '#CC2222',
-    bodyLight: '#EE4444',
-    bodyDark: '#881111',
-    eyes: '#FFDD00',
-    accent: '#FF6B35',
-    moves: {
-      jab:   { damage: 6,  range: 48, startup: 2, active: 3, recovery: 6, hitstun: 10 },
-      hook:  { damage: 10, range: 52, startup: 4, active: 4, recovery: 10, hitstun: 14 },
-      uppercut: { damage: 16, range: 44, startup: 6, active: 5, recovery: 14, hitstun: 20, headshot: true },
-      body:  { damage: 8,  range: 46, startup: 3, active: 3, recovery: 8, hitstun: 12, type: 'low' },
-    },
+    body: '#CC2222', bodyLight: '#EE4444', bodyDark: '#881111',
+    eyes: '#FFDD00', accent: '#FF6B35', fist: '#DD3333',
   },
   blue: {
     name: 'BLUE BOMBER',
-    body: '#2244CC',
-    bodyLight: '#4466EE',
-    bodyDark: '#112288',
-    eyes: '#FFDD00',
-    accent: '#00CCFF',
-    moves: {
-      jab:   { damage: 7,  range: 46, startup: 2, active: 3, recovery: 5, hitstun: 10 },
-      hook:  { damage: 11, range: 50, startup: 4, active: 4, recovery: 9, hitstun: 14 },
-      uppercut: { damage: 18, range: 42, startup: 7, active: 5, recovery: 16, hitstun: 22, headshot: true },
-      body:  { damage: 9,  range: 44, startup: 3, active: 3, recovery: 7, hitstun: 12, type: 'low' },
-    },
+    body: '#2244CC', bodyLight: '#4466EE', bodyDark: '#112288',
+    eyes: '#FFDD00', accent: '#00CCFF', fist: '#3355DD',
   },
 }
 
-function createRobot(type, x, facing) {
+function createRobot(type) {
   return {
-    type, x, y: GROUND_Y, facing,
-    vx: 0,
+    type,
     health: HEALTH_MAX,
-    state: 'idle', // idle, walk, attack, hitstun, blockstun, ko
-    stateTimer: 0,
-    currentMove: null,
-    blocking: false,
-    headPopY: 0, // 0 = normal, >0 = head popping up on KO
-    headBob: 0,
+    punchState: 'idle', // idle, punching, retracting
+    punchTimer: 0,
+    cooldown: 0,
+    stunTimer: 0,
+    headPopY: 0,
+    ko: false,
     roundsWon: 0,
-    comboCount: 0,
+    punchCount: 0,
   }
 }
 
-// ── Draw Robot ──
-function drawRobot(ctx, r, tick, ringRight) {
-  const data = ROBOTS[r.type]
-  const isHurt = r.state === 'hitstun'
-  const isKO = r.state === 'ko'
-  const isAttacking = r.state === 'attack'
-  const bob = r.state === 'idle' ? Math.sin(tick * 0.06) * 1.5 : 0
-  const shakX = isHurt ? (Math.random() - 0.5) * 4 : 0
-  const shakY = isHurt ? (Math.random() - 0.5) * 2 : 0
+function drawRobot(ctx, robot, x, y, facing, tick) {
+  const data = ROBOTS[robot.type]
+  const isStunned = robot.stunTimer > 0
+  const shakeX = isStunned ? (Math.random() - 0.5) * 3 : 0
+  const shakeY = isStunned ? (Math.random() - 0.5) * 2 : 0
+  const bob = !isStunned && !robot.ko ? Math.sin(tick * 0.05) * 1 : 0
 
   ctx.save()
-  ctx.translate(r.x + shakX, r.y + shakY)
-  ctx.scale(r.facing, 1)
+  ctx.translate(x + shakeX, y + shakeY + bob)
+  ctx.scale(facing, 1)
 
-  const yOff = -70 + bob
-
-  // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.35)'
-  ctx.beginPath()
-  ctx.ellipse(0, 2, 22, 6, 0, 0, Math.PI * 2)
-  ctx.fill()
-
-  // ── Legs — pistons ──
-  ctx.fillStyle = '#666'
-  ctx.fillRect(-12, yOff + 52, 6, 20)
-  ctx.fillRect(6, yOff + 52, 6, 20)
-  // Feet
+  // ── Base / platform ──
+  ctx.fillStyle = '#444'
+  ctx.fillRect(-30, 70, 60, 8)
   ctx.fillStyle = '#555'
-  ctx.fillRect(-15, yOff + 68, 12, 5)
-  ctx.fillRect(3, yOff + 68, 12, 5)
-  // Piston detail
-  ctx.fillStyle = '#888'
-  ctx.fillRect(-11, yOff + 56, 4, 3)
-  ctx.fillRect(7, yOff + 56, 4, 3)
+  ctx.fillRect(-28, 70, 56, 3)
 
-  // ── Body — boxy torso ──
-  const bodyGrd = ctx.createLinearGradient(-18, yOff + 18, 18, yOff + 18)
+  // ── Body column ──
+  ctx.fillStyle = '#666'
+  ctx.fillRect(-6, 40, 12, 32)
+  // Body pistons
+  ctx.fillStyle = '#777'
+  ctx.fillRect(-10, 50, 4, 10)
+  ctx.fillRect(6, 50, 4, 10)
+
+  // ── Torso ──
+  const bodyGrd = ctx.createLinearGradient(-24, 0, 24, 0)
   bodyGrd.addColorStop(0, data.bodyDark)
-  bodyGrd.addColorStop(0.3, data.body)
-  bodyGrd.addColorStop(0.7, data.bodyLight)
+  bodyGrd.addColorStop(0.35, data.body)
+  bodyGrd.addColorStop(0.65, data.bodyLight)
   bodyGrd.addColorStop(1, data.body)
   ctx.fillStyle = bodyGrd
-  ctx.fillRect(-18, yOff + 18, 36, 36)
-
-  // Body panel lines
+  ctx.fillRect(-24, 4, 48, 40)
   ctx.strokeStyle = data.bodyDark
-  ctx.lineWidth = 1
-  ctx.strokeRect(-16, yOff + 20, 32, 32)
-  // Chest plate
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(-24, 4, 48, 40)
+
+  // Chest panel
   ctx.fillStyle = data.bodyDark
-  ctx.fillRect(-10, yOff + 24, 20, 4)
-  ctx.fillRect(-10, yOff + 32, 20, 4)
-  // Power indicator
-  ctx.fillStyle = r.health > 30 ? '#00FF44' : '#FF2200'
-  ctx.fillRect(-4, yOff + 40, 8, 6)
-  ctx.strokeStyle = '#333'
-  ctx.strokeRect(-4, yOff + 40, 8, 6)
+  ctx.fillRect(-14, 10, 28, 3)
+  ctx.fillRect(-14, 18, 28, 3)
+  ctx.fillRect(-14, 26, 28, 3)
 
-  // ── Arms ──
+  // Power meter on chest
+  const meterW = 20
+  const meterH = 6
+  ctx.fillStyle = '#222'
+  ctx.fillRect(-meterW / 2, 32, meterW, meterH)
+  const healthPct = robot.health / HEALTH_MAX
+  ctx.fillStyle = healthPct > 0.3 ? '#00FF44' : '#FF2200'
+  ctx.fillRect(-meterW / 2, 32, meterW * healthPct, meterH)
+  ctx.strokeStyle = '#555'
+  ctx.lineWidth = 1
+  ctx.strokeRect(-meterW / 2, 32, meterW, meterH)
+
+  // ── Arms + Fists ──
+  const punchExtend = robot.punchState === 'punching' ? 28 : robot.punchState === 'retracting' ? 14 : 0
+  const guardBob = Math.sin(tick * 0.08) * 1
+
+  // Punching arm (right side = forward)
   ctx.fillStyle = '#888'
-  // Shoulder joints
+  // Shoulder
   ctx.beginPath()
-  ctx.arc(-20, yOff + 22, 5, 0, Math.PI * 2)
-  ctx.arc(20, yOff + 22, 5, 0, Math.PI * 2)
+  ctx.arc(26, 12, 6, 0, Math.PI * 2)
   ctx.fill()
+  // Arm
+  ctx.fillStyle = data.body
+  ctx.fillRect(24, 8, 12 + punchExtend, 9)
+  // Fist
+  ctx.fillStyle = data.fist
+  const fistX = 34 + punchExtend
+  ctx.fillRect(fistX, 4, 16, 16)
+  ctx.strokeStyle = data.bodyDark
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(fistX, 4, 16, 16)
+  // Knuckle lines
+  ctx.fillStyle = data.bodyDark
+  ctx.fillRect(fistX + 12, 6, 2, 12)
+  ctx.fillRect(fistX + 8, 6, 2, 12)
 
-  if (isAttacking && r.currentMove) {
-    // Punching arm — extended
-    const punchExt = r.stateTimer > 6 ? 30 : 20
-    ctx.fillStyle = data.body
-    ctx.fillRect(16, yOff + 18, punchExt, 8)
-    // Fist
-    ctx.fillStyle = data.bodyLight
-    ctx.fillRect(16 + punchExt - 4, yOff + 15, 14, 14)
-    ctx.strokeStyle = data.bodyDark
-    ctx.lineWidth = 1.5
-    ctx.strokeRect(16 + punchExt - 4, yOff + 15, 14, 14)
-    // Knuckle lines
-    ctx.fillStyle = data.bodyDark
-    ctx.fillRect(16 + punchExt + 6, yOff + 17, 2, 10)
-
-    // Other arm — guard
-    ctx.fillStyle = data.body
-    ctx.fillRect(-30, yOff + 20, 12, 7)
-    ctx.fillStyle = data.bodyLight
-    ctx.fillRect(-34, yOff + 17, 10, 12)
-  } else if (r.blocking) {
-    // Both arms up guarding
-    ctx.fillStyle = data.body
-    ctx.fillRect(-32, yOff + 12, 14, 8)
-    ctx.fillRect(18, yOff + 12, 14, 8)
-    ctx.fillStyle = data.bodyLight
-    ctx.fillRect(-36, yOff + 8, 12, 14)
-    ctx.fillRect(24, yOff + 8, 12, 14)
-  } else {
-    // Idle arms — guard position
-    ctx.fillStyle = data.body
-    ctx.fillRect(-30, yOff + 20, 12, 7)
-    ctx.fillRect(18, yOff + 20, 12, 7)
-    ctx.fillStyle = data.bodyLight
-    ctx.fillRect(-34, yOff + 17, 10, 12)
-    ctx.fillRect(26, yOff + 17, 10, 12)
-  }
+  // Guard arm (left side)
+  ctx.fillStyle = '#888'
+  ctx.beginPath()
+  ctx.arc(-26, 12, 6, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = data.body
+  ctx.fillRect(-38, 8 + guardBob, 14, 9)
+  ctx.fillStyle = data.fist
+  ctx.fillRect(-44, 4 + guardBob, 14, 14)
+  ctx.strokeStyle = data.bodyDark
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(-44, 4 + guardBob, 14, 14)
 
   // ── Head ──
-  const headY = yOff + 2 - r.headPopY
-  // Neck / spring (visible when head pops)
-  if (r.headPopY > 0) {
-    ctx.strokeStyle = '#888'
+  const headY = -8 - robot.headPopY
+
+  // Neck / spring when popping
+  if (robot.headPopY > 2) {
+    ctx.strokeStyle = '#999'
     ctx.lineWidth = 2
-    const segments = 6
-    for (let i = 0; i < segments; i++) {
-      const sy = yOff + 16 - (r.headPopY / segments) * i
-      const sx = Math.sin(i * 1.2) * 3
-      ctx.beginPath()
-      ctx.moveTo(sx - 3, sy)
-      ctx.lineTo(sx + 3, sy - r.headPopY / segments)
-      ctx.stroke()
+    const segs = 8
+    const segH = robot.headPopY / segs
+    ctx.beginPath()
+    for (let i = 0; i <= segs; i++) {
+      const sy = 2 - i * segH
+      const sx = Math.sin(i * 1.8) * 4
+      if (i === 0) ctx.moveTo(sx, sy)
+      else ctx.lineTo(sx, sy)
     }
+    ctx.stroke()
   }
 
-  // Head block
-  const headGrd = ctx.createLinearGradient(-14, headY - 14, 14, headY - 14)
+  // Head box
+  const headGrd = ctx.createLinearGradient(-16, headY - 18, 16, headY - 18)
   headGrd.addColorStop(0, data.bodyDark)
   headGrd.addColorStop(0.4, data.bodyLight)
   headGrd.addColorStop(1, data.body)
   ctx.fillStyle = headGrd
-  ctx.fillRect(-14, headY - 14, 28, 22)
+  ctx.fillRect(-16, headY - 18, 32, 24)
   ctx.strokeStyle = data.bodyDark
   ctx.lineWidth = 1.5
-  ctx.strokeRect(-14, headY - 14, 28, 22)
+  ctx.strokeRect(-16, headY - 18, 32, 24)
 
   // Jaw
   ctx.fillStyle = data.body
-  ctx.fillRect(-10, headY + 4, 20, 8)
+  ctx.fillRect(-12, headY + 2, 24, 6)
 
   // Eyes
-  if (isKO) {
-    ctx.fillStyle = '#FF0000'
-    ctx.fillRect(-8, headY - 8, 6, 4)
-    ctx.fillRect(2, headY - 8, 6, 4)
+  if (robot.ko) {
+    // X eyes
+    ctx.strokeStyle = '#FF0000'
+    ctx.lineWidth = 2
+    for (const ex of [-7, 5]) {
+      ctx.beginPath()
+      ctx.moveTo(ex - 3, headY - 12)
+      ctx.lineTo(ex + 3, headY - 6)
+      ctx.moveTo(ex + 3, headY - 12)
+      ctx.lineTo(ex - 3, headY - 6)
+      ctx.stroke()
+    }
   } else {
     ctx.fillStyle = data.eyes
     ctx.shadowColor = data.eyes
-    ctx.shadowBlur = 4
-    ctx.fillRect(-8, headY - 8, 6, 5)
-    ctx.fillRect(2, headY - 8, 6, 5)
+    ctx.shadowBlur = 5
+    ctx.fillRect(-10, headY - 12, 7, 6)
+    ctx.fillRect(3, headY - 12, 7, 6)
     ctx.shadowBlur = 0
     // Pupils
     ctx.fillStyle = '#000'
-    ctx.fillRect(-6, headY - 6, 2, 3)
-    ctx.fillRect(4, headY - 6, 2, 3)
+    ctx.fillRect(-7, headY - 10, 3, 4)
+    ctx.fillRect(6, headY - 10, 3, 4)
   }
 
   // Mouth grill
   ctx.fillStyle = '#333'
-  ctx.fillRect(-6, headY + 1, 12, 6)
-  ctx.fillStyle = data.bodyDark
-  for (let i = 0; i < 4; i++) {
-    ctx.fillRect(-5 + i * 3, headY + 1, 1, 6)
+  ctx.fillRect(-8, headY - 2, 16, 6)
+  for (let i = 0; i < 5; i++) {
+    ctx.fillStyle = data.bodyDark
+    ctx.fillRect(-7 + i * 3.5, headY - 2, 1, 6)
   }
 
   // Antenna
   ctx.fillStyle = '#888'
-  ctx.fillRect(-1, headY - 18, 2, 6)
-  ctx.fillStyle = r.health > 50 ? data.accent : '#FF0000'
+  ctx.fillRect(-1, headY - 24, 2, 8)
+  const antennaColor = robot.ko ? '#FF0000' : robot.health > 25 ? data.accent : '#FF4400'
+  ctx.fillStyle = antennaColor
+  ctx.shadowColor = antennaColor
+  ctx.shadowBlur = robot.ko ? 0 : 6
   ctx.beginPath()
-  ctx.arc(0, headY - 19, 3, 0, Math.PI * 2)
+  ctx.arc(0, headY - 25, 3, 0, Math.PI * 2)
   ctx.fill()
+  ctx.shadowBlur = 0
 
   ctx.restore()
-}
-
-// ── AI ──
-function aiUpdate(ai, player, tick) {
-  const dist = Math.abs(ai.x - player.x)
-  const input = { left: false, right: false, punch: false, hook: false, uppercut: false, body: false, block: false }
-
-  if (ai.state !== 'idle' && ai.state !== 'walk') return input
-
-  const shouldGoRight = player.x > ai.x
-
-  // Incoming attack — try to block
-  if (player.state === 'attack' && dist < 60) {
-    if (Math.random() < 0.5) { input.block = true; return input }
-  }
-
-  if (dist > 100) {
-    if (shouldGoRight) input.right = true; else input.left = true
-  } else if (dist > 55) {
-    if (shouldGoRight) input.right = true; else input.left = true
-    if (Math.random() < 0.02) input.hook = true
-  } else {
-    // In range — fight
-    const r = Math.random()
-    if (r < 0.05) input.punch = true
-    else if (r < 0.08) input.hook = true
-    else if (r < 0.10) input.uppercut = true
-    else if (r < 0.13) input.body = true
-    else if (r < 0.18) input.block = true
-    else if (r < 0.22) { if (shouldGoRight) input.left = true; else input.right = true } // dodge back
-  }
-
-  return input
 }
 
 export default function Fighter() {
   const canvasRef = useRef(null)
   const stateRef = useRef(null)
-  const keysRef = useRef({})
   const [screen, setScreen] = useState('start')
 
   const initRound = useCallback((canvas, keepRounds) => {
     const w = canvas.width, h = canvas.height
     const prev = stateRef.current
-    const ringRight = w - RING_RIGHT_PAD
-    const p1 = createRobot('red', w * 0.35, 1)
-    const p2 = createRobot('blue', w * 0.65, -1)
+    const p1 = createRobot('red')
+    const p2 = createRobot('blue')
     if (keepRounds && prev) {
       p1.roundsWon = prev.p1.roundsWon
       p2.roundsWon = prev.p2.roundsWon
     }
-    return { w, h, ringRight, p1, p2, particles: [], tick: 0, roundTimer: ROUND_TIME * 60, roundOver: false, roundEndTimer: 0, message: 'ROUND ' + ((keepRounds && prev ? Math.max(prev.p1.roundsWon, prev.p2.roundsWon) : 0) + 1), messageTimer: 50 }
+    const round = (keepRounds && prev ? Math.max(prev.p1.roundsWon, prev.p2.roundsWon) : 0) + 1
+    return { w, h, p1, p2, particles: [], tick: 0, roundOver: false, roundEndTimer: 0, message: `ROUND ${round}`, messageTimer: 50 }
   }, [])
 
   const startGame = useCallback(() => {
@@ -301,95 +247,14 @@ export default function Fighter() {
     canvas.height = canvas.parentElement.clientHeight
 
     let raf
+    let spacePressed = false
 
-    const processInput = (robot, input, opponent, s) => {
-      const data = ROBOTS[robot.type]
-      if (robot.state === 'ko') return
-      if (robot.state === 'hitstun' || robot.state === 'blockstun') {
-        robot.stateTimer--
-        if (robot.stateTimer <= 0) { robot.state = 'idle'; robot.comboCount = 0 }
-        return
-      }
-
-      robot.facing = opponent.x > robot.x ? 1 : -1
-      robot.blocking = input.block
-
-      if (robot.state === 'attack') {
-        robot.stateTimer--
-        const move = data.moves[robot.currentMove]
-        const elapsed = (move.startup + move.active + move.recovery) - robot.stateTimer
-
-        if (elapsed >= move.startup && elapsed < move.startup + move.active) {
-          const hitX = robot.x + robot.facing * move.range
-          if (Math.abs(hitX - opponent.x) < 30 && !opponent._hitThisMove) {
-            opponent._hitThisMove = true
-            const blocked = opponent.blocking && move.type !== 'low'
-            if (blocked) {
-              opponent.state = 'blockstun'
-              opponent.stateTimer = BLOCK_STUN
-              opponent.vx = robot.facing * 2
-              opponent.health -= 1
-              s.particles.push({ x: opponent.x, y: opponent.y - 40, vx: 0, vy: -1, life: 20, text: 'BLOCK', color: '#888' })
-            } else {
-              opponent.health -= move.damage
-              opponent.state = 'hitstun'
-              opponent.stateTimer = move.hitstun
-              opponent.vx = robot.facing * KNOCKBACK
-              opponent.headBob = 6
-              opponent.comboCount++
-
-              // Hit sparks
-              const sparkColor = data.accent
-              for (let i = 0; i < 8; i++) {
-                const ang = Math.random() * Math.PI * 2
-                const spd = 2 + Math.random() * 4
-                s.particles.push({ x: opponent.x - robot.facing * 10, y: opponent.y - 35, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 8 + Math.random() * 6, color: sparkColor })
-              }
-
-              // Damage text
-              s.particles.push({ x: opponent.x, y: opponent.y - 70, vx: 0, vy: -1.5, life: 30, text: `-${move.damage}`, color: '#FF4444' })
-
-              if (opponent.comboCount > 1) {
-                s.particles.push({ x: (robot.x + opponent.x) / 2, y: opponent.y - 85, vx: 0, vy: -1, life: 35, text: `${opponent.comboCount} HIT!`, color: '#FFD700' })
-              }
-
-              if (opponent.health <= 0) {
-                opponent.health = 0
-                opponent.state = 'ko'
-                opponent.stateTimer = 120
-              }
-            }
-          }
-        }
-
-        if (robot.stateTimer <= 0) {
-          robot.state = 'idle'
-          robot.currentMove = null
-        }
-        return
-      }
-
-      // Movement
-      if (input.left) { robot.vx = -MOVE_SPEED; robot.state = 'walk' }
-      else if (input.right) { robot.vx = MOVE_SPEED; robot.state = 'walk' }
-      else { robot.vx = 0; if (robot.state === 'walk') robot.state = 'idle' }
-
-      // Attacks
-      let moveName = null
-      if (input.uppercut) moveName = 'uppercut'
-      else if (input.hook) moveName = 'hook'
-      else if (input.body) moveName = 'body'
-      else if (input.punch) moveName = 'jab'
-
-      if (moveName) {
-        robot.state = 'attack'
-        robot.currentMove = moveName
-        const m = data.moves[moveName]
-        robot.stateTimer = m.startup + m.active + m.recovery
-        robot.vx = 0
-        if (robot === s.p1) s.p2._hitThisMove = false
-        else s.p1._hitThisMove = false
-      }
+    const tryPunch = (robot) => {
+      if (robot.cooldown > 0 || robot.stunTimer > 0 || robot.ko) return
+      robot.punchState = 'punching'
+      robot.punchTimer = 6
+      robot.cooldown = PUNCH_COOLDOWN
+      robot.punchCount++
     }
 
     const update = () => {
@@ -398,17 +263,15 @@ export default function Fighter() {
       s.tick++
 
       if (s.messageTimer > 0) { s.messageTimer--; return }
-
       if (s.roundOver) {
-        // KO head pop animation
-        const loser = s.p1.state === 'ko' ? s.p1 : s.p2.state === 'ko' ? s.p2 : null
-        if (loser && loser.headPopY < 40) {
-          loser.headPopY += 2
+        // Animate head pop
+        const loser = s.p1.ko ? s.p1 : s.p2.ko ? s.p2 : null
+        if (loser && loser.headPopY < HEAD_POP_MAX) {
+          loser.headPopY += HEAD_POP_SPEED
         }
-
         s.roundEndTimer--
         if (s.roundEndTimer <= 0) {
-          if (s.p1.roundsWon >= ROUNDS_TO_WIN || s.p2.roundsWon >= ROUNDS_TO_WIN) {
+          if (s.p1.roundsWon >= 3 || s.p2.roundsWon >= 3) {
             setScreen('gameover')
             return
           }
@@ -420,220 +283,269 @@ export default function Fighter() {
         return
       }
 
-      s.roundTimer--
+      // Player punch — spacebar tap
+      // (handled in keydown event below)
 
-      // Player input
-      const p1Input = {
-        left: keysRef.current['a'], right: keysRef.current['d'],
-        punch: keysRef.current['f'], hook: keysRef.current['g'],
-        uppercut: keysRef.current['h'], body: keysRef.current['r'],
-        block: keysRef.current['s'],
+      // AI punching
+      if (s.p2.cooldown <= 0 && s.p2.stunTimer <= 0 && !s.p2.ko) {
+        if (Math.random() < AI_PUNCH_CHANCE) {
+          tryPunch(s.p2)
+        }
       }
-      const p2Input = aiUpdate(s.p2, s.p1, s.tick)
 
-      processInput(s.p1, p1Input, s.p2, s)
-      processInput(s.p2, p2Input, s.p1, s)
-
-      // Physics
+      // Process both robots
       for (const r of [s.p1, s.p2]) {
-        r.x += r.vx
-        r.vx *= 0.8
-        r.x = Math.max(RING_LEFT, Math.min(s.ringRight, r.x))
-        if (r.headBob > 0) r.headBob -= 0.5
+        if (r.cooldown > 0) r.cooldown--
+        if (r.stunTimer > 0) r.stunTimer--
+
+        if (r.punchState === 'punching') {
+          r.punchTimer--
+          if (r.punchTimer <= 0) {
+            r.punchState = 'retracting'
+            r.punchTimer = 5
+          }
+        } else if (r.punchState === 'retracting') {
+          r.punchTimer--
+          if (r.punchTimer <= 0) r.punchState = 'idle'
+        }
       }
 
-      // Push apart
-      const dist = Math.abs(s.p1.x - s.p2.x)
-      if (dist < 40) {
-        const push = (40 - dist) / 2
-        s.p1.x -= Math.sign(s.p1.x - s.p2.x) * push || push
-        s.p2.x -= Math.sign(s.p2.x - s.p1.x) * push || -push
+      // Hit detection — punch connects at peak extension
+      const checkHit = (attacker, defender, s) => {
+        if (attacker.punchState !== 'punching' || attacker.punchTimer !== 3) return // only on frame 3
+        if (defender.stunTimer > 0 || defender.ko) return
+
+        // If defender is also punching at the same time — clash, both stun
+        if (defender.punchState === 'punching') {
+          attacker.stunTimer = 8
+          defender.stunTimer = 8
+          attacker.punchState = 'idle'
+          defender.punchState = 'idle'
+          // Clash sparks
+          const mx = (s.w / 2)
+          for (let i = 0; i < 10; i++) {
+            const ang = Math.random() * Math.PI * 2
+            const spd = 2 + Math.random() * 4
+            s.particles.push({ x: mx, y: 190, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 10, color: '#FFD700' })
+          }
+          s.particles.push({ x: mx, y: 160, vx: 0, vy: -1, life: 25, text: 'CLASH!', color: '#FFD700' })
+          return
+        }
+
+        // Hit connects
+        defender.health -= HIT_DAMAGE
+        defender.stunTimer = HIT_STUN
+        defender.punchState = 'idle'
+
+        // Sparks
+        const hitX = s.w / 2 + (attacker === s.p1 ? 20 : -20)
+        const sparkColor = ROBOTS[attacker.type].accent
+        for (let i = 0; i < 6; i++) {
+          const ang = Math.random() * Math.PI * 2
+          const spd = 1 + Math.random() * 3
+          s.particles.push({ x: hitX, y: 190, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 8, color: sparkColor })
+        }
+        s.particles.push({ x: hitX, y: 160, vx: 0, vy: -1.5, life: 25, text: 'HIT!', color: sparkColor })
+
+        if (defender.health <= 0) {
+          defender.health = 0
+          defender.ko = true
+          attacker.roundsWon++
+          s.roundOver = true
+          s.roundEndTimer = 140
+          s.message = 'KNOCKOUT!'
+          s.messageTimer = 40
+
+          // Big explosion
+          for (let i = 0; i < 20; i++) {
+            const ang = Math.random() * Math.PI * 2
+            const spd = 2 + Math.random() * 5
+            s.particles.push({ x: hitX, y: 180, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 2, life: 20, color: sparkColor })
+          }
+        }
       }
+
+      checkHit(s.p1, s.p2, s)
+      checkHit(s.p2, s.p1, s)
 
       // Particles
       for (let i = s.particles.length - 1; i >= 0; i--) {
         const p = s.particles[i]
         p.x += p.vx || 0; p.y += p.vy || 0
+        if (!p.text) p.vy += 0.1
         p.life--
         if (p.life <= 0) s.particles.splice(i, 1)
-      }
-
-      // Round end
-      if (s.p1.health <= 0 || s.p2.health <= 0 || s.roundTimer <= 0) {
-        s.roundOver = true
-        s.roundEndTimer = 100
-
-        if (s.p1.health <= 0) {
-          s.p2.roundsWon++
-          s.message = 'KNOCKOUT!'
-        } else if (s.p2.health <= 0) {
-          s.p1.roundsWon++
-          s.message = 'KNOCKOUT!'
-        } else {
-          if (s.p1.health > s.p2.health) s.p1.roundsWon++
-          else if (s.p2.health > s.p1.health) s.p2.roundsWon++
-          s.message = 'TIME!'
-        }
-        s.messageTimer = 50
       }
     }
 
     const draw = () => {
       const s = stateRef.current
       const cw = canvas.width, ch = canvas.height
-      ctx.fillStyle = '#111'
+      ctx.fillStyle = '#0a0a14'
       ctx.fillRect(0, 0, cw, ch)
       if (!s) return
 
-      // Background — arena
-      const bgGrd = ctx.createLinearGradient(0, 0, 0, GROUND_Y)
-      bgGrd.addColorStop(0, '#1a1a2e')
-      bgGrd.addColorStop(1, '#16213e')
+      // Background — arena lights
+      const bgGrd = ctx.createRadialGradient(cw / 2, 60, 20, cw / 2, 200, 300)
+      bgGrd.addColorStop(0, '#1a1a30')
+      bgGrd.addColorStop(1, '#0a0a14')
       ctx.fillStyle = bgGrd
-      ctx.fillRect(0, 0, cw, GROUND_Y)
+      ctx.fillRect(0, 0, cw, ch)
 
-      // Crowd (dots)
-      ctx.fillStyle = '#222'
-      for (let i = 0; i < 60; i++) {
-        const cx2 = (i * 53 + 17) % cw
-        const cy = 30 + (i * 37) % 60
-        ctx.fillRect(cx2, cy, 4, 6)
+      // Crowd
+      for (let i = 0; i < 50; i++) {
+        ctx.fillStyle = `hsl(${(i * 73) % 360}, 30%, 15%)`
+        const cx2 = (i * 47 + 13) % cw
+        const cy = 20 + (i * 31) % 50
+        ctx.fillRect(cx2, cy, 5, 7)
       }
 
-      // Ring floor
-      ctx.fillStyle = '#2a3a5a'
-      ctx.fillRect(RING_LEFT - 20, GROUND_Y, cw - RING_LEFT - RING_RIGHT_PAD + 40, ch - GROUND_Y)
+      // Ring platform
+      ctx.fillStyle = '#2a2a3a'
+      ctx.fillRect(20, 310, cw - 40, 60)
+      ctx.fillStyle = '#3a3a4a'
+      ctx.fillRect(20, 310, cw - 40, 4)
       // Ring mat
-      ctx.fillStyle = '#354a70'
-      ctx.fillRect(RING_LEFT - 10, GROUND_Y, cw - RING_LEFT - RING_RIGHT_PAD + 20, 4)
+      ctx.fillStyle = '#333350'
+      ctx.fillRect(30, 314, cw - 60, 50)
 
       // Ring ropes
       ctx.strokeStyle = '#FF4444'
-      ctx.lineWidth = 2.5
+      ctx.lineWidth = 3
       for (let i = 0; i < 3; i++) {
-        const ropeY = GROUND_Y - 20 - i * 30
         ctx.beginPath()
-        ctx.moveTo(RING_LEFT - 15, ropeY)
-        ctx.lineTo(s.ringRight + 15, ropeY)
+        ctx.moveTo(15, 120 + i * 30)
+        ctx.lineTo(cw - 15, 120 + i * 30)
         ctx.stroke()
       }
-
-      // Ring posts
-      ctx.fillStyle = '#888'
-      ctx.fillRect(RING_LEFT - 18, GROUND_Y - 90, 6, 94)
-      ctx.fillRect(s.ringRight + 12, GROUND_Y - 90, 6, 94)
-      // Post tops
+      // Posts
+      ctx.fillStyle = '#777'
+      ctx.fillRect(12, 100, 6, 218)
+      ctx.fillRect(cw - 18, 100, 6, 218)
       ctx.fillStyle = '#FFD700'
       ctx.beginPath()
-      ctx.arc(RING_LEFT - 15, GROUND_Y - 92, 6, 0, Math.PI * 2)
-      ctx.arc(s.ringRight + 15, GROUND_Y - 92, 6, 0, Math.PI * 2)
+      ctx.arc(15, 98, 6, 0, Math.PI * 2)
+      ctx.arc(cw - 15, 98, 6, 0, Math.PI * 2)
       ctx.fill()
 
-      // Particles
+      // Spotlight
+      ctx.fillStyle = 'rgba(255,255,200,0.03)'
+      ctx.beginPath()
+      ctx.moveTo(cw / 2 - 10, 0)
+      ctx.lineTo(cw / 2 - 80, 310)
+      ctx.lineTo(cw / 2 + 80, 310)
+      ctx.lineTo(cw / 2 + 10, 0)
+      ctx.fill()
+
+      // Particles (behind robots)
       for (const p of s.particles) {
-        if (p.text) {
-          ctx.globalAlpha = p.life / 30
-          ctx.fillStyle = p.color
-          ctx.font = p.text.includes('HIT') ? 'bold 14px monospace' : 'bold 11px monospace'
-          ctx.textAlign = 'center'
-          ctx.fillText(p.text, p.x, p.y)
-        } else {
-          ctx.globalAlpha = p.life / 14
-          ctx.fillStyle = p.color
-          ctx.fillRect(p.x - 2, p.y - 2, 4, 4)
-        }
+        if (p.text) continue
+        ctx.globalAlpha = p.life / 20
+        ctx.fillStyle = p.color
+        ctx.fillRect(p.x - 2, p.y - 2, 4, 4)
       }
       ctx.globalAlpha = 1
 
-      // Robots
-      drawRobot(ctx, s.p1, s.tick, s.ringRight)
-      drawRobot(ctx, s.p2, s.tick, s.ringRight)
+      // Robots — fixed positions, facing each other
+      const p1X = cw / 2 - 60
+      const p2X = cw / 2 + 60
+      const robotY = 270
+
+      drawRobot(ctx, s.p1, p1X, robotY, 1, s.tick)
+      drawRobot(ctx, s.p2, p2X, robotY, -1, s.tick)
+
+      // Text particles (in front)
+      for (const p of s.particles) {
+        if (!p.text) continue
+        ctx.globalAlpha = p.life / 25
+        ctx.fillStyle = p.color
+        ctx.font = p.text === 'CLASH!' ? 'bold 16px monospace' : 'bold 12px monospace'
+        ctx.textAlign = 'center'
+        ctx.fillText(p.text, p.x, p.y)
+      }
+      ctx.globalAlpha = 1
 
       // ── HUD ──
-      const hbW = 140, hbH = 16, hbY = 10
+      const hbW = 120, hbH = 14, hbY = 80
 
       // P1 health
-      ctx.fillStyle = '#333'
-      ctx.fillRect(12, hbY, hbW, hbH)
-      const p1Pct = s.p1.health / HEALTH_MAX
-      const p1Grd = ctx.createLinearGradient(12, 0, 12 + hbW, 0)
-      p1Grd.addColorStop(0, '#FF2222')
-      p1Grd.addColorStop(1, '#FF6644')
-      ctx.fillStyle = p1Grd
-      ctx.fillRect(12, hbY, hbW * p1Pct, hbH)
+      ctx.fillStyle = '#222'
+      ctx.fillRect(20, hbY, hbW, hbH)
+      ctx.fillStyle = '#CC2222'
+      ctx.fillRect(20, hbY, hbW * (s.p1.health / HEALTH_MAX), hbH)
       ctx.strokeStyle = '#666'
-      ctx.lineWidth = 1.5
-      ctx.strokeRect(12, hbY, hbW, hbH)
+      ctx.lineWidth = 1
+      ctx.strokeRect(20, hbY, hbW, hbH)
 
       // P2 health
-      ctx.fillStyle = '#333'
-      ctx.fillRect(cw - 12 - hbW, hbY, hbW, hbH)
-      const p2Pct = s.p2.health / HEALTH_MAX
-      const p2Grd = ctx.createLinearGradient(cw - 12 - hbW, 0, cw - 12, 0)
-      p2Grd.addColorStop(0, '#4466FF')
-      p2Grd.addColorStop(1, '#2244CC')
-      ctx.fillStyle = p2Grd
-      ctx.fillRect(cw - 12 - hbW * p2Pct, hbY, hbW * p2Pct, hbH)
+      ctx.fillStyle = '#222'
+      ctx.fillRect(cw - 20 - hbW, hbY, hbW, hbH)
+      ctx.fillStyle = '#2244CC'
+      ctx.fillRect(cw - 20 - hbW * (s.p2.health / HEALTH_MAX), hbY, hbW * (s.p2.health / HEALTH_MAX), hbH)
       ctx.strokeStyle = '#666'
-      ctx.strokeRect(cw - 12 - hbW, hbY, hbW, hbH)
+      ctx.strokeRect(cw - 20 - hbW, hbY, hbW, hbH)
 
       // Names
       ctx.font = 'bold 10px monospace'
-      ctx.fillStyle = '#FF4444'
       ctx.textAlign = 'left'
-      ctx.fillText('RED ROCKER', 12, hbY + hbH + 12)
-      ctx.fillStyle = '#4488FF'
+      ctx.fillStyle = '#FF4444'
+      ctx.fillText('RED ROCKER', 20, hbY - 4)
       ctx.textAlign = 'right'
-      ctx.fillText('BLUE BOMBER', cw - 12, hbY + hbH + 12)
+      ctx.fillStyle = '#4488FF'
+      ctx.fillText('BLUE BOMBER', cw - 20, hbY - 4)
 
       // Round dots
-      for (let i = 0; i < ROUNDS_TO_WIN; i++) {
+      for (let i = 0; i < 3; i++) {
         ctx.fillStyle = i < s.p1.roundsWon ? '#FFD700' : '#333'
         ctx.beginPath()
-        ctx.arc(14 + i * 14, hbY + hbH + 22, 4, 0, Math.PI * 2)
+        ctx.arc(22 + i * 14, hbY + hbH + 10, 4, 0, Math.PI * 2)
         ctx.fill()
       }
-      for (let i = 0; i < ROUNDS_TO_WIN; i++) {
+      for (let i = 0; i < 3; i++) {
         ctx.fillStyle = i < s.p2.roundsWon ? '#FFD700' : '#333'
         ctx.beginPath()
-        ctx.arc(cw - 14 - i * 14, hbY + hbH + 22, 4, 0, Math.PI * 2)
+        ctx.arc(cw - 22 - i * 14, hbY + hbH + 10, 4, 0, Math.PI * 2)
         ctx.fill()
       }
 
-      // Timer
-      ctx.fillStyle = '#FFD700'
-      ctx.font = 'bold 26px monospace'
-      ctx.textAlign = 'center'
-      ctx.fillText(Math.max(0, Math.ceil(s.roundTimer / 60)), cw / 2, hbY + 22)
-
       // VS
-      ctx.fillStyle = '#555'
-      ctx.font = 'bold 10px monospace'
-      ctx.fillText('VS', cw / 2, hbY + 34)
+      ctx.fillStyle = '#FFD700'
+      ctx.font = 'bold 16px monospace'
+      ctx.textAlign = 'center'
+      ctx.fillText('VS', cw / 2, hbY + 12)
 
       // Message
-      if (s.messageTimer > 0 || (s.message && s.roundOver)) {
+      if (s.messageTimer > 0 || (s.roundOver && s.message)) {
         ctx.fillStyle = s.message === 'KNOCKOUT!' ? '#FF0000' : '#FFD700'
-        ctx.font = 'bold 32px monospace'
+        ctx.font = 'bold 30px monospace'
         ctx.textAlign = 'center'
-        ctx.shadowColor = s.message === 'KNOCKOUT!' ? '#FF000088' : '#FFD70088'
-        ctx.shadowBlur = 16
-        ctx.fillText(s.message, cw / 2, ch / 2 - 40)
+        ctx.shadowColor = s.message === 'KNOCKOUT!' ? '#FF000066' : '#FFD70066'
+        ctx.shadowBlur = 20
+        ctx.fillText(s.message, cw / 2, ch / 2 - 60)
         ctx.shadowBlur = 0
       }
 
-      // Controls
+      // Controls hint
       ctx.fillStyle = '#333'
-      ctx.font = '8px monospace'
+      ctx.font = '9px monospace'
       ctx.textAlign = 'center'
-      ctx.fillText('A/D move · S block · F jab · G hook · H uppercut · R body', cw / 2, ch - 4)
+      ctx.fillText('Tap SPACE to punch! Mash fast to win!', cw / 2, ch - 6)
     }
 
     const loop = () => { update(); draw(); raf = requestAnimationFrame(loop) }
 
     const onKey = (e) => {
-      if (['w', 'a', 's', 'd', 'f', 'g', 'h', 'r'].includes(e.key)) e.preventDefault()
-      keysRef.current[e.key] = e.type === 'keydown'
+      if (e.key === ' ') e.preventDefault()
+      if (e.type === 'keydown' && e.key === ' ' && !spacePressed) {
+        spacePressed = true
+        const s = stateRef.current
+        if (s && screen === 'playing' && !s.roundOver && s.messageTimer <= 0) {
+          tryPunch(s.p1)
+        }
+      }
+      if (e.type === 'keyup' && e.key === ' ') {
+        spacePressed = false
+      }
     }
 
     window.addEventListener('keydown', onKey)
@@ -645,7 +557,7 @@ export default function Fighter() {
   const s = stateRef.current
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#111' }}>
+    <div className="flex flex-col h-full" style={{ background: '#0a0a14' }}>
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
@@ -654,8 +566,10 @@ export default function Fighter() {
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
               {screen === 'gameover' ? (
                 <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#FFD700' }}>
-                    {s && s.p1.roundsWon >= ROUNDS_TO_WIN ? 'RED WINS!' : 'BLUE WINS!'}
+                  <div className="text-xl font-bold mb-2" style={{ color: '#FFD700' }}>
+                    {s && s.p1.roundsWon >= 3
+                      ? 'RED ROCKER WINS!'
+                      : 'BLUE BOMBER WINS!'}
                   </div>
                   <div className="text-sm mb-4" style={{ color: '#888' }}>
                     {s ? `${s.p1.roundsWon} - ${s.p2.roundsWon}` : ''}
@@ -663,15 +577,14 @@ export default function Fighter() {
                 </>
               ) : (
                 <>
-                  <div className="text-xs mb-1" style={{ color: '#FF444488' }}>★ ★ ★</div>
-                  <div className="text-xl font-bold mb-0" style={{ color: '#FF4444' }}>ROCK'EM</div>
+                  <div className="text-xs mb-1" style={{ color: '#FF444466' }}>★ ★ ★</div>
+                  <div className="text-xl font-bold" style={{ color: '#FF4444' }}>ROCK'EM</div>
                   <div className="text-xl font-bold mb-1" style={{ color: '#4488FF' }}>SOCK'EM</div>
                   <div className="text-lg font-bold mb-3" style={{ color: '#FFD700' }}>ROBOTS</div>
                   <div className="text-xs mb-1" style={{ color: '#FF4444' }}>RED ROCKER <span style={{ color: '#666' }}>vs</span> <span style={{ color: '#4488FF' }}>BLUE BOMBER</span></div>
-                  <div className="text-xs mb-1 mt-2" style={{ color: '#666' }}>A/D — move &middot; S — block</div>
-                  <div className="text-xs mb-1" style={{ color: '#666' }}>F — jab &middot; G — hook</div>
-                  <div className="text-xs mb-3" style={{ color: '#666' }}>H — uppercut &middot; R — body shot</div>
-                  <div className="text-xs mb-3" style={{ color: '#555' }}>Best of {ROUNDS_TO_WIN * 2 - 1} &middot; Land an uppercut to pop their head!</div>
+                  <div className="text-sm mt-3 mb-1" style={{ color: '#ccc' }}>Tap SPACEBAR to punch!</div>
+                  <div className="text-xs mb-3" style={{ color: '#666' }}>Mash fast — knock their block off!</div>
+                  <div className="text-xs mb-3" style={{ color: '#555' }}>Best of 5 rounds</div>
                 </>
               )}
               <button
