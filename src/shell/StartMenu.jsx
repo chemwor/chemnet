@@ -133,7 +133,7 @@ export function StartMenu({ onOpenApp, onClose }) {
                     className="absolute"
                     style={{
                       left: '100%',
-                      top: -2,
+                      bottom: -2,
                       background: 'var(--color-surface)',
                       borderTop: '2px solid var(--color-bevel-light)',
                       borderLeft: '2px solid var(--color-bevel-light)',
