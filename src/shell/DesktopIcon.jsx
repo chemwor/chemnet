@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import { AppIcon } from './AppIcon'
 
 export function DesktopIcon({ app, onOpen, index = 0 }) {
   const [selected, setSelected] = useState(false)
@@ -28,7 +29,7 @@ export function DesktopIcon({ app, onOpen, index = 0 }) {
 
   return (
     <motion.button
-      className="desktop-icon flex flex-col items-center gap-1 p-2 rounded w-20 border-none bg-transparent"
+      className="desktop-icon flex flex-col items-center gap-1.5 p-2 rounded w-20 border-none bg-transparent"
       onClick={handleClick}
       onBlur={() => setSelected(false)}
       title={app.label}
@@ -41,12 +42,12 @@ export function DesktopIcon({ app, onOpen, index = 0 }) {
       }}
     >
       <span
-        className="text-3xl select-none"
+        className="select-none"
         style={{
           transition: 'transform 120ms ease-out, filter 120ms ease-out',
         }}
       >
-        {app.icon}
+        <AppIcon icon={app.icon} size={32} />
       </span>
       <span
         className="text-xs text-center leading-tight break-words w-full px-1 rounded-sm"

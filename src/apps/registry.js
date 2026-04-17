@@ -3,7 +3,7 @@ export const APP_REGISTRY = [
   {
     id: 'about',
     label: 'README.txt',
-    icon: '📄',
+    icon: 'document',
     component: () => import('./About/About.jsx'),
     defaultSize: { width: 480, height: 360 },
     defaultPosition: { x: 80, y: 60 },
@@ -15,7 +15,7 @@ export const APP_REGISTRY = [
   {
     id: 'projects',
     label: 'Companies / Projects',
-    icon: '📁',
+    icon: 'folder',
     component: () => import('./Projects/Projects.jsx'),
     defaultSize: { width: 560, height: 420 },
     defaultPosition: { x: 120, y: 80 },
@@ -27,7 +27,7 @@ export const APP_REGISTRY = [
   {
     id: 'blog',
     label: 'Blog',
-    icon: '📝',
+    icon: 'blog',
     component: () => import('./Blog/Blog.jsx'),
     defaultSize: { width: 520, height: 440 },
     defaultPosition: { x: 100, y: 60 },
@@ -39,7 +39,7 @@ export const APP_REGISTRY = [
   {
     id: 'pictures',
     label: 'Pictures',
-    icon: '🖼️',
+    icon: 'pictures',
     component: () => import('./Pictures/Pictures.jsx'),
     defaultSize: { width: 500, height: 400 },
     defaultPosition: { x: 110, y: 50 },
@@ -51,7 +51,7 @@ export const APP_REGISTRY = [
   {
     id: 'videos',
     label: 'Videos',
-    icon: '🎬',
+    icon: 'videos',
     component: () => import('./Videos/Videos.jsx'),
     defaultSize: { width: 520, height: 420 },
     defaultPosition: { x: 120, y: 60 },
@@ -63,7 +63,7 @@ export const APP_REGISTRY = [
   {
     id: 'messageboard',
     label: 'Message Board',
-    icon: '💬',
+    icon: 'message',
     component: () => import('./MessageBoard/MessageBoard.jsx'),
     defaultSize: { width: 480, height: 400 },
     defaultPosition: { x: 130, y: 70 },
@@ -75,7 +75,7 @@ export const APP_REGISTRY = [
   {
     id: 'music',
     label: 'Music',
-    icon: '🎵',
+    icon: 'music',
     component: () => import('./Music/Music.jsx'),
     defaultSize: { width: 440, height: 360 },
     defaultPosition: { x: 140, y: 80 },
@@ -87,7 +87,7 @@ export const APP_REGISTRY = [
   {
     id: 'terminal',
     label: 'Terminal',
-    icon: '💻',
+    icon: 'terminal',
     component: () => import('./Terminal/Terminal.jsx'),
     defaultSize: { width: 500, height: 340 },
     defaultPosition: { x: 200, y: 140 },
@@ -101,7 +101,7 @@ export const APP_REGISTRY = [
   {
     id: 'solitaire',
     label: 'Solitaire',
-    icon: '🃏',
+    icon: 'cards',
     component: () => import('./Solitaire/Solitaire.jsx'),
     defaultSize: { width: 620, height: 560 },
     defaultPosition: { x: 100, y: 40 },
@@ -113,7 +113,7 @@ export const APP_REGISTRY = [
   {
     id: 'minesweeper',
     label: 'Minesweeper',
-    icon: '💣',
+    icon: 'bomb',
     component: () => import('./Minesweeper/Minesweeper.jsx'),
     defaultSize: { width: 280, height: 380 },
     defaultPosition: { x: 160, y: 60 },
@@ -125,7 +125,7 @@ export const APP_REGISTRY = [
   {
     id: 'chess',
     label: 'Chess',
-    icon: '♚',
+    icon: 'chess',
     component: () => import('./Chess/Chess.jsx'),
     defaultSize: { width: 540, height: 480 },
     defaultPosition: { x: 100, y: 20 },
@@ -137,7 +137,7 @@ export const APP_REGISTRY = [
   {
     id: 'pong',
     label: 'Table Tennis',
-    icon: '🏓',
+    icon: 'paddle',
     component: () => import('./Pong/Pong.jsx'),
     defaultSize: { width: 560, height: 400 },
     defaultPosition: { x: 140, y: 60 },
@@ -149,7 +149,7 @@ export const APP_REGISTRY = [
   {
     id: 'asteroids',
     label: 'Asteroids',
-    icon: '☄️',
+    icon: 'rocket',
     component: () => import('./Asteroids/Asteroids.jsx'),
     defaultSize: { width: 560, height: 440 },
     defaultPosition: { x: 120, y: 50 },
@@ -161,7 +161,7 @@ export const APP_REGISTRY = [
   {
     id: 'pacman',
     label: 'Pac-Man',
-    icon: '👾',
+    icon: 'ghost',
     component: () => import('./Pacman/Pacman.jsx'),
     defaultSize: { width: 460, height: 430 },
     defaultPosition: { x: 130, y: 30 },
@@ -173,7 +173,7 @@ export const APP_REGISTRY = [
   {
     id: 'spaceinvaders',
     label: 'Space Invaders',
-    icon: '👽',
+    icon: 'alien',
     component: () => import('./SpaceInvaders/SpaceInvaders.jsx'),
     defaultSize: { width: 520, height: 480 },
     defaultPosition: { x: 110, y: 40 },
@@ -185,7 +185,7 @@ export const APP_REGISTRY = [
   {
     id: 'arkanoid',
     label: 'Arkanoid',
-    icon: '🧱',
+    icon: 'brick',
     component: () => import('./Arkanoid/Arkanoid.jsx'),
     defaultSize: { width: 440, height: 520 },
     defaultPosition: { x: 130, y: 30 },
@@ -197,7 +197,7 @@ export const APP_REGISTRY = [
   {
     id: 'fighter',
     label: "Rock'em Sock'em",
-    icon: '🤖',
+    icon: 'robot',
     component: () => import('./Fighter/Fighter.jsx'),
     defaultSize: { width: 560, height: 420 },
     defaultPosition: { x: 100, y: 30 },
@@ -210,5 +210,5 @@ export const APP_REGISTRY = [
 
 // Category definitions for the Start Menu
 export const MENU_CATEGORIES = [
-  { id: 'games', label: 'Games', icon: '🎮' },
+  { id: 'games', label: 'Games', icon: 'games' },
 ]

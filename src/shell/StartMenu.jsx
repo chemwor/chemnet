@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { APP_REGISTRY, MENU_CATEGORIES } from '../apps/registry'
+import { AppIcon } from './AppIcon'
 
 function MenuItem({ icon, label, hasSubmenu, onClick, onMouseEnter }) {
   return (
@@ -22,7 +23,7 @@ function MenuItem({ icon, label, hasSubmenu, onClick, onMouseEnter }) {
       }}
       onClick={onClick}
     >
-      <span className="w-5 text-center text-sm">{icon}</span>
+      <span className="w-5 flex items-center justify-center shrink-0"><AppIcon icon={icon} size={16} /></span>
       <span className="flex-1 truncate">{label}</span>
       {hasSubmenu && <span className="text-xs ml-1" style={{ opacity: 0.6 }}>▸</span>}
     </button>
@@ -167,13 +168,13 @@ export function StartMenu({ onOpenApp, onClose }) {
 
           {/* Bottom items */}
           <MenuItem
-            icon="⚙️"
+            icon="settings"
             label="Settings"
             onMouseEnter={() => setActiveSubmenu(null)}
             onClick={onClose}
           />
           <MenuItem
-            icon="❓"
+            icon="help"
             label="About ChemNet"
             onMouseEnter={() => setActiveSubmenu(null)}
             onClick={() => handleOpen('about')}

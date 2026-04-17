@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, useAnimationControls } from 'framer-motion'
 import Draggable from 'react-draggable'
+import { AppIcon } from '../shell/AppIcon'
 
 const EXPO_OUT = [0.16, 1, 0.3, 1]
 
@@ -66,10 +67,10 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
           }}
         >
           <span
-            className="text-sm font-bold truncate"
+            className="text-sm font-bold truncate flex items-center gap-1.5"
             style={{ color: 'var(--color-titlebar-text)' }}
           >
-            {app.icon} {app.label}
+            <AppIcon icon={app.icon} size={14} /> {app.label}
           </span>
 
           <div className="flex gap-0.5 ml-2 shrink-0">
