@@ -307,6 +307,39 @@ export default function Asteroids() {
       if (screen === 'playing') {
         drawShip(ctx, s.ship)
       }
+
+      // HUD — drawn on canvas so it never gets clipped
+      if (screen === 'playing') {
+        // Score — top left
+        ctx.fillStyle = '#F0EBE1'
+        ctx.font = 'bold 20px monospace'
+        ctx.textAlign = 'left'
+        ctx.fillText(s.score, 14, 28)
+
+        // Level indicator
+        ctx.font = '12px monospace'
+        ctx.fillStyle = '#666'
+        ctx.fillText(`LEVEL ${s.level}`, 14, 44)
+
+        // Lives — small ship icons top right
+        ctx.strokeStyle = '#F0EBE1'
+        ctx.lineWidth = 1.2
+        for (let i = 0; i < s.lives; i++) {
+          const lx = cw - 24 - i * 22
+          const ly = 22
+          ctx.save()
+          ctx.translate(lx, ly)
+          ctx.rotate(-Math.PI / 2) // point up
+          ctx.beginPath()
+          ctx.moveTo(10, 0)
+          ctx.lineTo(-7, -5)
+          ctx.lineTo(-4, 0)
+          ctx.lineTo(-7, 5)
+          ctx.closePath()
+          ctx.stroke()
+          ctx.restore()
+        }
+      }
     }
 
     const loop = () => {
@@ -349,21 +382,6 @@ export default function Asteroids() {
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#000' }}>
-      {/* HUD */}
-      {screen === 'playing' && (
-        <div
-          className="absolute top-2 left-0 right-0 flex justify-between px-4 pointer-events-none"
-          style={{ zIndex: 2, fontFamily: 'monospace' }}
-        >
-          <span style={{ color: '#F0EBE1', fontSize: 16, fontWeight: 'bold' }}>
-            {hud.score}
-          </span>
-          <span style={{ color: '#F0EBE1', fontSize: 14 }}>
-            {'▲ '.repeat(hud.lives)}
-          </span>
-        </div>
-      )}
-
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
