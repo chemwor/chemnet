@@ -81,7 +81,7 @@ export const APP_REGISTRY = [
     label: 'Pac-Man',
     icon: '👾',
     component: () => import('./Pacman/Pacman.jsx'),
-    defaultSize: { width: 460, height: 540 },
+    defaultSize: { width: 460, height: 430 },
     defaultPosition: { x: 130, y: 30 },
     openOnBoot: false,
     pinned: false,

@@ -4,24 +4,19 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 const MAP_TEMPLATE = [
   '1111111111111111111',
   '1222222212222222221',
-  '1311121212121211131',
-  '1212121212121212121',
+  '1311112212211111321',
   '1222222222222222221',
-  '1211121111121112121',
-  '1222221222122222221',
-  '1111121011101211111',
-  '0000121000001210000',
-  '1111121011101211111',
-  '1000100044400010001',
-  '1111101111101011111',
-  '0000100000000010000',
-  '1111101111101011111',
-  '1222222212222222221',
-  '1211121212121211121',
-  '1322212222222212231',
-  '1121212111112121211',
-  '1222212222222212221',
-  '1211111211121111121',
+  '1221111211112211221',
+  '1222222222222222221',
+  '1221122111122112211',
+  '1222122000221222211',
+  '0002100044400012000',
+  '1222122000221222211',
+  '1221122111122112211',
+  '1222222222222222221',
+  '1221111211112211221',
+  '1222222222222222221',
+  '1311112212211111321',
   '1222222222222222221',
   '1111111111111111111',
 ]
@@ -118,10 +113,10 @@ export default function Pacman() {
     const totalDots = countDots(map)
 
     // Find a good start for pacman (center bottom area)
-    const pacman = { x: 9, y: 16, dir: DIRS.left, nextDir: null, mouthAngle: 0, mouthDir: 1 }
+    const pacman = { x: 9, y: 13, dir: DIRS.left, nextDir: null, mouthAngle: 0, mouthDir: 1 }
 
     const ghosts = GHOST_COLORS.map((color, i) => ({
-      x: 8 + i, y: 10, dir: DIRS.up, color, scared: false, scaredTimer: 0,
+      x: 8 + i, y: 8, dir: DIRS.up, color, scared: false, scaredTimer: 0,
       released: i === 0, releaseTimer: i * 120,
     }))
 
@@ -262,12 +257,12 @@ export default function Pacman() {
             }
             // Reset positions
             p.x = 9
-            p.y = 16
+            p.y = 13
             p.dir = DIRS.left
             p.nextDir = null
             for (let j = 0; j < s.ghosts.length; j++) {
               s.ghosts[j].x = 8 + j
-              s.ghosts[j].y = 10
+              s.ghosts[j].y = 8
               s.ghosts[j].scared = false
               s.ghosts[j].scaredTimer = 0
               s.ghosts[j].released = j === 0
@@ -288,11 +283,11 @@ export default function Pacman() {
         s.dotsEaten = 0
         s.totalDots = countDots(newMap)
         p.x = 9
-        p.y = 16
+        p.y = 13
         p.dir = DIRS.left
         for (let j = 0; j < s.ghosts.length; j++) {
           s.ghosts[j].x = 8 + j
-          s.ghosts[j].y = 10
+          s.ghosts[j].y = 8
           s.ghosts[j].released = j === 0
           s.ghosts[j].releaseTimer = j * 90
           s.ghosts[j].scared = false
