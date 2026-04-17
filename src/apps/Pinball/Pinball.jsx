@@ -4,8 +4,8 @@ const BALL_R = 5
 const GRAVITY = 0.12
 const FLIPPER_LEN = 44
 const FLIPPER_W = 7
-const FLIPPER_REST = 0.45
-const FLIPPER_UP = -0.55
+const FLIPPER_REST_DOWN = 0.5   // rest: tips angled down (V shape)
+const FLIPPER_ACTIVE_UP = -0.5  // active: tips angled up
 const FLIPPER_SPEED = 0.25
 const WALL_BOUNCE = 0.55
 const PLUNGER_MAX = 80
@@ -73,8 +73,8 @@ export default function Pinball() {
     return {
       w, h, pw, cx,
       ball: null,
-      leftFlipper:  { angle: FLIPPER_REST, target: FLIPPER_REST, x: cx - 40, y: flipperY },
-      rightFlipper: { angle: Math.PI - FLIPPER_REST, target: Math.PI - FLIPPER_REST, x: cx + 40, y: flipperY },
+      leftFlipper:  { angle: FLIPPER_REST_DOWN, target: FLIPPER_REST_DOWN, x: cx - 40, y: flipperY },
+      rightFlipper: { angle: FLIPPER_REST_DOWN, target: FLIPPER_REST_DOWN, x: cx + 40, y: flipperY },
       bumpers, lanes, dropTargets, kickers, guides,
       score: 0, balls: 3, multiplier: 1,
       plunger: 0, plungerCharging: false, launched: false,
@@ -138,8 +138,8 @@ export default function Pinball() {
       // Flippers
       const leftActive = keysRef.current['ArrowLeft'] || keysRef.current['a'] || keysRef.current['z']
       const rightActive = keysRef.current['ArrowRight'] || keysRef.current['d'] || keysRef.current['/']
-      lf.target = leftActive ? FLIPPER_UP : FLIPPER_REST
-      rf.target = rightActive ? Math.PI - FLIPPER_UP : Math.PI - FLIPPER_REST
+      lf.target = leftActive ? FLIPPER_ACTIVE_UP : FLIPPER_REST_DOWN
+      rf.target = rightActive ? FLIPPER_ACTIVE_UP : FLIPPER_REST_DOWN
 
       for (const f of [lf, rf]) {
         const diff = f.target - f.angle
