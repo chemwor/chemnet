@@ -109,4 +109,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'fighter',
+    label: 'Street Brawler',
+    icon: '🥊',
+    component: () => import('./Fighter/Fighter.jsx'),
+    defaultSize: { width: 560, height: 420 },
+    defaultPosition: { x: 100, y: 30 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
