@@ -1,58 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import daytimeVideo from '../assets/wallpapers/daytimescreensaver.mp4'
+import nighttimeVideo from '../assets/wallpapers/nighttimescreensaver.mp4'
 
-function Toaster({ delay }) {
-  const [pos, setPos] = useState({
-    x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 800),
-    y: -80 - Math.random() * 400,
-  })
-
-  useEffect(() => {
-    let raf
-    let startTime = null
-    const speed = 60 + Math.random() * 40
-
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp
-      const elapsed = (timestamp - startTime) / 1000
-      setPos(prev => ({
-        x: prev.x - speed * 0.016,
-        y: -80 - Math.random() * 400 + elapsed * speed,
-      }))
-      raf = requestAnimationFrame(animate)
-    }
-
-    const timeout = setTimeout(() => {
-      raf = requestAnimationFrame(animate)
-    }, delay)
-
-    return () => {
-      clearTimeout(timeout)
-      cancelAnimationFrame(raf)
-    }
-  }, [delay])
-
-  return (
-    <div
-      className="absolute text-4xl select-none"
-      style={{
-        left: pos.x,
-        top: pos.y % ((typeof window !== 'undefined' ? window.innerHeight : 600) + 160) - 80,
-        transform: 'rotate(-15deg)',
-      }}
-    >
-      🍞🔥
-    </div>
-  )
+function isDaytime() {
+  const hour = new Date().getHours()
+  return hour >= 6 && hour < 18
 }
 
 export function Screensaver({ onDismiss }) {
-  const toasters = useRef(
-    Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      delay: i * 300,
-    }))
-  ).current
+  const videoRef = useRef(null)
+  const video = isDaytime() ? daytimeVideo : nighttimeVideo
 
   useEffect(() => {
     const handler = () => onDismiss()
@@ -69,21 +27,27 @@ export function Screensaver({ onDismiss }) {
   return (
     <motion.div
       className="fixed inset-0 overflow-hidden"
-      style={{ zIndex: 99998, background: '#000000' }}
+      style={{ zIndex: 99998, background: '#000' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.5 }}
     >
-      {toasters.map(t => (
-        <Toaster key={t.id} delay={t.delay} />
-      ))}
-      <div
-        className="absolute bottom-4 left-0 right-0 text-center text-xs"
-        style={{ color: '#333' }}
-      >
-        Move mouse to dismiss
-      </div>
+      <video
+        ref={videoRef}
+        src={video}
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
     </motion.div>
   )
 }
