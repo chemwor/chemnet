@@ -87,4 +87,15 @@ export const APP_REGISTRY = [
     pinned: false,
     auth: false,
   },
+  {
+    id: 'spaceinvaders',
+    label: 'Space Invaders',
+    icon: '👽',
+    component: () => import('./SpaceInvaders/SpaceInvaders.jsx'),
+    defaultSize: { width: 520, height: 480 },
+    defaultPosition: { x: 110, y: 40 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+  },
 ]
