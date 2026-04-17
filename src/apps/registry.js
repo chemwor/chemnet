@@ -45,7 +45,7 @@ export const APP_REGISTRY = [
   },
   {
     id: 'pong',
-    label: 'Pong',
+    label: 'Table Tennis',
     icon: '🏓',
     component: () => import('./Pong/Pong.jsx'),
     defaultSize: { width: 560, height: 400 },

@@ -1,29 +1,34 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-const PADDLE_H = 60
-const PADDLE_W = 10
-const BALL_SIZE = 8
-const PADDLE_SPEED = 5
-const BALL_SPEED_INIT = 3
-const WINNING_SCORE = 7
-const AI_SPEED = 3.2
+const PADDLE_H = 70
+const PADDLE_W = 12
+const PADDLE_MARGIN = 20
+const BALL_R = 7
+const PADDLE_SPEED = 4.5
+const BALL_SPEED_INIT = 3.5
+const BALL_SPEED_MAX = 8
+const WINNING_SCORE = 11
+const AI_SPEED = 3.0
+const AI_REACTION_ZONE = 15
 
 export default function Pong() {
   const canvasRef = useRef(null)
   const stateRef = useRef(null)
   const keysRef = useRef({})
-  const [scores, setScores] = useState({ player: 0, ai: 0 })
-  const [paused, setPaused] = useState(true)
-  const [winner, setWinner] = useState(null)
+  const [screen, setScreen] = useState('start') // start | playing | paused | gameover
 
-  const resetBall = useCallback((state) => {
+  const resetBall = useCallback((state, serveDir) => {
     const { w, h } = state
+    const dir = serveDir || (Math.random() > 0.5 ? 1 : -1)
+    const angle = (Math.random() - 0.5) * 0.8 // narrow serve angle
     state.ball = {
       x: w / 2,
       y: h / 2,
-      vx: (Math.random() > 0.5 ? 1 : -1) * BALL_SPEED_INIT,
-      vy: (Math.random() - 0.5) * 4,
+      vx: dir * BALL_SPEED_INIT,
+      vy: Math.sin(angle) * 2,
+      speed: BALL_SPEED_INIT,
     }
+    state.serveDelay = 40 // brief pause before ball moves
   }, [])
 
   const initState = useCallback((canvas) => {
@@ -36,41 +41,48 @@ export default function Pong() {
       ball: null,
       playerScore: 0,
       aiScore: 0,
+      serveDelay: 0,
+      rallies: 0,
+      lastHit: null, // 'player' or 'ai'
     }
-    resetBall(state)
+    resetBall(state, 1)
     return state
   }, [resetBall])
 
   const startGame = useCallback(() => {
-    setWinner(null)
-    setScores({ player: 0, ai: 0 })
-    setPaused(false)
-    if (stateRef.current) {
-      stateRef.current.playerScore = 0
-      stateRef.current.aiScore = 0
-      stateRef.current.player.y = stateRef.current.h / 2 - PADDLE_H / 2
-      stateRef.current.ai.y = stateRef.current.h / 2 - PADDLE_H / 2
-      resetBall(stateRef.current)
-    }
-  }, [resetBall])
+    const canvas = canvasRef.current
+    if (!canvas) return
+    canvas.width = canvas.parentElement.clientWidth
+    canvas.height = canvas.parentElement.clientHeight
+    stateRef.current = initState(canvas)
+    setScreen('playing')
+  }, [initState])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    const parent = canvas.parentElement
-    canvas.width = parent.clientWidth
-    canvas.height = parent.clientHeight
+    canvas.width = canvas.parentElement.clientWidth
+    canvas.height = canvas.parentElement.clientHeight
 
-    stateRef.current = initState(canvas)
+    if (!stateRef.current) {
+      stateRef.current = initState(canvas)
+    }
+
     let raf
 
     const update = () => {
       const s = stateRef.current
-      if (!s) return
+      if (!s || screen !== 'playing') return
       const { w, h, ball, player, ai } = s
 
-      // Player movement (arrow keys or W/S)
+      // Serve delay
+      if (s.serveDelay > 0) {
+        s.serveDelay--
+        return
+      }
+
+      // Player movement
       if (keysRef.current['ArrowUp'] || keysRef.current['w']) {
         player.y = Math.max(0, player.y - PADDLE_SPEED)
       }
@@ -78,16 +90,21 @@ export default function Pong() {
         player.y = Math.min(h - PADDLE_H, player.y + PADDLE_SPEED)
       }
 
-      // AI movement — follows ball with slight delay
+      // AI — tracks ball when coming toward it, slight imperfection
       const aiCenter = ai.y + PADDLE_H / 2
+      const aiTarget = ball.y
       if (ball.vx > 0) {
-        // Ball coming toward AI
-        if (aiCenter < ball.y - 10) ai.y += AI_SPEED
-        else if (aiCenter > ball.y + 10) ai.y -= AI_SPEED
+        // Ball coming toward AI — track it
+        if (aiCenter < aiTarget - AI_REACTION_ZONE) {
+          ai.y += Math.min(AI_SPEED, aiTarget - aiCenter)
+        } else if (aiCenter > aiTarget + AI_REACTION_ZONE) {
+          ai.y -= Math.min(AI_SPEED, aiCenter - aiTarget)
+        }
       } else {
-        // Ball going away — drift toward center
-        if (aiCenter < h / 2 - 20) ai.y += AI_SPEED * 0.5
-        else if (aiCenter > h / 2 + 20) ai.y -= AI_SPEED * 0.5
+        // Ball going away — slowly return to center
+        const center = h / 2
+        if (aiCenter < center - 30) ai.y += AI_SPEED * 0.4
+        else if (aiCenter > center + 30) ai.y -= AI_SPEED * 0.4
       }
       ai.y = Math.max(0, Math.min(h - PADDLE_H, ai.y))
 
@@ -96,64 +113,74 @@ export default function Pong() {
       ball.y += ball.vy
 
       // Top/bottom bounce
-      if (ball.y <= 0 || ball.y >= h - BALL_SIZE) {
-        ball.vy *= -1
-        ball.y = ball.y <= 0 ? 0 : h - BALL_SIZE
+      if (ball.y - BALL_R <= 0) {
+        ball.y = BALL_R
+        ball.vy = Math.abs(ball.vy)
+      }
+      if (ball.y + BALL_R >= h) {
+        ball.y = h - BALL_R
+        ball.vy = -Math.abs(ball.vy)
       }
 
-      // Player paddle collision (left side)
+      // Player paddle collision
+      const pLeft = PADDLE_MARGIN
+      const pRight = PADDLE_MARGIN + PADDLE_W
       if (
-        ball.x <= PADDLE_W + 12 &&
-        ball.x >= 12 &&
-        ball.y + BALL_SIZE >= player.y &&
-        ball.y <= player.y + PADDLE_H &&
-        ball.vx < 0
+        ball.vx < 0 &&
+        ball.x - BALL_R <= pRight &&
+        ball.x + BALL_R >= pLeft &&
+        ball.y >= player.y - BALL_R &&
+        ball.y <= player.y + PADDLE_H + BALL_R
       ) {
-        ball.vx = Math.abs(ball.vx) * 1.05
-        ball.vy += ((ball.y - (player.y + PADDLE_H / 2)) / PADDLE_H) * 3
-        ball.x = PADDLE_W + 13
+        // Where on paddle did it hit? -1 to 1
+        const hitPos = (ball.y - (player.y + PADDLE_H / 2)) / (PADDLE_H / 2)
+        const newAngle = hitPos * (Math.PI / 3) // max 60 degree deflection
+        ball.speed = Math.min(BALL_SPEED_MAX, ball.speed + 0.15)
+        ball.vx = Math.cos(newAngle) * ball.speed
+        ball.vy = Math.sin(newAngle) * ball.speed
+        ball.x = pRight + BALL_R
+        s.rallies++
+        s.lastHit = 'player'
       }
 
-      // AI paddle collision (right side)
+      // AI paddle collision
+      const aiLeft = w - PADDLE_MARGIN - PADDLE_W
+      const aiRight = w - PADDLE_MARGIN
       if (
-        ball.x + BALL_SIZE >= w - PADDLE_W - 12 &&
-        ball.x + BALL_SIZE <= w - 12 &&
-        ball.y + BALL_SIZE >= ai.y &&
-        ball.y <= ai.y + PADDLE_H &&
-        ball.vx > 0
+        ball.vx > 0 &&
+        ball.x + BALL_R >= aiLeft &&
+        ball.x - BALL_R <= aiRight &&
+        ball.y >= ai.y - BALL_R &&
+        ball.y <= ai.y + PADDLE_H + BALL_R
       ) {
-        ball.vx = -Math.abs(ball.vx) * 1.05
-        ball.vy += ((ball.y - (ai.y + PADDLE_H / 2)) / PADDLE_H) * 3
-        ball.x = w - PADDLE_W - 12 - BALL_SIZE - 1
+        const hitPos = (ball.y - (ai.y + PADDLE_H / 2)) / (PADDLE_H / 2)
+        const newAngle = Math.PI - hitPos * (Math.PI / 3)
+        ball.speed = Math.min(BALL_SPEED_MAX, ball.speed + 0.15)
+        ball.vx = Math.cos(newAngle) * ball.speed
+        ball.vy = Math.sin(newAngle) * ball.speed
+        ball.x = aiLeft - BALL_R
+        s.rallies++
+        s.lastHit = 'ai'
       }
 
       // Scoring
-      if (ball.x < 0) {
+      if (ball.x + BALL_R < 0) {
         s.aiScore++
-        setScores({ player: s.playerScore, ai: s.aiScore })
-        if (s.aiScore >= WINNING_SCORE) {
-          setWinner('CPU')
-          setPaused(true)
+        if (s.aiScore >= WINNING_SCORE && s.aiScore - s.playerScore >= 2) {
+          setScreen('gameover')
         } else {
-          resetBall(s)
+          resetBall(s, 1) // serve toward player
         }
+        s.rallies = 0
       }
-      if (ball.x > w) {
+      if (ball.x - BALL_R > w) {
         s.playerScore++
-        setScores({ player: s.playerScore, ai: s.aiScore })
-        if (s.playerScore >= WINNING_SCORE) {
-          setWinner('You')
-          setPaused(true)
+        if (s.playerScore >= WINNING_SCORE && s.playerScore - s.aiScore >= 2) {
+          setScreen('gameover')
         } else {
-          resetBall(s)
+          resetBall(s, -1) // serve toward AI
         }
-      }
-
-      // Cap ball speed
-      const speed = Math.sqrt(ball.vx ** 2 + ball.vy ** 2)
-      if (speed > 10) {
-        ball.vx = (ball.vx / speed) * 10
-        ball.vy = (ball.vy / speed) * 10
+        s.rallies = 0
       }
     }
 
@@ -162,43 +189,111 @@ export default function Pong() {
       if (!s) return
       const { w, h, ball, player, ai } = s
 
-      // Background
-      ctx.fillStyle = '#000'
+      // Table background — dark green
+      ctx.fillStyle = '#1B5E20'
       ctx.fillRect(0, 0, w, h)
 
-      // Center dashed line
-      ctx.setLineDash([6, 6])
-      ctx.strokeStyle = '#333'
+      // Table border
+      ctx.strokeStyle = '#fff'
       ctx.lineWidth = 2
+      ctx.strokeRect(2, 2, w - 4, h - 4)
+
+      // Center line (net)
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+      ctx.lineWidth = 2
+      ctx.setLineDash([])
       ctx.beginPath()
       ctx.moveTo(w / 2, 0)
       ctx.lineTo(w / 2, h)
       ctx.stroke()
-      ctx.setLineDash([])
 
-      // Scores
-      ctx.fillStyle = '#444'
-      ctx.font = 'bold 40px monospace'
+      // Net posts
+      ctx.fillStyle = '#888'
+      ctx.fillRect(w / 2 - 2, 0, 4, 6)
+      ctx.fillRect(w / 2 - 2, h - 6, 4, 6)
+
+      // Center circle
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.arc(w / 2, h / 2, 40, 0, Math.PI * 2)
+      ctx.stroke()
+
+      // Score display — top center
+      ctx.font = 'bold 32px "Courier New", monospace'
       ctx.textAlign = 'center'
-      ctx.fillText(s.playerScore, w / 2 - 40, 50)
-      ctx.fillText(s.aiScore, w / 2 + 40, 50)
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'
+      ctx.fillText(`${s.playerScore}`, w / 2 - 36, 36)
+      ctx.fillStyle = 'rgba(255,255,255,0.4)'
+      ctx.fillText(':', w / 2, 36)
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'
+      ctx.fillText(`${s.aiScore}`, w / 2 + 36, 36)
 
-      // Paddles
-      ctx.fillStyle = '#F0EBE1'
-      ctx.fillRect(12, player.y, PADDLE_W, PADDLE_H)
-      ctx.fillRect(w - PADDLE_W - 12, ai.y, PADDLE_W, PADDLE_H)
+      // Player/CPU labels
+      ctx.font = '10px monospace'
+      ctx.fillStyle = 'rgba(255,255,255,0.3)'
+      ctx.textAlign = 'left'
+      ctx.fillText('YOU', 10, h - 8)
+      ctx.textAlign = 'right'
+      ctx.fillText('CPU', w - 10, h - 8)
 
-      // Ball
-      ctx.fillStyle = '#FF6B35'
-      ctx.shadowColor = '#FF6B35'
-      ctx.shadowBlur = 10
-      ctx.fillRect(ball.x, ball.y, BALL_SIZE, BALL_SIZE)
+      // Paddles — white with rounded ends
+      ctx.fillStyle = '#fff'
+      // Player paddle
+      const pr = PADDLE_W / 2
+      ctx.beginPath()
+      ctx.arc(PADDLE_MARGIN + pr, player.y + pr, pr, Math.PI, 0)
+      ctx.arc(PADDLE_MARGIN + pr, player.y + PADDLE_H - pr, pr, 0, Math.PI)
+      ctx.closePath()
+      ctx.fill()
+
+      // AI paddle
+      ctx.beginPath()
+      ctx.arc(w - PADDLE_MARGIN - pr, ai.y + pr, pr, Math.PI, 0)
+      ctx.arc(w - PADDLE_MARGIN - pr, ai.y + PADDLE_H - pr, pr, 0, Math.PI)
+      ctx.closePath()
+      ctx.fill()
+
+      // Ball — white with shadow
+      ctx.fillStyle = '#fff'
+      ctx.shadowColor = 'rgba(0,0,0,0.4)'
+      ctx.shadowBlur = 6
+      ctx.shadowOffsetX = 2
+      ctx.shadowOffsetY = 2
+      ctx.beginPath()
+      ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.shadowColor = 'transparent'
       ctx.shadowBlur = 0
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 0
+
+      // Ball highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'
+      ctx.beginPath()
+      ctx.arc(ball.x - 2, ball.y - 2, 2.5, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Serve indicator
+      if (s.serveDelay > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'
+        ctx.font = '12px monospace'
+        ctx.textAlign = 'center'
+        ctx.fillText('SERVE', w / 2, h / 2 + 30)
+      }
+
+      // Rally counter
+      if (s.rallies > 2) {
+        ctx.fillStyle = 'rgba(255,255,255,0.2)'
+        ctx.font = '10px monospace'
+        ctx.textAlign = 'center'
+        ctx.fillText(`Rally: ${s.rallies}`, w / 2, h - 8)
+      }
     }
 
     const loop = () => {
       if (!stateRef.current) return
-      if (!paused && !winner) update()
+      update()
       draw()
       raf = requestAnimationFrame(loop)
     }
@@ -219,48 +314,50 @@ export default function Pong() {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('keyup', onKey)
     }
-  }, [initState, resetBall, paused, winner])
+  }, [initState, resetBall, screen])
+
+  const s = stateRef.current
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#000' }}>
+    <div className="flex flex-col h-full" style={{ background: '#1B5E20' }}>
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-        {/* Overlay states */}
-        {(paused || winner) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2 }}>
+        {(screen === 'start' || screen === 'gameover') && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2, background: 'rgba(0,0,0,0.7)' }}>
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
-              {winner ? (
+              {screen === 'gameover' ? (
                 <>
-                  <div className="text-2xl font-bold mb-2" style={{ color: '#FF6B35' }}>
-                    {winner} Win{winner === 'You' ? '' : 's'}!
+                  <div className="text-xl font-bold mb-1" style={{ color: '#fff' }}>
+                    {s && s.playerScore > s.aiScore ? 'You Win!' : 'CPU Wins'}
                   </div>
-                  <div className="text-sm mb-4" style={{ color: '#666' }}>
-                    {scores.player} – {scores.ai}
+                  <div className="text-lg mb-1" style={{ color: '#8BC34A' }}>
+                    {s ? `${s.playerScore} – ${s.aiScore}` : ''}
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                    First to {WINNING_SCORE}, win by 2
                   </div>
                 </>
               ) : (
-                <div className="text-lg mb-2" style={{ color: '#F0EBE1' }}>
-                  PONG
-                </div>
+                <>
+                  <div className="text-2xl font-bold mb-1" style={{ color: '#fff' }}>
+                    TABLE TENNIS
+                  </div>
+                  <div className="text-xs mb-1" style={{ color: '#8BC34A' }}>
+                    First to {WINNING_SCORE}, win by 2
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                    ↑ ↓ or W/S to move paddle
+                  </div>
+                </>
               )}
               <button
                 onClick={startGame}
-                className="px-4 py-1.5 text-sm font-bold cursor-pointer border-none"
-                style={{
-                  background: '#FF6B35',
-                  color: '#000',
-                  fontFamily: 'monospace',
-                }}
+                className="px-5 py-2 text-sm font-bold cursor-pointer border-none rounded"
+                style={{ background: '#8BC34A', color: '#1B5E20', fontFamily: 'monospace' }}
               >
-                {winner ? 'Play Again' : 'Start'}
+                {screen === 'gameover' ? 'Play Again' : 'Start Game'}
               </button>
-              <div className="mt-3 text-xs" style={{ color: '#555' }}>
-                ↑↓ or W/S to move
-              </div>
-              <div className="text-xs" style={{ color: '#555' }}>
-                First to {WINNING_SCORE} wins
-              </div>
             </div>
           </div>
         )}
