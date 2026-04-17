@@ -92,8 +92,11 @@ export function DesktopShell({ windowManager }) {
         {/* Layer 1 — CRT scanlines + noise + vignette */}
         <CRTOverlay />
 
-        {/* Layer 2 — Desktop icons with staggered fade-in */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2" style={{ zIndex: 2 }}>
+        {/* Layer 2 — Desktop icons with staggered fade-in, wrapping into columns */}
+        <div
+          className="absolute top-4 left-4 flex flex-col flex-wrap gap-2 content-start"
+          style={{ zIndex: 2, maxHeight: 'calc(100% - 16px)' }}
+        >
           {APP_REGISTRY.map((app, i) => (
             <DesktopIcon key={app.id} app={app} onOpen={openApp} index={i} />
           ))}
