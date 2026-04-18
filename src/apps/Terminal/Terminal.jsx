@@ -323,9 +323,16 @@ export default function Terminal() {
         addOutput(cwd)
         break
 
-      case 'whoami':
-        addOutput('eric')
+      case 'whoami': {
+        const responses = [
+          `Good question.\n\nAre you the person you are at work? The one at home?\nThe one at 2am staring at the ceiling? The one your\nmother thinks you are? The one your friends know?\n\nWe contain multitudes. We wear masks on top of masks\nuntil we forget which face is underneath.\n\nBut sure — for the purposes of this terminal:\n\n> eric\n\n(...probably.)`,
+          `whoami?\n\nBrother, I've been asking myself that for years.\n\nAm I the guy who writes code? The one who plays guitar\nbadly? The one who pretends to understand wine?\n\nPhilosophers spent centuries on this question and the\nbest they came up with was "I think, therefore I am."\n\nCool. I think about pizza a lot. Am I pizza?\n\n> eric (allegedly)`,
+          `Depends who's asking.\n\nTo the compiler: a process with elevated privileges.\nTo my mom: "the one who's good with computers."\nTo my BJJ coach: "the guy who keeps forgetting to\n  breathe."\nTo this terminal: root.\n\nBut really — who is anyone? We're all just\ncollections of habits pretending to be a person.\n\n> eric (most days)`,
+          `$ whoami\n\nRunning identity check...\n\n  Name:        Eric Chemwor\n  Masks worn:  professional, casual, creative,\n               late-night-overthinker, "I'm fine"\n  Real self:   [REDACTED]\n  Confidence:  varies by day\n  Impostor:    syndrome active\n\nConclusion: inconclusive.\nTry again after coffee.`,
+        ]
+        addOutput(responses[Math.floor(Math.random() * responses.length)])
         break
+      }
 
       case 'whois':
         if (args[0] === 'eric') {
