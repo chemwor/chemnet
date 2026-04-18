@@ -1,21 +1,29 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, useAnimationControls } from 'framer-motion'
 import Draggable from 'react-draggable'
 import { AppIcon } from '../shell/AppIcon'
 
 const EXPO_OUT = [0.16, 1, 0.3, 1]
+const MIN_W = 200
+const MIN_H = 120
+const HANDLE = 6
 
 export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize, onFocus, onOffscreen, children }) {
   const nodeRef = useRef(null)
   const [position, setPosition] = useState(app.defaultPosition ?? { x: 100, y: 100 })
+  const [size, setSize] = useState({
+    w: app.defaultSize?.width ?? 480,
+    h: app.defaultSize?.height ?? 360,
+  })
   const [dragging, setDragging] = useState(false)
+  const [resizing, setResizing] = useState(null) // null or { dir, startX, startY, startW, startH, startPosX, startPosY }
   const glowControls = useAnimationControls()
   const prevZRef = useRef(windowState.zIndex)
 
   const isMaximized = windowState.maximized
   const isMinimized = windowState.minimized
 
-  // Focus glow: detect zIndex increase (brought to front)
+  // Focus glow
   useEffect(() => {
     if (windowState.zIndex > prevZRef.current && !isMinimized) {
       glowControls.start({
@@ -30,12 +38,83 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
     prevZRef.current = windowState.zIndex
   }, [windowState.zIndex, isMinimized, glowControls])
 
-  const sizeStyle = {
-    width: app.defaultSize?.width ?? 480,
-    height: app.defaultSize?.height ?? 360,
+  // Resize handlers
+  const handleResizeStart = useCallback((e, dir) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onFocus()
+    setResizing({
+      dir,
+      startX: e.clientX,
+      startY: e.clientY,
+      startW: size.w,
+      startH: size.h,
+      startPosX: position.x,
+      startPosY: position.y,
+    })
+  }, [size, position, onFocus])
+
+  useEffect(() => {
+    if (!resizing) return
+
+    const handleMouseMove = (e) => {
+      const dx = e.clientX - resizing.startX
+      const dy = e.clientY - resizing.startY
+      const { dir, startW, startH, startPosX, startPosY } = resizing
+
+      let newW = startW
+      let newH = startH
+      let newX = startPosX
+      let newY = startPosY
+
+      if (dir.includes('e')) newW = Math.max(MIN_W, startW + dx)
+      if (dir.includes('s')) newH = Math.max(MIN_H, startH + dy)
+      if (dir.includes('w')) {
+        const dw = Math.min(dx, startW - MIN_W)
+        newW = startW - dw
+        newX = startPosX + dw
+      }
+      if (dir.includes('n')) {
+        const dh = Math.min(dy, startH - MIN_H)
+        newH = startH - dh
+        newY = startPosY + dh
+      }
+
+      setSize({ w: newW, h: newH })
+      setPosition({ x: newX, y: newY })
+    }
+
+    const handleMouseUp = () => setResizing(null)
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [resizing])
+
+  // Cursor for each resize direction
+  const resizeCursors = {
+    n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize',
+    ne: 'nesw-resize', nw: 'nwse-resize', se: 'nwse-resize', sw: 'nesw-resize',
   }
 
-  // The inner animated content — shared between maximized and normal modes
+  const resizeHandles = !isMaximized && (
+    <>
+      {/* Edge handles */}
+      <div onMouseDown={(e) => handleResizeStart(e, 'n')} style={{ position: 'absolute', top: -HANDLE/2, left: HANDLE, right: HANDLE, height: HANDLE, cursor: 'ns-resize', zIndex: 1 }} />
+      <div onMouseDown={(e) => handleResizeStart(e, 's')} style={{ position: 'absolute', bottom: -HANDLE/2, left: HANDLE, right: HANDLE, height: HANDLE, cursor: 'ns-resize', zIndex: 1 }} />
+      <div onMouseDown={(e) => handleResizeStart(e, 'w')} style={{ position: 'absolute', top: HANDLE, bottom: HANDLE, left: -HANDLE/2, width: HANDLE, cursor: 'ew-resize', zIndex: 1 }} />
+      <div onMouseDown={(e) => handleResizeStart(e, 'e')} style={{ position: 'absolute', top: HANDLE, bottom: HANDLE, right: -HANDLE/2, width: HANDLE, cursor: 'ew-resize', zIndex: 1 }} />
+      {/* Corner handles */}
+      <div onMouseDown={(e) => handleResizeStart(e, 'nw')} style={{ position: 'absolute', top: -HANDLE/2, left: -HANDLE/2, width: HANDLE*2, height: HANDLE*2, cursor: 'nwse-resize', zIndex: 2 }} />
+      <div onMouseDown={(e) => handleResizeStart(e, 'ne')} style={{ position: 'absolute', top: -HANDLE/2, right: -HANDLE/2, width: HANDLE*2, height: HANDLE*2, cursor: 'nesw-resize', zIndex: 2 }} />
+      <div onMouseDown={(e) => handleResizeStart(e, 'sw')} style={{ position: 'absolute', bottom: -HANDLE/2, left: -HANDLE/2, width: HANDLE*2, height: HANDLE*2, cursor: 'nesw-resize', zIndex: 2 }} />
+      <div onMouseDown={(e) => handleResizeStart(e, 'se')} style={{ position: 'absolute', bottom: -HANDLE/2, right: -HANDLE/2, width: HANDLE*2, height: HANDLE*2, cursor: 'nwse-resize', zIndex: 2 }} />
+    </>
+  )
+
   const innerContent = (
     <motion.div
       className="flex flex-col h-full"
@@ -111,14 +190,13 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
       nodeRef={nodeRef}
       handle=".titlebar"
       position={position}
+      disabled={!!resizing}
       onStart={() => setDragging(true)}
       onStop={(_, data) => {
         setDragging(false)
-        const w = app.defaultSize?.width ?? 480
-        const h = app.defaultSize?.height ?? 360
         const vw = window.innerWidth
         const vh = window.innerHeight
-        if (data.x + w < 20 || data.x > vw - 20 || data.y + h < 20 || data.y > vh - 60) {
+        if (data.x + size.w < 20 || data.x > vw - 20 || data.y + size.h < 20 || data.y > vh - 60) {
           onOffscreen?.()
           setPosition(app.defaultPosition ?? { x: 100, y: 100 })
         } else {
@@ -128,10 +206,16 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
     >
       <div
         ref={nodeRef}
-        style={{ position: 'absolute', zIndex: windowState.zIndex, ...sizeStyle }}
+        style={{
+          position: 'absolute',
+          zIndex: windowState.zIndex,
+          width: size.w,
+          height: size.h,
+        }}
         className="flex flex-col"
         onMouseDown={onFocus}
       >
+        {resizeHandles}
         {innerContent}
       </div>
     </Draggable>
