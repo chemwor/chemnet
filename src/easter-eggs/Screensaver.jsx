@@ -11,9 +11,13 @@ function isDaytime() {
 
 export function Screensaver({ onDismiss }) {
   const gif = useMemo(() => {
-    // 10% chance of the scary screensaver
-    if (Math.random() < 0.1) return scaryGif
-    return isDaytime() ? daytimeGif : nighttimeGif
+    const hour = new Date().getHours()
+    // 3am-4am: scary screensaver
+    if (hour === 3) return scaryGif
+    // 6am-6pm: daytime
+    if (hour >= 6 && hour < 18) return daytimeGif
+    // everything else: nighttime
+    return nighttimeGif
   }, [])
 
   useEffect(() => {
