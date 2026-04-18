@@ -1,46 +1,46 @@
 import { useState, useEffect, useRef } from 'react'
 
 const LINES = [
-  { text: '> cat README.txt', delay: 0, style: 'command' },
-  { text: '', delay: 300 },
-  { text: '╔══════════════════════════════════════════╗', delay: 400, style: 'border' },
-  { text: '║         Welcome to ChemNet v1.0          ║', delay: 500, style: 'border' },
-  { text: '╚══════════════════════════════════════════╝', delay: 600, style: 'border' },
-  { text: '', delay: 700 },
-  { text: "Hey — welcome to my site.", delay: 800 },
-  { text: '', delay: 900 },
-  { text: "I'm Eric Chemwor.", delay: 1000 },
-  { text: '', delay: 1100 },
-  { text: 'When building this site, I wanted to chase the', delay: 1200 },
-  { text: 'feeling of the old internet — back when the web', delay: 1300 },
-  { text: 'was weird, personal, and actually fun to explore.', delay: 1400 },
-  { text: '', delay: 1500 },
-  { text: 'I wanted to build myself a tech garden that\'s', delay: 1600 },
-  { text: 'free from the homogeny of social media. A space', delay: 1700 },
-  { text: 'that has some personality. Something that feels', delay: 1800 },
-  { text: 'like mine.', delay: 1900 },
-  { text: '', delay: 2000 },
-  { text: 'So here it is.', delay: 2100, style: 'accent' },
-  { text: '', delay: 2200 },
-  { text: 'Explore — there\'s a lot to do here:', delay: 2300 },
-  { text: '', delay: 2400 },
-  { text: '  → Blogs      writings on building, life, and code', delay: 2500, style: 'item' },
-  { text: '  → Videos     things I\'ve been watching and making', delay: 2600, style: 'item' },
-  { text: '  → Projects   companies and products I\'ve built', delay: 2700, style: 'item' },
-  { text: '  → Games      solitaire, chess, asteroids, and more', delay: 2800, style: 'item' },
-  { text: '  → Music      what I\'ve been listening to', delay: 2900, style: 'item' },
-  { text: '  → Terminal   if you know, you know', delay: 3000, style: 'item' },
-  { text: '', delay: 3100 },
-  { text: 'There are also some easter eggs hidden around.', delay: 3200 },
-  { text: 'Good luck finding them.', delay: 3300, style: 'accent' },
-  { text: '', delay: 3400 },
-  { text: 'If you\'re interested in anything, have questions,', delay: 3500 },
-  { text: 'or just want to say what\'s up — feel free to', delay: 3600 },
-  { text: 'reach out. I\'d love to hear from you.', delay: 3700 },
-  { text: '', delay: 3800 },
-  { text: '— Eric', delay: 3900, style: 'accent' },
-  { text: '', delay: 4000 },
-  { text: '> _', delay: 4200, style: 'cursor' },
+  { text: '> ./README.sh', delay: 0, style: 'command' },
+  { text: '', delay: 600 },
+  { text: '╔══════════════════════════════════════════╗', delay: 900, style: 'border' },
+  { text: '║         Welcome to ChemNet v1.0          ║', delay: 1100, style: 'border' },
+  { text: '╚══════════════════════════════════════════╝', delay: 1300, style: 'border' },
+  { text: '', delay: 1800 },
+  { text: "Hey — welcome to my site.", delay: 2200 },
+  { text: '', delay: 2800 },
+  { text: "I'm Eric Chemwor.", delay: 3300 },
+  { text: '', delay: 3900 },
+  { text: 'When building this site, I wanted to chase the', delay: 4400 },
+  { text: 'feeling of the old internet — back when the web', delay: 5000 },
+  { text: 'was weird, personal, and actually fun to explore.', delay: 5600 },
+  { text: '', delay: 6200 },
+  { text: 'I wanted to build myself a tech garden that\'s', delay: 6800 },
+  { text: 'free from the homogeny of social media. A space', delay: 7400 },
+  { text: 'that has some personality. Something that feels', delay: 8000 },
+  { text: 'like mine.', delay: 8600 },
+  { text: '', delay: 9200 },
+  { text: 'So here it is.', delay: 9800, style: 'accent' },
+  { text: '', delay: 10400 },
+  { text: 'Explore — there\'s a lot to do here:', delay: 11000 },
+  { text: '', delay: 11500 },
+  { text: '  → Blogs      writings on building, life, and code', delay: 12000, style: 'item' },
+  { text: '  → Videos     things I\'ve been watching and making', delay: 12500, style: 'item' },
+  { text: '  → Projects   companies and products I\'ve built', delay: 13000, style: 'item' },
+  { text: '  → Games      solitaire, chess, asteroids, and more', delay: 13500, style: 'item' },
+  { text: '  → Music      what I\'ve been listening to', delay: 14000, style: 'item' },
+  { text: '  → Terminal   if you know, you know', delay: 14500, style: 'item' },
+  { text: '', delay: 15200 },
+  { text: 'There are also some easter eggs hidden around.', delay: 15800 },
+  { text: 'Good luck finding them.', delay: 16500, style: 'accent' },
+  { text: '', delay: 17200 },
+  { text: 'If you\'re interested in anything, have questions,', delay: 17800 },
+  { text: 'or just want to say what\'s up — feel free to', delay: 18500 },
+  { text: 'reach out. I\'d love to hear from you.', delay: 19200 },
+  { text: '', delay: 19900 },
+  { text: '— Eric', delay: 20500, style: 'accent' },
+  { text: '', delay: 21200 },
+  { text: '> _', delay: 22000, style: 'cursor' },
 ]
 
 export default function About() {
@@ -52,11 +52,10 @@ export default function About() {
     if (hasRun.current) return
     hasRun.current = true
 
-    LINES.forEach((line, i) => {
-      setTimeout(() => {
-        setVisibleCount(i + 1)
-      }, line.delay)
-    })
+    const timers = LINES.map((line, i) =>
+      setTimeout(() => setVisibleCount(i + 1), line.delay)
+    )
+    return () => timers.forEach(clearTimeout)
   }, [])
 
   useEffect(() => {

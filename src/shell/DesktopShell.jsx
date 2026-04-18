@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useEffect, useState, useCallback } from 'react'
+import { Suspense, lazy, useMemo, useEffect, useState, useCallback, useRef } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { APP_REGISTRY } from '../apps/registry'
 import { DesktopIcon } from './DesktopIcon'
@@ -36,6 +36,14 @@ function BusyCursor() {
 
 export function DesktopShell({ windowManager }) {
   const { windows, openApp, closeApp, minimizeApp, maximizeApp, focusApp } = windowManager
+  const bootedRef = useRef(false)
+
+  // Open boot apps on first mount
+  useEffect(() => {
+    if (bootedRef.current) return
+    bootedRef.current = true
+    APP_REGISTRY.filter(a => a.openOnBoot).forEach(a => openApp(a.id))
+  }, [openApp])
 
   // Easter egg hooks
   const { idle, resetIdle } = useIdleTimer(60000)

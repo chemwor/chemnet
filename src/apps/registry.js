@@ -2,8 +2,8 @@ export const APP_REGISTRY = [
   // ── Content ──
   {
     id: 'about',
-    label: 'README.txt',
-    icon: 'document',
+    label: 'README.sh',
+    icon: 'terminal',
     component: () => import('./About/About.jsx'),
     defaultSize: { width: 480, height: 360 },
     defaultPosition: { x: 80, y: 60 },
