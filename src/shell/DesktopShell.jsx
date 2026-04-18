@@ -50,6 +50,16 @@ export function DesktopShell({ windowManager }) {
   const konamiActive = useKonamiCode()
   const { triggered: bsodActive, dismiss: dismissBsod } = useSecretCode('IDDQD')
 
+  // Terminal open app command
+  useEffect(() => {
+    const handler = (e) => {
+      const appId = e.detail
+      if (APP_REGISTRY.find(a => a.id === appId)) openApp(appId)
+    }
+    window.addEventListener('ericOS:openApp', handler)
+    return () => window.removeEventListener('ericOS:openApp', handler)
+  }, [openApp])
+
   // Meltdown state
   const [meltdownActive, setMeltdownActive] = useState(false)
 
