@@ -25,3 +25,4 @@ dist-ssr
 
 # Large media files (host externally)
 *.mp4
+src/assets/wallpapers/*.gif

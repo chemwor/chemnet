@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import daytimeVideo from '../assets/wallpapers/daytimescreensaver.mp4'
-import nighttimeVideo from '../assets/wallpapers/nighttimescreensaver.mp4'
+import daytimeGif from '../assets/wallpapers/daytimescreensaver.gif'
+import nighttimeGif from '../assets/wallpapers/nighttimescreensaver.gif'
+import scaryGif from '../assets/wallpapers/scaryscreensaver.gif'
 
 function isDaytime() {
   const hour = new Date().getHours()
@@ -9,8 +10,11 @@ function isDaytime() {
 }
 
 export function Screensaver({ onDismiss }) {
-  const videoRef = useRef(null)
-  const video = isDaytime() ? daytimeVideo : nighttimeVideo
+  const gif = useMemo(() => {
+    // 10% chance of the scary screensaver
+    if (Math.random() < 0.1) return scaryGif
+    return isDaytime() ? daytimeGif : nighttimeGif
+  }, [])
 
   useEffect(() => {
     const handler = () => onDismiss()
@@ -33,13 +37,9 @@ export function Screensaver({ onDismiss }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <video
-        ref={videoRef}
-        src={video}
-        autoPlay
-        loop
-        muted
-        playsInline
+      <img
+        src={gif}
+        alt=""
         style={{
           position: 'absolute',
           inset: 0,
