@@ -46,12 +46,9 @@ const LINES = [
 export default function About() {
   const [visibleCount, setVisibleCount] = useState(0)
   const containerRef = useRef(null)
-  const hasRun = useRef(false)
 
   useEffect(() => {
-    if (hasRun.current) return
-    hasRun.current = true
-
+    setVisibleCount(0)
     const timers = LINES.map((line, i) =>
       setTimeout(() => setVisibleCount(i + 1), line.delay)
     )
