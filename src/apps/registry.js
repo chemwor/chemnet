@@ -121,6 +121,20 @@ export const APP_REGISTRY = [
     category: null,
   },
 
+  // ── Stats ──
+  {
+    id: 'stats',
+    label: 'Scoreboard',
+    icon: 'trophy',
+    component: () => import('./Stats/Stats.jsx'),
+    defaultSize: { width: 520, height: 460 },
+    defaultPosition: { x: 120, y: 40 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+    category: 'games',
+  },
+
   // ── Games ──
   {
     id: 'solitaire',

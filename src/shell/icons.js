@@ -2,6 +2,9 @@
 // These are original designs inspired by the retro computing era
 
 export const ICONS = {
+  // Trophy — scoreboard
+  trophy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 2h8v5c0 2.5-1.5 4-4 4s-4-1.5-4-4z" fill="#FFD700" stroke="#B8860B" stroke-width=".6"/><rect x="7" y="11" width="2" height="2" fill="#B8860B"/><rect x="5" y="13" width="6" height="2" fill="#888" stroke="#666" stroke-width=".3"/><path d="M4 3H2v3c0 1.5 1 2 2 2z" fill="#FFD700" stroke="#B8860B" stroke-width=".4"/><path d="M12 3h2v3c0 1.5-1 2-2 2z" fill="#FFD700" stroke="#B8860B" stroke-width=".4"/><text x="8" y="8" fill="#B8860B" font-size="5" font-family="serif" text-anchor="middle" font-weight="bold">1</text></svg>`,
+
   // Email — envelope
   email: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" fill="#fff" stroke="#000" stroke-width=".7"/><path d="M1 3l7 5 7-5" fill="none" stroke="#000" stroke-width=".7"/><rect x="1" y="3" width="14" height="2" fill="#ff0"/></svg>`,
 
