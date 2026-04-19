@@ -16,218 +16,88 @@ const FS = {
     children: ['about.txt', 'projects', 'blog', 'music', 'pictures', 'videos', '.hidden', '.ssh'],
   },
   '/home/eric/about.txt': {
-    type: 'file',
-    content: `Eric Chemwor
-─────────────
-Builder. Engineer. Guitarist. BJJ practitioner.
-
-Based out of Nairobi → the world.
-Building things that matter, one commit at a time.
-
-Currently working on: ChemNet, DMHOA, MGN
-Currently reading: Meditations by Marcus Aurelius
-Currently listening to: Kendrick, J. Cole, Afrobeats
-
-"Ship it. Learn from it. Ship the next one."`,
+    type: 'file', date: 'Mar 01 2026',
+    content: `Eric Chemwor\n─────────────\nBuilder. Engineer. Guitarist. BJJ practitioner.\n\nBased out of Nairobi → the world.\nBuilding things that matter, one commit at a time.\n\nCurrently working on: ChemNet, DMHOA, MGN\nCurrently reading: Meditations by Marcus Aurelius\nCurrently listening to: Kendrick, J. Cole, Afrobeats\n\n"Ship it. Learn from it. Ship the next one."`,
   },
-  '/home/eric/projects': {
-    type: 'dir',
-    children: ['dmhoa.txt', 'mgn.txt', 'chemnet.txt', 'blitzsquares.txt'],
-  },
+  '/home/eric/projects': { type: 'dir', date: 'Apr 01 2026', children: ['dmhoa.txt', 'mgn.txt', 'chemnet.txt', 'blitzsquares.txt'] },
   '/home/eric/projects/dmhoa.txt': {
-    type: 'file',
-    content: `DMHOA — Homeowners Association Platform
-────────────────────────────────────────
-A platform to help HOAs communicate, manage dues,
-and coordinate community events. Built because our
-HOA was stuck in the dark ages of paper notices.
-
-Stack: React, Node.js, PostgreSQL, Stripe
-Status: Live and growing`,
+    type: 'file', date: 'Jan 15 2025',
+    content: `DMHOA — Homeowners Association Platform\n────────────────────────────────────────\nA platform to help HOAs communicate, manage dues,\nand coordinate community events. Built because our\nHOA was stuck in the dark ages of paper notices.\n\nStack: React, Node.js, PostgreSQL, Stripe\nStatus: Live and growing`,
   },
   '/home/eric/projects/mgn.txt': {
-    type: 'file',
-    content: `MGN — Local News Network
-────────────────────────
-Hyperlocal news platform connecting communities
-with the stories that matter to them. Filling the
-gap left by dying local newspapers.
-
-Stack: Next.js, Supabase, Mapbox
-Status: In development`,
+    type: 'file', date: 'Aug 22 2025',
+    content: `MGN — Local News Network\n────────────────────────\nHyperlocal news platform connecting communities\nwith the stories that matter to them. Filling the\ngap left by dying local newspapers.\n\nStack: Next.js, Supabase, Mapbox\nStatus: In development`,
   },
   '/home/eric/projects/chemnet.txt': {
-    type: 'file',
-    content: `ChemNet — This Site
-────────────────────
-A personal site styled as a Win95 desktop OS.
-Built to chase the feeling of the old internet.
-
-Stack: React, Vite, react95, Tailwind, Framer Motion
-Status: You're looking at it`,
+    type: 'file', date: 'Apr 09 2026',
+    content: `ChemNet — This Site\n────────────────────\nA personal site styled as a Win95 desktop OS.\nBuilt to chase the feeling of the old internet.\n\nStack: React, Vite, react95, Tailwind, Framer Motion\nStatus: You're looking at it`,
   },
   '/home/eric/projects/blitzsquares.txt': {
-    type: 'file',
-    content: `BlitzSquares — Football Squares Game
-─────────────────────────────────────
-Real-time football squares game for Super Bowl
-parties and watch groups. Automated scoring,
-live updates, cash out.
-
-Stack: React Native, Firebase
-Status: Seasonal`,
+    type: 'file', date: 'Feb 01 2025',
+    content: `BlitzSquares — Football Squares Game\n─────────────────────────────────────\nReal-time football squares game for Super Bowl\nparties and watch groups. Automated scoring,\nlive updates, cash out.\n\nStack: React Native, Firebase\nStatus: Seasonal`,
   },
-  '/home/eric/blog': {
-    type: 'dir',
-    children: ['why-i-build.txt', 'chess-and-business.txt', 'kenyan-in-tech.txt'],
-  },
+  '/home/eric/blog': { type: 'dir', date: 'Mar 15 2026', children: ['why-i-build.txt', 'chess-and-business.txt', 'kenyan-in-tech.txt'] },
   '/home/eric/blog/why-i-build.txt': {
-    type: 'file',
-    content: `The best projects come from scratching your own itch.
-Ship it. Learn from it. Ship the next one.
-
-(Open the Blog app for the full post)`,
+    type: 'file', date: 'Mar 15 2026',
+    content: `The best projects come from scratching your own itch.\nShip it. Learn from it. Ship the next one.\n\n(Open the Blog app for the full post)`,
   },
   '/home/eric/blog/chess-and-business.txt': {
-    type: 'file',
-    content: `Control the center. Think three moves ahead.
-Sacrifice pieces strategically. Tempo is everything.
-
-(Open the Blog app for the full post)`,
+    type: 'file', date: 'Feb 28 2026',
+    content: `Control the center. Think three moves ahead.\nSacrifice pieces strategically. Tempo is everything.\n\n(Open the Blog app for the full post)`,
   },
   '/home/eric/blog/kenyan-in-tech.txt': {
-    type: 'file',
-    content: `Kenyans built M-Pesa before the rest of the world
-understood mobile payments. Build for the people in
-front of you, not the people on TechCrunch.
-
-(Open the Blog app for the full post)`,
+    type: 'file', date: 'Feb 10 2026',
+    content: `Kenyans built M-Pesa before the rest of the world\nunderstood mobile payments. Build for the people in\nfront of you, not the people on TechCrunch.\n\n(Open the Blog app for the full post)`,
   },
-  '/home/eric/music': {
-    type: 'dir',
-    children: ['now-playing.txt', 'gear.txt'],
-  },
+  '/home/eric/music': { type: 'dir', date: 'Apr 05 2026', children: ['now-playing.txt', 'gear.txt'] },
   '/home/eric/music/now-playing.txt': {
-    type: 'file',
-    content: `Now Playing:
-  Kendrick Lamar — GNX
-  J. Cole — The Fall Off
-  Burna Boy — I Told Them
-  Tyler, the Creator — CHROMAKOPIA`,
+    type: 'file', date: 'Apr 05 2026',
+    content: `Now Playing:\n  Kendrick Lamar — GNX\n  J. Cole — The Fall Off\n  Burna Boy — I Told Them\n  Tyler, the Creator — CHROMAKOPIA`,
   },
   '/home/eric/music/gear.txt': {
-    type: 'file',
-    content: `Guitar Gear:
-  Fender Stratocaster (MIM, sunburst)
-  Orange Crush 20RT
-  Boss DS-1 Distortion
-  TC Electronic Hall of Fame Reverb
-  Snark clip-on tuner (the essentials)`,
+    type: 'file', date: 'Dec 20 2025',
+    content: `Guitar Gear:\n  Fender Stratocaster (MIM, sunburst)\n  Orange Crush 20RT\n  Boss DS-1 Distortion\n  TC Electronic Hall of Fame Reverb\n  Snark clip-on tuner (the essentials)`,
   },
-  '/home/eric/pictures': {
-    type: 'dir',
-    children: ['nairobi.jpg', 'kilimanjaro.jpg', 'setup.jpg'],
-  },
-  '/home/eric/pictures/nairobi.jpg': {
-    type: 'file',
-    content: `[IMAGE: Nairobi skyline at sunset, 2024]
-(Open the Pictures app to view)`,
-  },
-  '/home/eric/pictures/kilimanjaro.jpg': {
-    type: 'file',
-    content: `[IMAGE: Summit of Kilimanjaro, Uhuru Peak, 5895m]
-(Open the Pictures app to view)`,
-  },
-  '/home/eric/pictures/setup.jpg': {
-    type: 'file',
-    content: `[IMAGE: Desk setup — dual monitors, mechanical keyboard, coffee]
-(Open the Pictures app to view)`,
-  },
-  '/home/eric/videos': {
-    type: 'dir',
-    children: ['README.txt'],
-  },
-  '/home/eric/videos/README.txt': {
-    type: 'file',
-    content: `Videos coming soon. Open the Videos app to check.`,
-  },
+  '/home/eric/pictures': { type: 'dir', date: 'Mar 10 2026', children: ['nairobi.jpg', 'kilimanjaro.jpg', 'setup.jpg'] },
+  '/home/eric/pictures/nairobi.jpg': { type: 'file', date: 'Jun 14 2024', content: `[IMAGE: Nairobi skyline at sunset, 2024]\n(Open the Pictures app to view)` },
+  '/home/eric/pictures/kilimanjaro.jpg': { type: 'file', date: 'Dec 18 2025', content: `[IMAGE: Summit of Kilimanjaro, Uhuru Peak, 5895m]\n(Open the Pictures app to view)` },
+  '/home/eric/pictures/setup.jpg': { type: 'file', date: 'Mar 10 2026', content: `[IMAGE: Desk setup — dual monitors, mechanical keyboard, coffee]\n(Open the Pictures app to view)` },
+  '/home/eric/videos': { type: 'dir', date: 'Apr 01 2026', children: ['README.txt'] },
+  '/home/eric/videos/README.txt': { type: 'file', date: 'Apr 01 2026', content: `Videos coming soon. Open the Videos app to check.` },
 
   // ── Hidden files ──
-  '/home/eric/.hidden': {
-    type: 'dir',
-    children: ['thoughts.txt', 'todo.txt', 'easter-egg.txt', 'manifesto.txt'],
-  },
+  '/home/eric/.hidden': { type: 'dir', date: 'Apr 09 2026', children: ['thoughts.txt', 'todo.txt', 'easter-egg.txt', 'manifesto.txt'] },
   '/home/eric/.hidden/thoughts.txt': {
-    type: 'file',
-    content: `3am thoughts:
-─────────────
-Is a hotdog a sandwich?
-If you try to fail and succeed, which did you do?
-The person who invented "knock knock" jokes deserves a no-bell prize.
-We live on a rock floating in infinite void and people get mad about fonts.`,
+    type: 'file', date: 'Apr 12 2026',
+    content: `3am thoughts:\n─────────────\nIs a hotdog a sandwich?\nIf you try to fail and succeed, which did you do?\nThe person who invented "knock knock" jokes deserves a no-bell prize.\nWe live on a rock floating in infinite void and people get mad about fonts.`,
   },
   '/home/eric/.hidden/todo.txt': {
-    type: 'file',
-    content: `TODO:
-  [x] Build personal site
-  [x] Make it look like Win95
-  [x] Add games
-  [x] Add easter eggs
-  [ ] Touch grass
-  [ ] Stop adding features at 2am
-  [ ] Actually write blog posts`,
+    type: 'file', date: 'Apr 17 2026',
+    content: `TODO:\n  [x] Build personal site\n  [x] Make it look like Win95\n  [x] Add games\n  [x] Add easter eggs\n  [ ] Touch grass\n  [ ] Stop adding features at 2am\n  [ ] Actually write blog posts`,
   },
   '/home/eric/.hidden/easter-egg.txt': {
-    type: 'file',
-    content: `🎉 You found a secret file!
-
-Here are some hints:
-  • Type "IDDQD" anywhere on the site
-  • Try the Konami Code (↑↑↓↓←→←→BA)
-  • Visit at 3am for a surprise
-  • Try "sudo rm -rf /" in this terminal
-  • Right-click the desktop
-
-There might be more. Keep looking.`,
+    type: 'file', date: 'Apr 09 2026',
+    content: `🎉 You found a secret file!\n\nHere are some hints:\n  • Type "IDDQD" anywhere on the site\n  • Try the Konami Code (↑↑↓↓←→←→BA)\n  • Visit at 3am for a surprise\n  • Try "sudo rm -rf /" in this terminal\n  • Right-click the desktop\n\nThere might be more. Keep looking.`,
   },
-  '/home/eric/.ssh': {
-    type: 'dir',
-    children: ['id_rsa.pub'],
-  },
-  '/home/eric/.ssh/id_rsa.pub': {
-    type: 'file',
-    content: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQAB...
-(nice try 😏)`,
-  },
-
   '/home/eric/.hidden/manifesto.txt': {
-    type: 'file',
-    content: `THE CHEMNET MANIFESTO
-═════════════════════
-
-1. The internet should be fun again.
-2. Personal sites > social media profiles.
-3. Ship things. Break things. Fix things. Repeat.
-4. Build for people, not algorithms.
-5. Leave easter eggs everywhere.
-6. Every website should have games.
-7. The old internet was better and we all know it.
-
-    — e.c.`,
+    type: 'file', date: 'Apr 09 2026',
+    content: `THE CHEMNET MANIFESTO\n═════════════════════\n\n1. The internet should be fun again.\n2. Personal sites > social media profiles.\n3. Ship things. Break things. Fix things. Repeat.\n4. Build for people, not algorithms.\n5. Leave easter eggs everywhere.\n6. Every website should have games.\n7. The old internet was better and we all know it.\n\n    — e.c.`,
   },
+  '/home/eric/.ssh': { type: 'dir', date: 'Jan 01 2025', children: ['id_rsa.pub'] },
+  '/home/eric/.ssh/id_rsa.pub': { type: 'file', date: 'Jan 01 2025', content: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQAB...\n(nice try 😏)` },
 
   // ── System files ──
-  '/usr': { type: 'dir', children: ['bin', 'local'] },
-  '/usr/bin': { type: 'dir', children: ['games'] },
-  '/usr/bin/games': { type: 'file', content: 'Try: open solitaire, open chess, open asteroids, open pacman' },
-  '/usr/local': { type: 'dir', children: [] },
-  '/etc': { type: 'dir', children: ['motd', 'hostname'] },
-  '/etc/motd': { type: 'file', content: 'Welcome to ChemNet OS v1.0\nA place to explore.' },
-  '/etc/hostname': { type: 'file', content: 'chemnet' },
-  '/var': { type: 'dir', children: ['log'] },
-  '/var/log': { type: 'dir', children: ['system.log'] },
-  '/var/log/system.log': { type: 'file', content: '[OK] Desktop loaded\n[OK] Games initialized\n[OK] Easter eggs armed\n[OK] Vibes: immaculate' },
-  '/tmp': { type: 'dir', children: [] },
+  '/usr': { type: 'dir', date: 'Jan 01 2026', children: ['bin', 'local'] },
+  '/usr/bin': { type: 'dir', date: 'Jan 01 2026', children: ['games'] },
+  '/usr/bin/games': { type: 'file', date: 'Apr 09 2026', content: 'Try: open solitaire, open chess, open asteroids, open pacman' },
+  '/usr/local': { type: 'dir', date: 'Jan 01 2026', children: [] },
+  '/etc': { type: 'dir', date: 'Jan 01 2026', children: ['motd', 'hostname'] },
+  '/etc/motd': { type: 'file', date: 'Apr 01 2026', content: 'Welcome to ChemNet OS v1.0\nA place to explore.' },
+  '/etc/hostname': { type: 'file', date: 'Jan 01 2026', content: 'chemnet' },
+  '/var': { type: 'dir', date: 'Jan 01 2026', children: ['log'] },
+  '/var/log': { type: 'dir', date: 'Apr 19 2026', children: ['system.log'] },
+  '/var/log/system.log': { type: 'file', date: 'Apr 19 2026', content: '[OK] Desktop loaded\n[OK] Games initialized\n[OK] Easter eggs armed\n[OK] Vibes: immaculate' },
+  '/tmp': { type: 'dir', date: 'Apr 19 2026', children: [] },
 }
 
 function resolvePath(cwd, path) {
@@ -369,13 +239,16 @@ export default function Terminal() {
           if (items.length === 0) {
             addOutput('(empty directory)')
           } else {
-            const formatted = items.map(item => {
+            const rows = items.map(item => {
               const fullPath = target === '/' ? '/' + item : target + '/' + item
               const child = FS[fullPath]
-              if (child?.type === 'dir') return item + '/'
-              return item
+              const isDir = child?.type === 'dir'
+              const name = isDir ? item + '/' : item
+              const date = child?.date || ''
+              const type = isDir ? '<DIR>' : '     '
+              return `${date.padEnd(13)}${type}  ${name}`
             })
-            addOutput(formatted.join('  '))
+            addOutput(rows.join('\n'))
           }
         }
         break
