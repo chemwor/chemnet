@@ -29,7 +29,7 @@ export function DesktopIcon({ app, onOpen, index = 0 }) {
 
   return (
     <motion.button
-      className="desktop-icon flex flex-col items-center gap-1.5 p-2 rounded w-20 border-none bg-transparent"
+      className="desktop-icon flex flex-col items-center gap-1.5 p-2 rounded border-none bg-transparent"
       onClick={handleClick}
       onBlur={() => setSelected(false)}
       title={app.label}
@@ -50,7 +50,7 @@ export function DesktopIcon({ app, onOpen, index = 0 }) {
         <AppIcon icon={app.icon} size={32} />
       </span>
       <span
-        className="text-xs text-center leading-tight break-words w-full px-1 rounded-sm"
+        className="text-xs text-center leading-tight whitespace-nowrap px-1 rounded-sm"
         style={{
           color: 'var(--color-text-primary)',
           textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
