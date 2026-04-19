@@ -65,23 +65,27 @@ const FS = {
   '/home/eric/videos': { type: 'dir', date: 'Apr 19 2026', children: ['README.txt'] },
   '/home/eric/videos/README.txt': { type: 'file', date: 'Apr 19 2026', content: `Videos coming soon. Open the Videos app to check.` },
 
-  // ── Hidden files ──
+  // ── Hidden files (polished + raw drafts) ──
   '/home/eric/.hidden': { type: 'dir', date: 'Apr 19 2026', children: ['thoughts.txt', 'todo.txt', 'easter-egg.txt', 'manifesto.txt'] },
   '/home/eric/.hidden/thoughts.txt': {
     type: 'file', date: 'Apr 19 2026',
-    content: `3am thoughts:\n─────────────\nIs a hotdog a sandwich?\nIf you try to fail and succeed, which did you do?\nThe person who invented "knock knock" jokes deserves a no-bell prize.\nWe live on a rock floating in infinite void and people get mad about fonts.`,
+    content: `3am Thoughts\n─────────────\nIs a hotdog a sandwich? The structural argument says yes — starch on both sides of a protein. But the vibes say no. Vibes matter.\n\nIf you try to fail and succeed, which have you done? This kept me up for an hour. I still don't have an answer.\n\nThe person who invented knock-knock jokes deserves a no-bell prize. I'm not sorry.\n\nWe exist on a rock hurtling through infinite void at 67,000 mph and people lose their minds over font choices. Then again, I spent three hours picking the green for this terminal. So maybe I get it.`,
+    raw: `3am thoughts\n\nis a hotdog a sandwich?? i think technically yes but it feels wrong\n\nif u try to fail and u succeed... did u fail or succeed. been thinking abt this for like an hour\n\nknock knock jokes. no bell prize. lol\n\nwe literally live on a flying rock in space and ppl get mad about fonts. tbf i just spent 3 hrs picking this green color so maybe im the problem`,
   },
   '/home/eric/.hidden/todo.txt': {
     type: 'file', date: 'Apr 19 2026',
-    content: `TODO:\n  [x] Build personal site\n  [x] Make it look like Win95\n  [x] Add games\n  [x] Add easter eggs\n  [ ] Touch grass\n  [ ] Stop adding features at 2am\n  [ ] Actually write blog posts`,
+    content: `TODO\n────\n  [x] Build personal site\n  [x] Make it look like Win95\n  [x] Add games\n  [x] Add easter eggs\n  [x] Add layer system\n  [ ] Touch grass\n  [ ] Stop adding features at 2am\n  [ ] Actually write blog posts\n  [ ] Learn to cook something besides eggs\n  [ ] Call mom back`,
+    raw: `todo\n\nbuild site ✓\nmake it look old ✓\ngames ✓\neaster eggs ✓\nlayers ✓\ngo outside lol\nstop coding at 2am (wont happen)\nwrite blogs (keep saying ill do this)\nlearn to cook more than eggs\ncall mom she called twice`,
   },
   '/home/eric/.hidden/easter-egg.txt': {
     type: 'file', date: 'Apr 19 2026',
-    content: `🎉 You found a secret file!\n\nHere are some hints:\n  • Type "IDDQD" anywhere on the site\n  • Try the Konami Code (↑↑↓↓←→←→BA)\n  • Visit at 3am for a surprise\n  • Try "sudo rm -rf /" in this terminal\n  • Right-click the desktop\n\nThere might be more. Keep looking.`,
+    content: `You found a secret file.\n\nHere's what's hidden around the site:\n  • Type "IDDQD" anywhere — triggers a BSOD\n  • Konami Code (↑↑↓↓←→←→BA) — inverts the screen\n  • Visit between 3am-4am — scary screensaver\n  • "sudo rm -rf /" in this terminal — meltdown sequence\n  • Right-click the desktop — context menu\n  • Drag a window off screen — it snaps back with a message\n\nThere are more. I won't say how many.`,
+    raw: `easter eggs i put in\n\nIDDQD = bsod lol classic doom reference\nkonami code = screen goes weird for 3 sec\n3am screensaver = the scary one haha\nsudo rm -rf = fake meltdown, ppl will panic\nright click desktop = context menu w "why are you right clicking"\ndrag window off screen = snaps back, says hey where u taking that\n\nthink thats all of them? maybe ill add more idk`,
   },
   '/home/eric/.hidden/manifesto.txt': {
     type: 'file', date: 'Apr 19 2026',
-    content: `THE CHEMNET MANIFESTO\n═════════════════════\n\n1. The internet should be fun again.\n2. Personal sites > social media profiles.\n3. Ship things. Break things. Fix things. Repeat.\n4. Build for people, not algorithms.\n5. Leave easter eggs everywhere.\n6. Every website should have games.\n7. The old internet was better and we all know it.\n\n    — e.c.`,
+    content: `THE CHEMNET MANIFESTO\n═════════════════════\n\n1. The internet should be fun again.\n2. Personal sites should matter more than social media profiles.\n3. Ship things. Break things. Fix things. Repeat.\n4. Build for people, not algorithms.\n5. Leave easter eggs everywhere.\n6. Every website should have games.\n7. The old internet was better and we all know it.\n\n    — e.c.`,
+    raw: `manifesto or whatever\n\n1. internet should be fun again. it used to be\n2. personal sites > social media. linkedins are all the same\n3. ship stuff break stuff fix stuff do it again\n4. build for actual ppl not the algorithm\n5. put easter eggs in everything why not\n6. websites should have games. i said what i said\n7. old internet was better fight me\n\n- ec`,
   },
   '/home/eric/.ssh': { type: 'dir', date: 'Apr 19 2026', children: ['id_rsa.pub'] },
   '/home/eric/.ssh/id_rsa.pub': { type: 'file', date: 'Apr 19 2026', content: `ssh-rsa AAAAB3NzaC1yc2EAAAADAQAB...\n(nice try 😏)` },
@@ -125,7 +129,8 @@ const HELP_TEXT = `Available commands:
   ls [path]        list directory contents
   ls -a [path]     list all files (including hidden)
   cd <path>        change directory
-  cat <file>       read a file
+  cat <file>       read a file (polished)
+  cat --raw <file> read the rough draft
   pwd              print working directory
   whoami           who are you?
   whois eric       about Eric
@@ -275,18 +280,26 @@ export default function Terminal() {
       }
 
       case 'cat': {
-        if (!args[0]) {
+        const useRaw = args.includes('--raw')
+        const fileArg = args.find(a => a !== '--raw')
+        if (!fileArg) {
           addOutput('cat: missing file operand')
           break
         }
-        const target = resolvePath(cwd, args[0])
+        const target = resolvePath(cwd, fileArg)
         const node = FS[target]
         if (!node) {
-          addOutput(`cat: ${args[0]}: No such file or directory`)
+          addOutput(`cat: ${fileArg}: No such file or directory`)
         } else if (node.type === 'dir') {
-          addOutput(`cat: ${args[0]}: Is a directory`)
+          addOutput(`cat: ${fileArg}: Is a directory`)
+        } else if (useRaw && node.raw) {
+          addOutput(`── raw draft ──\n\n${node.raw}\n\n── (use "cat ${fileArg}" for the polished version) ──`)
+        } else if (useRaw && !node.raw) {
+          addOutput(`cat: no raw draft available for ${fileArg}`)
         } else {
-          addOutput(node.content)
+          let output = node.content
+          if (node.raw) output += `\n\n── (use "cat --raw ${fileArg}" to see the rough draft) ──`
+          addOutput(output)
         }
         break
       }
