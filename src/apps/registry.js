@@ -97,6 +97,18 @@ export const APP_REGISTRY = [
     category: null,
   },
   {
+    id: 'email',
+    label: 'ChemNet Mail',
+    icon: 'email',
+    component: () => import('./Email/Email.jsx'),
+    defaultSize: { width: 580, height: 440 },
+    defaultPosition: { x: 100, y: 50 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+    category: null,
+  },
+  {
     id: 'terminal',
     label: 'Terminal',
     icon: 'terminal',
