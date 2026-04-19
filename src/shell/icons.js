@@ -2,6 +2,9 @@
 // These are original designs inspired by the retro computing era
 
 export const ICONS = {
+  // Guestbook — open book with pen
+  guestbook: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1" fill="#f5e6c8" stroke="#8B4513" stroke-width=".8"/><rect x="2" y="2" width="3" height="12" fill="#8B4513"/><line x1="6" y1="5" x2="12" y2="5" stroke="#888" stroke-width=".4"/><line x1="6" y1="7" x2="12" y2="7" stroke="#888" stroke-width=".4"/><line x1="6" y1="9" x2="10" y2="9" stroke="#888" stroke-width=".4"/><path d="M12 8l2-3 .8.8-2 3z" fill="#00a"/></svg>`,
+
   // Document — notepad/text file
   document: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" fill="#fff" stroke="#000" stroke-width="1"/><rect x="3" y="1" width="3" height="3" fill="#ff0"/><line x1="5" y1="6" x2="11" y2="6" stroke="#000" stroke-width=".5"/><line x1="5" y1="8" x2="11" y2="8" stroke="#000" stroke-width=".5"/><line x1="5" y1="10" x2="9" y2="10" stroke="#000" stroke-width=".5"/></svg>`,
 
