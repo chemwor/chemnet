@@ -98,9 +98,9 @@ function FileDirectory({ posts, onOpen }) {
         <div className="font-bold" style={{ width: 90, textAlign: 'right' }}>Modified</div>
       </div>
 
-      {/* File list */}
+      {/* File list — newest first */}
       <div className="flex-1 overflow-auto" style={{ background: '#fff' }}>
-        {posts.map(post => {
+        {[...posts].sort((a, b) => b.date.localeCompare(a.date)).map(post => {
           const isSelected = selectedId === post.id
           return (
             <div
