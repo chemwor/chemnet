@@ -43,14 +43,22 @@ const LINES = [
   { text: '> _', delay: 22000, style: 'cursor' },
 ]
 
+// Module-level flag — survives remounts but resets on page reload
+let hasCompleted = false
+
 export default function About() {
-  const [visibleCount, setVisibleCount] = useState(0)
+  const [visibleCount, setVisibleCount] = useState(hasCompleted ? LINES.length : 0)
   const containerRef = useRef(null)
 
   useEffect(() => {
+    if (hasCompleted) return // already played, show all lines immediately
+
     setVisibleCount(0)
     const timers = LINES.map((line, i) =>
-      setTimeout(() => setVisibleCount(i + 1), line.delay)
+      setTimeout(() => {
+        setVisibleCount(i + 1)
+        if (i === LINES.length - 1) hasCompleted = true
+      }, line.delay)
     )
     return () => timers.forEach(clearTimeout)
   }, [])
