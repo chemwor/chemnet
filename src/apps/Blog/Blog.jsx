@@ -149,6 +149,29 @@ function FileDirectory({ posts, onOpen }) {
 }
 
 // ── Word-style document viewer ──
+const PAGE_HEIGHT = 680 // approximate content height per page in px
+const PAGE_PADDING = 40
+
+function paginateContent(text, isTitle) {
+  const paragraphs = text.split('\n\n')
+  const pages = [[]]
+  let currentHeight = isTitle ? 80 : 0 // title takes space on first page
+  const lineHeight = 22 // approximate px per line
+  const charsPerLine = 65
+
+  for (const para of paragraphs) {
+    const lines = Math.max(1, Math.ceil(para.length / charsPerLine))
+    const paraHeight = lines * lineHeight + 16 // 16px margin
+    if (currentHeight + paraHeight > PAGE_HEIGHT && pages[pages.length - 1].length > 0) {
+      pages.push([])
+      currentHeight = 0
+    }
+    pages[pages.length - 1].push(para)
+    currentHeight += paraHeight
+  }
+  return pages
+}
+
 function DocumentViewer({ post, onBack }) {
   const [showRaw, setShowRaw] = useState(false)
 
@@ -269,79 +292,92 @@ function DocumentViewer({ post, onBack }) {
         ))}
       </div>
 
-      {/* Document area */}
-      <div className="flex-1 overflow-auto flex justify-center" style={{ background: '#e8e8e8' }}>
-        <div
-          style={{
-            background: showRaw ? '#1a1a1a' : '#fff',
-            width: '100%',
-            maxWidth: 620,
-            minHeight: '100%',
-            padding: '32px 40px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-            fontFamily: showRaw ? '"Courier New", monospace' : '"Georgia", "Times New Roman", serif',
-            fontSize: showRaw ? 12 : 14,
-            lineHeight: showRaw ? 1.5 : 1.7,
-            color: showRaw ? '#33FF33' : '#1a1a1a',
-          }}
-        >
-          {/* Title */}
-          <h1 style={{
-            fontSize: showRaw ? 14 : 22,
-            fontWeight: 'bold',
-            margin: '0 0 8px',
-            color: showRaw ? '#66FF66' : '#000',
-            fontFamily: showRaw ? '"Courier New", monospace' : '"Georgia", serif',
-          }}>
-            {showRaw ? `> cat --raw "${post.filename}"` : post.title}
-          </h1>
+      {/* Document area — paginated pages */}
+      <div className="flex-1 overflow-auto" style={{ background: '#e8e8e8', padding: '16px 0' }}>
+        {(() => {
+          const bodyText = showRaw && post.raw ? post.raw : post.content
+          const pages = paginateContent(bodyText, true)
+          const fontFamily = showRaw ? '"Courier New", monospace' : '"Georgia", "Times New Roman", serif'
+          const fontSize = showRaw ? 12 : 14
+          const lineHt = showRaw ? 1.5 : 1.7
+          const textColor = showRaw ? '#33FF33' : '#1a1a1a'
+          const pageBg = showRaw ? '#1a1a1a' : '#fff'
 
-          {showRaw && (
-            <div style={{ fontSize: 10, color: '#227722', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #227722' }}>
-              ── raw draft — unedited, as originally written ──
+          return pages.map((pageParagraphs, pageIdx) => (
+            <div key={pageIdx} style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <div
+                style={{
+                  background: pageBg,
+                  width: '100%',
+                  maxWidth: 620,
+                  height: PAGE_HEIGHT + PAGE_PADDING * 2,
+                  padding: `${PAGE_PADDING}px ${PAGE_PADDING + 8}px`,
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                  fontFamily, fontSize, lineHeight: lineHt, color: textColor,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  marginLeft: 12, marginRight: 12,
+                }}
+              >
+                {/* First page gets header */}
+                {pageIdx === 0 && (
+                  <>
+                    <h1 style={{
+                      fontSize: showRaw ? 14 : 20,
+                      fontWeight: 'bold',
+                      margin: '0 0 6px',
+                      color: showRaw ? '#66FF66' : '#000',
+                      fontFamily: showRaw ? '"Courier New", monospace' : '"Georgia", serif',
+                    }}>
+                      {showRaw ? `> cat --raw "${post.filename}"` : post.title}
+                    </h1>
+
+                    {showRaw && (
+                      <div style={{ fontSize: 10, color: '#227722', marginBottom: 12, paddingBottom: 6, borderBottom: '1px solid #227722' }}>
+                        ── raw draft — unedited, as originally written ──
+                      </div>
+                    )}
+
+                    {!showRaw && (
+                      <div style={{ fontSize: 10, color: '#888', marginBottom: post.note ? 4 : 16, paddingBottom: 8, borderBottom: post.note ? 'none' : '1px solid #ddd', fontFamily: 'monospace' }}>
+                        {post.date} &middot; {post.size}
+                      </div>
+                    )}
+
+                    {!showRaw && post.note && (
+                      <div style={{ fontSize: 9, color: '#999', fontStyle: 'italic', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #ddd', fontFamily: 'monospace' }}>
+                        {post.note}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {pageParagraphs.map((para, i) => (
+                  <p key={i} style={{ margin: '0 0 12px', textAlign: showRaw ? 'left' : 'justify' }}>
+                    {para}
+                  </p>
+                ))}
+
+                {/* Last page raw footer */}
+                {showRaw && pageIdx === pages.length - 1 && (
+                  <div style={{ fontSize: 10, color: '#227722', marginTop: 16, paddingTop: 6, borderTop: '1px solid #227722' }}>
+                    ── end of raw draft ──
+                  </div>
+                )}
+
+                {/* Page number */}
+                <div style={{
+                  position: 'absolute', bottom: 12, left: 0, right: 0,
+                  textAlign: 'center', fontSize: 9,
+                  color: showRaw ? '#227722' : '#bbb',
+                  fontFamily: 'monospace',
+                }}>
+                  Page {pageIdx + 1} of {pages.length}
+                </div>
+              </div>
             </div>
-          )}
-
-          {!showRaw && (
-            <div style={{
-              fontSize: 11,
-              color: '#888',
-              marginBottom: post.note ? 8 : 24,
-              paddingBottom: 12,
-              borderBottom: post.note ? 'none' : '1px solid #ddd',
-              fontFamily: 'monospace',
-            }}>
-              {post.date} &middot; {post.size}
-            </div>
-          )}
-
-          {!showRaw && post.note && (
-            <div style={{
-              fontSize: 10,
-              color: '#999',
-              fontStyle: 'italic',
-              marginBottom: 24,
-              paddingBottom: 12,
-              borderBottom: '1px solid #ddd',
-              fontFamily: 'monospace',
-            }}>
-              {post.note}
-            </div>
-          )}
-
-          {/* Body */}
-          {(showRaw && post.raw ? post.raw : post.content).split('\n\n').map((para, i) => (
-            <p key={i} style={{ margin: '0 0 16px', textAlign: showRaw ? 'left' : 'justify' }}>
-              {para}
-            </p>
-          ))}
-
-          {showRaw && (
-            <div style={{ fontSize: 10, color: '#227722', marginTop: 24, paddingTop: 8, borderTop: '1px solid #227722' }}>
-              ── end of raw draft ──
-            </div>
-          )}
-        </div>
+          ))
+        })()}
       </div>
 
       {/* Status bar */}
@@ -355,7 +391,9 @@ function DocumentViewer({ post, onBack }) {
         }}
       >
         <span>{post.filename} {showRaw ? '(raw draft)' : ''}</span>
-        <span>{showRaw ? 'Showing: unedited original' : 'Showing: polished version'}</span>
+        <span>
+          {paginateContent(showRaw && post.raw ? post.raw : post.content, true).length} page(s) &middot; {showRaw ? 'unedited original' : 'polished'}
+        </span>
       </div>
     </div>
   )
