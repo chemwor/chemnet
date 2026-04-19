@@ -1,113 +1,54 @@
 import { useState } from 'react'
 import { iconUrl } from '../../shell/icons'
 
-// ── Blog posts (filler content for testing) ──
+// ── Blog posts ──
 const POSTS = [
   {
-    id: 'why-i-build',
-    filename: 'Why I Build Things.doc',
-    date: '2026-03-15',
-    size: '24 KB',
-    title: 'Why I Build Things',
-    content: `There's something about taking an idea from zero to something real that never gets old.
-
-I've been building things since I was a kid — taking apart electronics, writing scripts that automate the boring stuff, putting together projects that nobody asked for but everyone ends up using.
-
-The best projects come from scratching your own itch. DMHOA started because I was frustrated with how our homeowners association communicated. MGN came from seeing a gap in how local news reached people. Every project I've shipped started as "this should exist, and nobody's making it."
-
-I don't build to impress. I build because the alternative — waiting for someone else to solve the problem — is worse. The code doesn't have to be perfect. It has to work, and it has to ship.
-
-That's the philosophy. Ship it. Learn from it. Ship the next one.`,
-  },
-  {
-    id: 'lessons-from-chess',
-    filename: 'Lessons From Chess.doc',
-    date: '2026-02-28',
+    id: 'ai-writing',
+    filename: 'On Using AI to Clean Up My Writing.doc',
+    date: '2026-04-19',
     size: '18 KB',
-    title: 'Lessons From Chess That Apply to Business',
-    content: `I've been playing chess since I was young. The game teaches you things that no business book can.
+    title: 'On Using AI to Clean Up My Writing',
+    content: `What's the difference between me running this blog through AI and a magazine running an article through an editor?
 
-Control the center. In chess, the player who controls the center controls the game. In business, it's the same — find the core problem, own it, and everything else radiates outward.
+Almost everything we read has been filtered. Movies get cut and recut until the story lands. TV shows are shaped in edit bays. Books go through editors, copyeditors, proofreaders. Even in conversation, we censor ourselves. We pick different words for our boss than for our friends. The final product is never the first draft. It never was.
 
-Think three moves ahead. Every decision you make has second and third-order effects. Hiring someone isn't just about filling a seat — it changes team dynamics, culture, and velocity.
+We just don't see the retakes. That's the part that messes with people.
 
-Sacrifice pieces strategically. Sometimes you have to let go of a good thing to gain something better. Kill features, sunset products, say no to clients. Not every piece on the board needs to survive.
+In school, we were taught the process out loud. Write a draft. Cut the stuff that doesn't serve the main point. Make sure every paragraph ties back. I wasn't great at it. English might have been my worst subject. I still don't know if the way it was taught turned me off, or if I was just a kid who didn't care yet.
 
-The endgame matters most. Most people focus on openings. But games are won and lost in the endgame — execution, follow-through, and closing. Start strong, but finish stronger.
+What I do know is that I go on tangents. (Am I even using that word right?) Not full detours, more like I grab something on the way to the point because my brain decided it mattered before I could explain why. I notice it when I talk. I notice it when I write. If I want to write anything people actually read, I have to work on it.
 
-Tempo is everything. A move that gains you tempo — that forces your opponent to react — is worth more than a move that simply improves your position. In business, speed of iteration is your tempo.`,
-  },
-  {
-    id: 'on-being-kenyan',
-    filename: 'On Being Kenyan in Tech.doc',
-    date: '2026-02-10',
-    size: '21 KB',
-    title: 'On Being Kenyan in Tech',
-    content: `Growing up in Kenya gives you a different relationship with technology.
+I don't have the urge to write a book. But I do want this site to feel like an archive, a record of what I thought about and what I cared about. A blog. A collection of things that make me me.
 
-You learn to build with constraints. Internet is unreliable. Power goes out. Hardware is expensive. You learn to make things work with what you have, and that resourcefulness becomes your superpower.
+AI helps me bridge the gap between the idea in my head and the version of it that's presentable. If the tool makes my writing even 5% better than I could on my own, it's worth using. It gives my points structure. It makes them easier to read. The ideas are still mine. The polish is the part I outsource.
 
-Kenyans built M-Pesa before the rest of the world understood mobile payments. We leapfrogged entire generations of financial infrastructure. That wasn't luck — that was necessity mothering invention.
+I'm also keeping my rough drafts on the site. If you want to see what the thought looked like before it got cleaned up, it's there. I think that matters. Expectation versus reality is one of those things worth showing on purpose, because a lot of people are chasing a version of "good" that was never real to begin with.
 
-When I moved into tech professionally, I brought that mentality with me. Don't wait for perfect conditions. Don't wait for the right tools. Build with what's in front of you and iterate.
+Think about photos. Almost every image you see online has been edited. Better lighting. A filter. A crop. It takes real skill to make a photo not look like a random phone snap, and that skill is an art. But we've lost something in the process. We don't see the raw version anymore. We don't see that "perfection" is mostly a pile of mistakes someone learned from. That invisible gap makes people feel like imposters when they're just new.
 
-The Kenyan tech ecosystem is growing fast. Nairobi is a hub. But the real story isn't the startups getting funded — it's the thousands of developers building solutions for problems that Silicon Valley doesn't even know exist.
+Part of the reason nobody shows the raw cut is fear. People will use your imperfections against you. Misspell a word and suddenly you're not smart. Which, come on. Bad spelling isn't intelligence. It can be a signal, sure, but people have strengths in different places. We flatten everyone against the same benchmark and call it fair.
 
-I carry that with me. Build for the people in front of you, not the people on TechCrunch.`,
-  },
-  {
-    id: 'bjj-and-code',
-    filename: 'What BJJ Taught Me About Code.doc',
-    date: '2026-01-20',
-    size: '16 KB',
-    title: 'What BJJ Taught Me About Writing Code',
-    content: `I started Brazilian Jiu-Jitsu a few years ago. The parallels to software engineering are everywhere.
+Someone picking up a new thing is going to be bad at it. That's the whole deal. The people who respect that give them space to get better. The people who laugh at the first attempt? I feel bad for them. They don't understand what it costs to try something new in public.
 
-Fundamentals beat tricks. A solid guard pass will beat a flashy submission attempt every time. In code, clean architecture and good data modeling will outlast any clever hack.
+(Another tangent, probably.)
 
-Drilling matters more than sparring. You get better by repeating the basics until they're automatic, not by constantly testing yourself in live situations. Write the same patterns over and over. Build CRUD apps until it's muscle memory.
+All of this to say: can we really drag people for using AI as a tool, when the idea is still theirs and they're the ones shaping it into something worth reading? We accept editing everywhere else. We accept filters, retakes, second drafts, ghostwriters, studio lighting. AI is new and it's scary, and I get why people are suspicious. Some people do want to use it as a replacement instead of a tool. That's fair to push back on.
 
-Tap early, tap often. In BJJ, ego gets you injured. In code, ego gets you stuck. Admit when your approach isn't working. Throw it away and start fresh. The cost of tapping is nothing compared to the cost of a torn ligament — or a spaghetti codebase.
+But I don't think AI should be the idea factory. It should be the thing that lets someone who cares about an idea actually get it out of their head. If that first low-effort interaction gets them hooked enough to go deeper on the craft, even better. The problem isn't the tool. The problem is when the tool becomes the whole shortcut and nobody ever bothers to learn the thing underneath.
 
-Position before submission. Get to a dominant position before you attack. In code, set up your architecture, your tooling, your CI pipeline before you start building features. The setup is the work.
+I use AI to write cleaner. The ideas are mine. The rough drafts are on the site if you want to see the mess.`,
+    raw: `what's the diffrent between editors who fixe things before they are released ? = A lot of what we read and look into has been filtered to some point. We even sensor our selves when we speak. What space is it that we are speaking in. What language and words are and are off limits. It makes me wonder what gets lost in the process of drafting. We see the final product but not the retakes, edits, removing things that might not be relevant
 
-Everyone gets submitted. The best grapplers in the world get tapped. The best engineers ship bugs. It's not about being perfect — it's about recovering fast and learning from it.`,
-  },
-  {
-    id: 'remote-work',
-    filename: 'My Remote Work Setup.doc',
-    date: '2026-01-05',
-    size: '14 KB',
-    title: 'My Remote Work Setup in 2026',
-    content: `People ask about my setup a lot, so here it is.
+Movies are clipped and edited to give us a final form. A story is being told there but the way it's being done needs to get the main over arching point to audience memebers of all kinds. Same with a tv show or any media we consume in general. There's hard work being done behind the scenes that we don't get to see. A hidden magic that some see as the standard or achievable on the first try.
 
-Hardware: M3 MacBook Pro 16", two Dell 27" 4K monitors stacked vertically, Keychron Q1 mechanical keyboard (Gateron Brown switches), Logitech MX Master 3S. Standing desk from FlexiSpot. Herman Miller Aeron chair for when I sit.
+In school we would work on cleaning up our drafts. We would be given a topic we would need to write on. We would go through the process of this paragraph will be for this this other one is a new point. All of that combined should go back to the main point of the paper.
 
-Software: VS Code with Vim keybindings. iTerm2 with tmux. Arc browser. Linear for project management. Figma for design. Notion for docs. Slack, reluctantly.
+I wasn't really the best in english, it might have been my weakest subject. I do wonder if the way in which learning these topics hindered triggering something in me that would want to go further into improving my skills with writing. I have a habit to go off tangent(is this even being used right) at times. Not a complete detour but more of like a stop of picking up something that will be used in the point or over arching topic. I don't know the origin of this, if it's talking about one point and having it trigger something that is tied to the original topic but makes sense to me in the moment since th thought hasn't been fully articulated. I know these points in my structuring with the way I speak and write. I also know I need to work on it if I want to write anything. I don't have an urge to write a book but with this site it feels like a blog or an archive of my thoughts or the tings that make me as a person. In the age of AI, the tools out there help as a good stop gap for bridging my ideas and points in a way the personally I don't feel like I'm the greatest at. If it's even 5% better than me, I do think it's worth using to make my blogs. It gives the points more structure and something that's more presentable for someone to read. I also keep my rough drafts on the site so those that are interested in seeing my writing at its core can if they want. This expectations vs reality is one of those things I feel is important to point out so that people aren't chasing a perfection that doesn't exist
 
-Audio: AirPods Pro for calls. Sony WH-1000XM5 for deep work. A pair of Yamaha HS5 monitors for music.
+This takes me to how a lot of the images that we see are edited to an extent. Better lighting maybe a filter or something else. It takes a skill to be able to take photos that don't feel like a random one shows with a phone camera. It's an art and skill. With that though we do lose out on getting a more raw and unfiltered version to know that perfection is a process of many mistakes and getting better at not making them. This unrealistic expectation makes people feel like imposters or behind when in reality they aren't. It's just a filter.
 
-The real productivity hack isn't the gear though. It's time blocking. I do deep work from 6am to 11am. Meetings from 11am to 1pm. Afternoon is for code review, planning, and admin. After 5pm, I'm done.
-
-No notifications on my phone except calls. Slack notifications off except DMs. Email checked twice a day. The world can wait.`,
-  },
-  {
-    id: 'climbing-kili',
-    filename: 'Climbing Kilimanjaro.doc',
-    date: '2025-12-18',
-    size: '28 KB',
-    title: 'Climbing Kilimanjaro: What Nobody Tells You',
-    content: `I summited Kilimanjaro last year. Here's what the travel blogs leave out.
-
-The altitude hits different than you expect. It's not dramatic. It's subtle. You feel fine at 3,000 meters. At 4,000, you notice you're breathing harder. At 5,000, every step takes three breaths. At Uhuru Peak (5,895m), your brain is running on fumes.
-
-The key is pole pole — slowly, slowly. The guides say it constantly. You'll feel like you can go faster. Don't. The mountain doesn't care about your pace. It cares about whether you acclimatize.
-
-Night summit is brutal and beautiful. You start at midnight, headlamp on, freezing cold, walking in a line of lights up the mountain. You can see the lights of climbers above you snaking up the switchbacks. It looks impossible. Then you look back and realize how far you've come.
-
-The sunrise from the summit is the most beautiful thing I've ever seen. The clouds below you. The glaciers glowing orange. Africa stretching to the horizon in every direction. Worth every step.
-
-Would I do it again? Absolutely. But I'd train my legs more.`,
+There's also a fear with showing a raw cut due to how people would react. These dents/imperfections can be used against the poster for whatever reason - peoples judgment. Can't spell and it's seen as a big hit even simple words and that in it'self excludes other attributes that got that person there. Bad spelling != intelligence in my opinion. It can be a sign but some people have subject matters and things that lean heavily for them and some are well rounded. Each person is different but we use standards to flatten down and get a general benchmark of what is considered up to par. Someone can try something new and be terrible and that's okay since they are new and will get better if they keep up at it. Those that respect that will give space for that person to learn this craft and not get them discouraged. The negative are those that laugh and point at the failed attempt. I feel sad for them due to not understanding the courage it takes to pick up something new and try. This could be a whole other tanagent(again am I using this right) All os this to say, can we critic those that use AI as a tool to help get things done if they are the ones coming up with the original idea and polishing it up for something to present ? We do it with a lot of things even the way we show up but in a time where we have a new technology that is scary and we have people wanting to use it as a replacement and not a tool. I understand why some would be against it. I don't think AI should be the idea factory. It should be the tool that helps those without the ability to pick up something they are interested in at a low level. Hopefully that low level interaction gets them to get better in their craft but It shouldn't be used as a full short cut to jump in and never explore deeper.`,
   },
 ]
 
@@ -198,6 +139,8 @@ function FileDirectory({ posts, onOpen }) {
 
 // ── Word-style document viewer ──
 function DocumentViewer({ post, onBack }) {
+  const [showRaw, setShowRaw] = useState(false)
+
   return (
     <div className="flex flex-col h-full" style={{ background: '#fff' }}>
       {/* Menu bar */}
@@ -264,6 +207,37 @@ function DocumentViewer({ post, onBack }) {
         <span className="text-xs font-bold" style={{ color: '#666' }}>B</span>
         <span className="text-xs italic" style={{ color: '#666' }}>I</span>
         <span className="text-xs underline" style={{ color: '#666' }}>U</span>
+
+        {/* Raw/Polished toggle */}
+        {post.raw && (
+          <>
+            <div style={{ width: 1, height: 16, background: '#ccc', margin: '0 8px' }} />
+            <button
+              onClick={() => setShowRaw(false)}
+              className="px-2 py-0.5 text-xs cursor-pointer border-none"
+              style={{
+                background: !showRaw ? '#000080' : '#d4d0c8',
+                color: !showRaw ? '#fff' : '#000',
+                fontFamily: 'monospace',
+                border: '1px solid #808080',
+              }}
+            >
+              Polished
+            </button>
+            <button
+              onClick={() => setShowRaw(true)}
+              className="px-2 py-0.5 text-xs cursor-pointer border-none"
+              style={{
+                background: showRaw ? '#000080' : '#d4d0c8',
+                color: showRaw ? '#fff' : '#000',
+                fontFamily: 'monospace',
+                border: '1px solid #808080',
+              }}
+            >
+              Raw Draft
+            </button>
+          </>
+        )}
       </div>
 
       {/* Ruler */}
@@ -289,45 +263,59 @@ function DocumentViewer({ post, onBack }) {
         <div
           className="mx-auto my-4"
           style={{
-            background: '#fff',
+            background: showRaw ? '#1a1a1a' : '#fff',
             maxWidth: 540,
             minHeight: 600,
             padding: '48px 56px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-            fontFamily: '"Georgia", "Times New Roman", serif',
-            fontSize: 14,
-            lineHeight: 1.7,
-            color: '#1a1a1a',
+            fontFamily: showRaw ? '"Courier New", monospace' : '"Georgia", "Times New Roman", serif',
+            fontSize: showRaw ? 12 : 14,
+            lineHeight: showRaw ? 1.5 : 1.7,
+            color: showRaw ? '#33FF33' : '#1a1a1a',
           }}
         >
           {/* Title */}
           <h1 style={{
-            fontSize: 22,
+            fontSize: showRaw ? 14 : 22,
             fontWeight: 'bold',
             margin: '0 0 8px',
-            color: '#000',
-            fontFamily: '"Georgia", serif',
+            color: showRaw ? '#66FF66' : '#000',
+            fontFamily: showRaw ? '"Courier New", monospace' : '"Georgia", serif',
           }}>
-            {post.title}
+            {showRaw ? `> cat --raw "${post.filename}"` : post.title}
           </h1>
 
-          <div style={{
-            fontSize: 11,
-            color: '#888',
-            marginBottom: 24,
-            paddingBottom: 12,
-            borderBottom: '1px solid #ddd',
-            fontFamily: 'monospace',
-          }}>
-            {post.date} &middot; {post.size}
-          </div>
+          {showRaw && (
+            <div style={{ fontSize: 10, color: '#227722', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #227722' }}>
+              ── raw draft — unedited, as originally written ──
+            </div>
+          )}
+
+          {!showRaw && (
+            <div style={{
+              fontSize: 11,
+              color: '#888',
+              marginBottom: 24,
+              paddingBottom: 12,
+              borderBottom: '1px solid #ddd',
+              fontFamily: 'monospace',
+            }}>
+              {post.date} &middot; {post.size}
+            </div>
+          )}
 
           {/* Body */}
-          {post.content.split('\n\n').map((para, i) => (
-            <p key={i} style={{ margin: '0 0 16px', textAlign: 'justify' }}>
+          {(showRaw ? post.raw : post.content).split('\n\n').map((para, i) => (
+            <p key={i} style={{ margin: '0 0 16px', textAlign: showRaw ? 'left' : 'justify' }}>
               {para}
             </p>
           ))}
+
+          {showRaw && (
+            <div style={{ fontSize: 10, color: '#227722', marginTop: 24, paddingTop: 8, borderTop: '1px solid #227722' }}>
+              ── end of raw draft ──
+            </div>
+          )}
         </div>
       </div>
 
@@ -341,8 +329,8 @@ function DocumentViewer({ post, onBack }) {
           fontFamily: 'monospace',
         }}
       >
-        <span>{post.filename}</span>
-        <span>Page 1 of 1</span>
+        <span>{post.filename} {showRaw ? '(raw draft)' : ''}</span>
+        <span>{showRaw ? 'Showing: unedited original' : 'Showing: polished version'}</span>
       </div>
     </div>
   )
