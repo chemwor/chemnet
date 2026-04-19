@@ -5,7 +5,7 @@ const INITIAL_ENTRIES = [
   { id: 2, name: 'explorer_jane', location: 'London, UK', date: '2026-04-05', message: 'Stumbled onto this from Twitter. Played Asteroids for way too long. Signed the book before I forget. ✌️' },
   { id: 3, name: 'k3nyan_dev', location: 'Nairobi, Kenya', date: '2026-04-06', message: 'Mkenya mwenzangu! Love seeing Kenyan devs build cool things. The chess Swahili names are a nice touch. Hongera!' },
   { id: 4, name: 'pixel_punk', location: 'Tokyo, Japan', date: '2026-04-08', message: 'The Win95 aesthetic is perfect. Reminds me of my first computer. Never stop building weird stuff on the internet.' },
-  { id: 5, name: 'curious_cat', location: 'Toronto, Canada', date: '2026-04-10', message: 'Found the secret manifesto. Rule 7 is correct — the old internet WAS better. Signing as proof I was here.' },
+  { id: 5, name: 'curious_cat', location: 'Toronto, Canada', date: '2026-04-10', message: 'Found the social media manifesto in .hidden. "The algorithm just isn\'t going to hand it to you." — real talk. Signing as proof I was here.' },
   { id: 6, name: 'anon', location: 'The Internet', date: '2026-04-12', message: 'sudo rm -rf / 😂 you got me with that one. GG.' },
 ]
 
