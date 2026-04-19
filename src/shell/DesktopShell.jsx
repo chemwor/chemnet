@@ -12,6 +12,8 @@ import { BSOD } from '../easter-eggs/BSOD'
 import { Screensaver } from '../easter-eggs/Screensaver'
 import { KonamiOverlay } from '../easter-eggs/KonamiOverlay'
 import { Meltdown } from '../easter-eggs/Meltdown'
+import { LayerNotification } from './LayerNotification'
+import { recordDiscovery } from '../lib/layers'
 import { useIdleTimer } from '../hooks/useIdleTimer'
 import { useKonamiCode } from '../hooks/useKonamiCode'
 import { useSecretCode } from '../hooks/useSecretCode'
@@ -78,6 +80,7 @@ export function DesktopShell({ windowManager }) {
   const handleContextMenu = useCallback((e) => {
     e.preventDefault()
     setContextMenu({ x: e.clientX, y: e.clientY })
+    recordDiscovery('right-click-desktop')
   }, [])
 
   const handleOffscreen = useCallback(() => {
@@ -188,6 +191,9 @@ export function DesktopShell({ windowManager }) {
       <AnimatePresence>
         {meltdownActive && <Meltdown onDone={() => setMeltdownActive(false)} />}
       </AnimatePresence>
+
+      {/* Layer unlock notifications */}
+      <LayerNotification />
     </div>
   )
 }

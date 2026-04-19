@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { recordDiscovery } from '../../lib/layers'
 
 // ── Fake filesystem ──
 const FS = {
@@ -358,6 +359,7 @@ export default function Terminal() {
 
       case 'ls': {
         const showHidden = args.includes('-a') || args.includes('-la') || args.includes('-al')
+        if (showHidden) recordDiscovery('ls-a')
         const pathArg = args.find(a => !a.startsWith('-'))
         const target = pathArg ? resolvePath(cwd, pathArg) : cwd
         const node = FS[target]
@@ -395,6 +397,9 @@ export default function Terminal() {
           addOutput(`cd: ${args[0]}: Not a directory`)
         } else {
           setCwd(target)
+          if (target.includes('.hidden') || target.includes('.secret')) {
+            recordDiscovery('found-hidden-dir')
+          }
         }
         break
       }
