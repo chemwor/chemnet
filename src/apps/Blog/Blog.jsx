@@ -71,7 +71,7 @@ function FileDirectory({ posts, onOpen }) {
   const [selectedId, setSelectedId] = useState(null)
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#fff' }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff' }}>
       {/* Toolbar */}
       <div className="flex items-center gap-1 px-2 py-1 shrink-0" style={{ background: 'var(--color-surface)', borderBottom: '1px solid var(--color-bevel-dark)' }}>
         <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
@@ -176,7 +176,7 @@ function DocumentViewer({ post, onBack }) {
   const [showRaw, setShowRaw] = useState(false)
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#fff' }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff' }}>
       {/* Menu bar */}
       <div
         className="flex items-center gap-3 px-2 py-1 text-xs shrink-0"
