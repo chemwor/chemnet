@@ -11,10 +11,10 @@ const INBOX_MESSAGES = [
   {
     id: 1,
     from: 'SysOp_Eric',
-    subject: 'Welcome to ChemNet Mail',
+    subject: 'Welcome to ChemMail',
     date: '2026-04-01',
     read: true,
-    body: `Hey — welcome to ChemNet Mail.
+    body: `Hey — welcome to ChemMail.
 
 This isn't a real email client (obviously). But if you want to reach me, hit "New Message" and write something. It'll come through to my actual inbox.
 
@@ -58,7 +58,7 @@ function FolderPanel({ folders, activeFolder, onSelect }) {
   return (
     <div className="shrink-0 overflow-auto" style={{ width: 130, background: '#d4d0c8', borderRight: '1px solid #808080' }}>
       <div className="px-2 py-1.5 text-xs font-bold" style={{ background: '#000080', color: '#fff' }}>
-        ChemNet Mail
+        ChemMail
       </div>
       {folders.map(f => (
         <div
@@ -379,7 +379,7 @@ export default function Email() {
       {/* Status bar */}
       <div className="flex items-center px-2 py-0.5 text-xs shrink-0" style={{ borderTop: '1px solid #808080', fontFamily: 'Tahoma, Arial, sans-serif', color: '#666' }}>
         <span>{currentMessages.length} message(s)</span>
-        <span className="ml-auto">ChemNet Mail — eric@chemnet.dev</span>
+        <span className="ml-auto">ChemMail — eric@chemnet.dev</span>
       </div>
     </div>
   )
