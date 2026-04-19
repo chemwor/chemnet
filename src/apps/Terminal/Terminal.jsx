@@ -5,7 +5,7 @@ import { recordDiscovery } from '../../lib/layers'
 const FS = {
   '/': {
     type: 'dir',
-    children: ['home', 'usr', 'etc', 'var', 'tmp', '.secret'],
+    children: ['home', 'usr', 'etc', 'var', 'tmp'],
   },
   '/home': {
     type: 'dir',
@@ -155,7 +155,7 @@ front of you, not the people on TechCrunch.
   // ── Hidden files ──
   '/home/eric/.hidden': {
     type: 'dir',
-    children: ['thoughts.txt', 'todo.txt', 'easter-egg.txt'],
+    children: ['thoughts.txt', 'todo.txt', 'easter-egg.txt', 'manifesto.txt'],
   },
   '/home/eric/.hidden/thoughts.txt': {
     type: 'file',
@@ -200,12 +200,7 @@ There might be more. Keep looking.`,
 (nice try 😏)`,
   },
 
-  // ── System files ──
-  '/.secret': {
-    type: 'dir',
-    children: ['manifesto.txt'],
-  },
-  '/.secret/manifesto.txt': {
+  '/home/eric/.hidden/manifesto.txt': {
     type: 'file',
     content: `THE CHEMNET MANIFESTO
 ═════════════════════
@@ -220,6 +215,8 @@ There might be more. Keep looking.`,
 
     — e.c.`,
   },
+
+  // ── System files ──
   '/usr': { type: 'dir', children: ['bin', 'local'] },
   '/usr/bin': { type: 'dir', children: ['games'] },
   '/usr/bin/games': { type: 'file', content: 'Try: open solitaire, open chess, open asteroids, open pacman' },
@@ -397,7 +394,7 @@ export default function Terminal() {
           addOutput(`cd: ${args[0]}: Not a directory`)
         } else {
           setCwd(target)
-          if (target.includes('.hidden') || target.includes('.secret')) {
+          if (target.includes('.hidden')) {
             recordDiscovery('found-hidden-dir')
           }
         }
