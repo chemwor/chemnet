@@ -270,14 +270,14 @@ function DocumentViewer({ post, onBack }) {
       </div>
 
       {/* Document area */}
-      <div className="flex-1 overflow-auto" style={{ background: '#e8e8e8' }}>
+      <div className="flex-1 overflow-auto flex justify-center" style={{ background: '#e8e8e8' }}>
         <div
-          className="mx-auto my-4"
           style={{
             background: showRaw ? '#1a1a1a' : '#fff',
-            maxWidth: 540,
-            minHeight: 600,
-            padding: '48px 56px',
+            width: '100%',
+            maxWidth: 620,
+            minHeight: '100%',
+            padding: '32px 40px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
             fontFamily: showRaw ? '"Courier New", monospace' : '"Georgia", "Times New Roman", serif',
             fontSize: showRaw ? 12 : 14,
