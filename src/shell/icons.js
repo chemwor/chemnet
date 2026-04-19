@@ -2,11 +2,11 @@
 // These are original designs inspired by the retro computing era
 
 export const ICONS = {
-  // Reviews — film/star
-  reviews: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="1" fill="#222" stroke="#888" stroke-width=".5"/><rect x="1" y="3" width="14" height="3" fill="#444"/><path d="M8 7l1.5 1-0.5-1.5L10.5 5.5H9L8 4 7 5.5H5.5L7 6.5 6.5 8z" fill="#FFD700"/><circle cx="4" cy="4.5" r=".8" fill="#888"/><circle cx="12" cy="4.5" r=".8" fill="#888"/></svg>`,
+  // Reviews — TV set
+  reviews: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="9" rx="1" fill="#333" stroke="#888" stroke-width=".6"/><rect x="2" y="5" width="12" height="7" fill="#1a3a5a"/><path d="M5 1l3 3M11 1L8 4" stroke="#888" stroke-width=".7" fill="none"/><rect x="5" y="14" width="6" height="1" fill="#888"/><rect x="4" y="14.5" width="8" height=".5" fill="#666"/><path d="M6 8l5 0M6 10l3 0" stroke="#4af" stroke-width=".5"/></svg>`,
 
-  // Restaurant — fork and knife
-  restaurant: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1v5c0 1 1 2 2 2v6h1V8c1 0 2-1 2-2V1M4 3h5M4 5h5" fill="none" stroke="#ccc" stroke-width=".8"/><path d="M11 1v4c0 0 0 2 1 3v6h1V8c1-1 1-3 1-3V1" fill="none" stroke="#ccc" stroke-width=".8"/></svg>`,
+  // Restaurant — cake
+  restaurant: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="2" y="8" width="12" height="6" rx="1" fill="#f5c542" stroke="#c99a2e" stroke-width=".5"/><rect x="2" y="8" width="12" height="2" fill="#e8a0b0"/><rect x="3" y="6" width="10" height="3" rx="1" fill="#fff0f5" stroke="#d88" stroke-width=".4"/><circle cx="5" cy="6" r="1" fill="#f00"/><circle cx="8" cy="5.5" r="1" fill="#f80"/><circle cx="11" cy="6" r="1" fill="#f00"/><rect x="7.5" y="2" width="1" height="4" fill="#c99a2e"/><ellipse cx="8" cy="2" rx="1.5" ry="1" fill="#ff6b35"/></svg>`,
 
   // Trophy — scoreboard
   trophy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 2h8v5c0 2.5-1.5 4-4 4s-4-1.5-4-4z" fill="#FFD700" stroke="#B8860B" stroke-width=".6"/><rect x="7" y="11" width="2" height="2" fill="#B8860B"/><rect x="5" y="13" width="6" height="2" fill="#888" stroke="#666" stroke-width=".3"/><path d="M4 3H2v3c0 1.5 1 2 2 2z" fill="#FFD700" stroke="#B8860B" stroke-width=".4"/><path d="M12 3h2v3c0 1.5-1 2-2 2z" fill="#FFD700" stroke="#B8860B" stroke-width=".4"/><text x="8" y="8" fill="#B8860B" font-size="5" font-family="serif" text-anchor="middle" font-weight="bold">1</text></svg>`,
