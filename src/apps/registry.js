@@ -14,7 +14,7 @@ export const APP_REGISTRY = [
   },
   {
     id: 'projects',
-    label: 'Companies / Projects',
+    label: 'Projects',
     icon: 'folder',
     component: () => import('./Projects/Projects.jsx'),
     defaultSize: { width: 560, height: 420 },
