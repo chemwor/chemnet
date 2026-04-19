@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useEffect, useState, useCallback, useRef } from 'react'
+import { Suspense, lazy, useMemo, useEffect, useState, useCallback, useRef, memo } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { APP_REGISTRY } from '../apps/registry'
 import { DesktopIcon } from './DesktopIcon'
@@ -17,6 +17,15 @@ import { recordDiscovery } from '../lib/layers'
 import { useIdleTimer } from '../hooks/useIdleTimer'
 import { useKonamiCode } from '../hooks/useKonamiCode'
 import { useSecretCode } from '../hooks/useSecretCode'
+
+// Cache lazy components so they don't remount on every render
+const lazyCache = new Map()
+function getLazyComponent(app) {
+  if (!lazyCache.has(app.id)) {
+    lazyCache.set(app.id, lazy(app.component))
+  }
+  return lazyCache.get(app.id)
+}
 
 function BusyCursorCleanup({ children }) {
   useEffect(() => {
@@ -126,7 +135,7 @@ export function DesktopShell({ windowManager }) {
         {/* Layer 10+ — Windows with AnimatePresence */}
         <AnimatePresence>
           {windowsWithMeta.map(w => {
-            const AppComponent = lazy(w.app.component)
+            const AppComponent = getLazyComponent(w.app)
 
             return (
               <WindowFrame

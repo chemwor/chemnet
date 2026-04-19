@@ -161,10 +161,13 @@ export function WindowFrame({ windowState, app, onClose, onMinimize, onMaximize,
 
         {/* Content */}
         <div
-          className="flex-1 overflow-auto"
+          className="flex-1"
           style={{
             background: 'var(--color-surface)',
             borderTop: '1px solid var(--color-bevel-dark)',
+            position: 'relative',
+            overflow: 'hidden',
+            minHeight: 0,
           }}
         >
           {children}
