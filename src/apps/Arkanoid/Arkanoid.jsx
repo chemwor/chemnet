@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { submitScore, getGameScore } from '../../lib/highscores'
 
 const PADDLE_W = 64
 const PADDLE_H = 10
@@ -225,6 +226,7 @@ export default function Arkanoid() {
         s.lives--
         hudRef.current.lives = s.lives
         if (s.lives <= 0) {
+          submitScore('arkanoid', hudRef.current.score)
           setScreen('gameover')
           return
         }
@@ -458,13 +460,15 @@ export default function Arkanoid() {
                 <>
                   <div className="text-xl font-bold mb-1" style={{ color: '#FF4444' }}>GAME OVER</div>
                   <div className="text-sm mb-1" style={{ color: '#888' }}>Score: {hudRef.current.score}</div>
-                  <div className="text-xs mb-4" style={{ color: '#555' }}>Level {hudRef.current.level}</div>
+                  <div className="text-xs mb-1" style={{ color: '#555' }}>Level {hudRef.current.level}</div>
+                  <div className="text-xs mb-4" style={{ color: '#555' }}>Hi-Score: {getGameScore('arkanoid').highScore || 0}</div>
                 </>
               ) : (
                 <>
                   <div className="text-2xl font-bold mb-2" style={{ color: '#fff' }}>ARKANOID</div>
                   <div className="text-xs mb-1" style={{ color: '#888' }}>← → or A/D to move</div>
-                  <div className="text-xs mb-3" style={{ color: '#888' }}>SPACE to launch ball</div>
+                  <div className="text-xs mb-1" style={{ color: '#888' }}>SPACE to launch ball</div>
+                  <div className="text-xs mb-3" style={{ color: '#555' }}>Hi-Score: {getGameScore('arkanoid').highScore || 0}</div>
                   <div className="flex gap-3 justify-center mb-4 text-xs" style={{ color: '#666' }}>
                     <span><span style={{ color: '#00CCFF' }}>W</span>ide</span>
                     <span><span style={{ color: '#FF00FF' }}>M</span>ulti</span>

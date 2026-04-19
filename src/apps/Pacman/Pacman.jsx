@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { submitScore, getGameScore } from '../../lib/highscores'
 
 // ── Map: 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house ──
 const MAP_TEMPLATE = [
@@ -252,6 +253,7 @@ export default function Pacman() {
             s.lives--
             setHud({ score: s.score, lives: s.lives })
             if (s.lives <= 0) {
+              submitScore('pacman', s.score)
               setScreen('gameover')
               return
             }
@@ -472,8 +474,11 @@ export default function Pacman() {
                   <div className="text-xl font-bold mb-1" style={{ color: '#FF0000' }}>
                     GAME OVER
                   </div>
-                  <div className="text-sm mb-4" style={{ color: '#FFD700' }}>
+                  <div className="text-sm mb-1" style={{ color: '#FFD700' }}>
                     Score: {hud.score}
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#888' }}>
+                    Hi-Score: {getGameScore('pacman').highScore || 0}
                   </div>
                 </>
               ) : (
@@ -481,8 +486,11 @@ export default function Pacman() {
                   <div className="text-2xl font-bold mb-1" style={{ color: '#FFD700' }}>
                     PAC-MAN
                   </div>
-                  <div className="text-xs mb-4" style={{ color: '#888' }}>
+                  <div className="text-xs mb-1" style={{ color: '#888' }}>
                     Arrow keys or WASD to move
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                    Hi-Score: {getGameScore('pacman').highScore || 0}
                   </div>
                 </>
               )}

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { submitSolitaire, getGameScore } from '../../lib/highscores'
 
 // ── Constants ──
 const SUITS = ['♠', '♥', '♦', '♣']
@@ -253,7 +254,10 @@ export default function Solitaire() {
   const won = game.foundations.every(f => f.length === 13)
 
   useEffect(() => {
-    if (won) setTimerRunning(false)
+    if (won) {
+      setTimerRunning(false)
+      submitSolitaire(game.score, moves)
+    }
   }, [won])
 
   const newGame = useCallback(() => {
@@ -476,6 +480,7 @@ export default function Solitaire() {
         </div>
         <div className="flex gap-4 text-xs" style={{ color: '#c8e6c0', fontFamily: 'Tahoma, Arial, sans-serif' }}>
           <span>Score: {game.score}</span>
+          <span>Best: {getGameScore('solitaire').highScore || 0}</span>
           <span>Moves: {moves}</span>
           <span><Timer running={timerRunning} /></span>
         </div>

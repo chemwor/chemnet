@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { submitWin, submitLoss, getGameScore } from '../../lib/highscores'
 
 const HEALTH_MAX = 50
 const HIT_DAMAGE = 2
@@ -272,6 +273,8 @@ export default function Fighter() {
         s.roundEndTimer--
         if (s.roundEndTimer <= 0) {
           if (s.p1.roundsWon >= 3 || s.p2.roundsWon >= 3) {
+            if (s.p1.roundsWon >= 3) submitWin('fighter')
+            else submitLoss('fighter')
             setScreen('gameover')
             return
           }
@@ -571,8 +574,11 @@ export default function Fighter() {
                       ? 'RED ROCKER WINS!'
                       : 'BLUE BOMBER WINS!'}
                   </div>
-                  <div className="text-sm mb-4" style={{ color: '#888' }}>
+                  <div className="text-sm mb-1" style={{ color: '#888' }}>
                     {s ? `${s.p1.roundsWon} - ${s.p2.roundsWon}` : ''}
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                    Record: {getGameScore('fighter').wins || 0}W - {getGameScore('fighter').losses || 0}L
                   </div>
                 </>
               ) : (
@@ -584,7 +590,10 @@ export default function Fighter() {
                   <div className="text-xs mb-1" style={{ color: '#FF4444' }}>RED ROCKER <span style={{ color: '#666' }}>vs</span> <span style={{ color: '#4488FF' }}>BLUE BOMBER</span></div>
                   <div className="text-sm mt-3 mb-1" style={{ color: '#ccc' }}>Tap SPACEBAR to punch!</div>
                   <div className="text-xs mb-3" style={{ color: '#666' }}>Mash fast — knock their block off!</div>
-                  <div className="text-xs mb-3" style={{ color: '#555' }}>Best of 5 rounds</div>
+                  <div className="text-xs mb-1" style={{ color: '#555' }}>Best of 5 rounds</div>
+                  <div className="text-xs mb-3" style={{ color: '#555' }}>
+                    Record: {getGameScore('fighter').wins || 0}W - {getGameScore('fighter').losses || 0}L
+                  </div>
                 </>
               )}
               <button

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { submitScore, getGameScore } from '../../lib/highscores'
 
 const PLAYER_W = 30
 const PLAYER_H = 16
@@ -159,7 +160,7 @@ export default function SpaceInvaders() {
   const canvasRef = useRef(null)
   const stateRef = useRef(null)
   const keysRef = useRef({})
-  const [hud, setHud] = useState({ score: 0, lives: 3, hi: 0 })
+  const [hud, setHud] = useState({ score: 0, lives: 3 })
   const [screen, setScreen] = useState('start')
 
   const initState = useCallback((canvas) => {
@@ -194,7 +195,7 @@ export default function SpaceInvaders() {
     canvas.width = canvas.parentElement.clientWidth
     canvas.height = canvas.parentElement.clientHeight
     stateRef.current = initState(canvas)
-    setHud(prev => ({ score: 0, lives: 3, hi: prev.hi }))
+    setHud({ score: 0, lives: 3 })
     setScreen('playing')
   }, [initState])
 
@@ -411,8 +412,9 @@ export default function SpaceInvaders() {
               life: 25 + Math.random() * 15, color: '#4ADE80',
             })
           }
-          setHud(prev => ({ ...prev, lives: s.lives, hi: Math.max(prev.hi, s.score) }))
+          setHud(prev => ({ ...prev, lives: s.lives }))
           if (s.lives <= 0) {
+            submitScore('spaceinvaders', s.score)
             setScreen('gameover')
             return
           }
@@ -424,7 +426,8 @@ export default function SpaceInvaders() {
       for (const inv of s.invaders) {
         if (inv.alive && inv.y + INVADER_H / 2 >= s.player.y - PLAYER_H) {
           s.lives = 0
-          setHud(prev => ({ ...prev, lives: 0, hi: Math.max(prev.hi, s.score) }))
+          submitScore('spaceinvaders', s.score)
+          setHud(prev => ({ ...prev, lives: 0 }))
           setScreen('gameover')
           return
         }
@@ -588,7 +591,7 @@ export default function SpaceInvaders() {
                     Score: {hud.score}
                   </div>
                   <div className="text-xs mb-4" style={{ color: '#666' }}>
-                    Hi-Score: {Math.max(hud.hi, hud.score)}
+                    Hi-Score: {getGameScore('spaceinvaders').highScore || 0}
                   </div>
                 </>
               ) : (
@@ -598,6 +601,9 @@ export default function SpaceInvaders() {
                   </div>
                   <div className="text-xs mb-1" style={{ color: '#FF6B35' }}>
                     ← → move &middot; SPACE shoot
+                  </div>
+                  <div className="text-xs mb-1" style={{ color: '#666' }}>
+                    Hi-Score: {getGameScore('spaceinvaders').highScore || 0}
                   </div>
                   <div className="flex flex-col gap-1 items-center my-3 text-xs" style={{ color: '#888' }}>
                     <span><span style={{ color: '#FF6B35' }}>■</span> = 30 pts &nbsp; <span style={{ color: '#F0EBE1' }}>■</span> = 20 pts &nbsp; <span style={{ color: '#A09AB0' }}>■</span> = 10 pts</span>

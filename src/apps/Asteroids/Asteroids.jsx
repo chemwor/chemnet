@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { submitScore, getGameScore } from '../../lib/highscores'
 
 const SHIP_SIZE = 14
 const TURN_SPEED = 0.07
@@ -215,6 +216,7 @@ export default function Asteroids() {
             }
 
             if (s.lives <= 0) {
+              submitScore('asteroids', s.score)
               setScreen('gameover')
               return
             }
@@ -393,8 +395,11 @@ export default function Asteroids() {
                   <div className="text-xl font-bold mb-1" style={{ color: '#FF6B35' }}>
                     GAME OVER
                   </div>
-                  <div className="text-sm mb-4" style={{ color: '#666' }}>
+                  <div className="text-sm mb-1" style={{ color: '#666' }}>
                     Score: {hud.score}
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#555' }}>
+                    Hi-Score: {getGameScore('asteroids').highScore || 0}
                   </div>
                 </>
               ) : (
@@ -402,8 +407,11 @@ export default function Asteroids() {
                   <div className="text-2xl font-bold mb-1" style={{ color: '#F0EBE1' }}>
                     ASTEROIDS
                   </div>
-                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                  <div className="text-xs mb-1" style={{ color: '#666' }}>
                     ← → rotate &middot; ↑ thrust &middot; SPACE shoot
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#555' }}>
+                    Hi-Score: {getGameScore('asteroids').highScore || 0}
                   </div>
                 </>
               )}

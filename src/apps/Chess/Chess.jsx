@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { submitWin, submitLoss, submitDraw, getGameScore } from '../../lib/highscores'
 
 // ── Piece constants ──
 const EMPTY = 0
@@ -391,6 +392,15 @@ export default function Chess() {
     return () => clearTimeout(timer)
   }, [turn, thinking, board, enPassant, castling, checkGameState])
 
+  useEffect(() => {
+    if (status === 'checkmate') {
+      if (turn === BLACK) submitWin('chess')
+      else submitLoss('chess')
+    } else if (status === 'stalemate') {
+      submitDraw('chess')
+    }
+  }, [status, turn])
+
   const newGame = useCallback(() => {
     setBoard(initialBoard())
     setSelected(-1)
@@ -560,7 +570,8 @@ export default function Chess() {
         </div>
         <div className="px-2 py-1 text-[9px] shrink-0" style={{ color: '#555', borderTop: '1px solid #333' }}>
           Wewe: Nyeupe<br />
-          CPU: Nyeusi
+          CPU: Nyeusi<br />
+          Record: {getGameScore('chess').wins || 0}W-{getGameScore('chess').losses || 0}L-{getGameScore('chess').draws || 0}D
         </div>
       </div>
     </div>

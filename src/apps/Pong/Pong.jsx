@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { submitWin, submitLoss, getGameScore } from '../../lib/highscores'
 
 const PADDLE_H = 70
 const PADDLE_W = 12
@@ -167,6 +168,7 @@ export default function Pong() {
       if (ball.x + BALL_R < 0) {
         s.aiScore++
         if (s.aiScore >= WINNING_SCORE && s.aiScore - s.playerScore >= 2) {
+          submitLoss('tabletennis')
           setScreen('gameover')
         } else {
           resetBall(s, 1) // serve toward player
@@ -176,6 +178,7 @@ export default function Pong() {
       if (ball.x - BALL_R > w) {
         s.playerScore++
         if (s.playerScore >= WINNING_SCORE && s.playerScore - s.aiScore >= 2) {
+          submitWin('tabletennis')
           setScreen('gameover')
         } else {
           resetBall(s, -1) // serve toward AI
@@ -334,8 +337,11 @@ export default function Pong() {
                   <div className="text-lg mb-1" style={{ color: '#8BC34A' }}>
                     {s ? `${s.playerScore} – ${s.aiScore}` : ''}
                   </div>
-                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                  <div className="text-xs mb-1" style={{ color: '#666' }}>
                     First to {WINNING_SCORE}, win by 2
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#555' }}>
+                    Record: {getGameScore('tabletennis').wins || 0}W - {getGameScore('tabletennis').losses || 0}L
                   </div>
                 </>
               ) : (
@@ -346,8 +352,11 @@ export default function Pong() {
                   <div className="text-xs mb-1" style={{ color: '#8BC34A' }}>
                     First to {WINNING_SCORE}, win by 2
                   </div>
-                  <div className="text-xs mb-4" style={{ color: '#666' }}>
+                  <div className="text-xs mb-1" style={{ color: '#666' }}>
                     ↑ ↓ or W/S to move paddle
+                  </div>
+                  <div className="text-xs mb-4" style={{ color: '#555' }}>
+                    Record: {getGameScore('tabletennis').wins || 0}W - {getGameScore('tabletennis').losses || 0}L
                   </div>
                 </>
               )}
