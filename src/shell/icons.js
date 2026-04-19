@@ -2,6 +2,12 @@
 // These are original designs inspired by the retro computing era
 
 export const ICONS = {
+  // Reviews — film/star
+  reviews: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="1" fill="#222" stroke="#888" stroke-width=".5"/><rect x="1" y="3" width="14" height="3" fill="#444"/><path d="M8 7l1.5 1-0.5-1.5L10.5 5.5H9L8 4 7 5.5H5.5L7 6.5 6.5 8z" fill="#FFD700"/><circle cx="4" cy="4.5" r=".8" fill="#888"/><circle cx="12" cy="4.5" r=".8" fill="#888"/></svg>`,
+
+  // Restaurant — fork and knife
+  restaurant: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1v5c0 1 1 2 2 2v6h1V8c1 0 2-1 2-2V1M4 3h5M4 5h5" fill="none" stroke="#ccc" stroke-width=".8"/><path d="M11 1v4c0 0 0 2 1 3v6h1V8c1-1 1-3 1-3V1" fill="none" stroke="#ccc" stroke-width=".8"/></svg>`,
+
   // Trophy — scoreboard
   trophy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 2h8v5c0 2.5-1.5 4-4 4s-4-1.5-4-4z" fill="#FFD700" stroke="#B8860B" stroke-width=".6"/><rect x="7" y="11" width="2" height="2" fill="#B8860B"/><rect x="5" y="13" width="6" height="2" fill="#888" stroke="#666" stroke-width=".3"/><path d="M4 3H2v3c0 1.5 1 2 2 2z" fill="#FFD700" stroke="#B8860B" stroke-width=".4"/><path d="M12 3h2v3c0 1.5-1 2-2 2z" fill="#FFD700" stroke="#B8860B" stroke-width=".4"/><text x="8" y="8" fill="#B8860B" font-size="5" font-family="serif" text-anchor="middle" font-weight="bold">1</text></svg>`,
 
