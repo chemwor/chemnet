@@ -1,8 +1,19 @@
 import { useState } from 'react'
 import { iconUrl } from '../../shell/icons'
+import { AI_PAPER } from './ai-paper'
 
 // ── Blog posts ──
 const POSTS = [
+  {
+    id: 'ai-workforce',
+    filename: 'Artificial Intelligence in The Workforce.doc',
+    date: '2016-05-18',
+    size: '48 KB',
+    title: 'Break Down of Artificial Intelligence and Its Impact on Human Life: Present, Future and Possibilities',
+    content: AI_PAPER,
+    raw: null, // this IS the raw — written in high school, unedited
+    note: 'Research paper written at John McEachern High School, Fall/Spring 2015-2016. Unedited original.',
+  },
   {
     id: 'ai-writing',
     filename: 'On Using AI to Clean Up My Writing.doc',
@@ -295,17 +306,31 @@ function DocumentViewer({ post, onBack }) {
             <div style={{
               fontSize: 11,
               color: '#888',
-              marginBottom: 24,
+              marginBottom: post.note ? 8 : 24,
               paddingBottom: 12,
-              borderBottom: '1px solid #ddd',
+              borderBottom: post.note ? 'none' : '1px solid #ddd',
               fontFamily: 'monospace',
             }}>
               {post.date} &middot; {post.size}
             </div>
           )}
 
+          {!showRaw && post.note && (
+            <div style={{
+              fontSize: 10,
+              color: '#999',
+              fontStyle: 'italic',
+              marginBottom: 24,
+              paddingBottom: 12,
+              borderBottom: '1px solid #ddd',
+              fontFamily: 'monospace',
+            }}>
+              {post.note}
+            </div>
+          )}
+
           {/* Body */}
-          {(showRaw ? post.raw : post.content).split('\n\n').map((para, i) => (
+          {(showRaw && post.raw ? post.raw : post.content).split('\n\n').map((para, i) => (
             <p key={i} style={{ margin: '0 0 16px', textAlign: showRaw ? 'left' : 'justify' }}>
               {para}
             </p>
