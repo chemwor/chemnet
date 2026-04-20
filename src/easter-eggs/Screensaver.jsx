@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 
+const STORAGE_BASE = 'https://cxbfuzqjlqipjyinhzqv.supabase.co/storage/v1/object/public/screensavers'
+
 function getScreensaverUrl() {
   const hour = new Date().getHours()
-  if (hour === 3) return '/screensavers/scaryscreensaver.gif'
-  if (hour >= 6 && hour < 18) return '/screensavers/daytimescreensaver.gif'
-  return '/screensavers/nighttimescreensaver.gif'
+  if (hour === 3) return `${STORAGE_BASE}/scaryscreensaver.gif`
+  if (hour >= 6 && hour < 18) return `${STORAGE_BASE}/daytimescreensaver.gif`
+  return `${STORAGE_BASE}/nighttimescreensaver.gif`
 }
 
 // Fallback: animated starfield if GIFs aren't available
