@@ -212,8 +212,8 @@ function Dock({ onTap }) {
   )
 }
 
-// ── Notification Banner (iOS style) ──
-function NotificationBanner({ onTap, onDismiss }) {
+// ── Notification Banner (iOS style) — replaces README.sh on mobile ──
+function NotificationBanner({ onTap }) {
   return (
     <motion.div
       className="absolute left-3 right-3"
@@ -223,30 +223,34 @@ function NotificationBanner({ onTap, onDismiss }) {
         background: 'rgba(30,28,40,0.92)',
         backdropFilter: 'blur(20px)',
         borderRadius: 14,
-        padding: '10px 14px',
+        padding: '12px 14px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
       }}
-      initial={{ y: -80, opacity: 0 }}
+      initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      exit={{ y: -80, opacity: 0 }}
+      exit={{ y: -100, opacity: 0 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       onClick={onTap}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2.5">
         <div style={{
-          width: 28, height: 28, borderRadius: 6,
-          background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 14,
+          width: 32, height: 32, borderRadius: 8,
+          background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '1px solid #333',
+          shrink: 0,
         }}>
-          <AppIcon icon="terminal" size={16} />
+          <AppIcon icon="terminal" size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#F0EBE1', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>Terminal</span>
+          <div className="flex items-center justify-between mb-0.5">
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#F0EBE1', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>README.sh</span>
             <span style={{ fontSize: 9, color: '#888', fontFamily: '-apple-system, sans-serif' }}>now</span>
           </div>
-          <div style={{ fontSize: 11, color: '#A09AB0', fontFamily: '-apple-system, "Helvetica Neue", sans-serif', marginTop: 1 }}>
-            psst — there's a terminal here. type "ls -a" to find secrets.
+          <div style={{ fontSize: 11, color: '#ccc', fontFamily: '-apple-system, "Helvetica Neue", sans-serif', lineHeight: 1.4 }}>
+            Hey. Karibu. I'm Eric. Come in.
+          </div>
+          <div style={{ fontSize: 10, color: '#888', fontFamily: '-apple-system, sans-serif', marginTop: 3 }}>
+            Tap to read more
           </div>
         </div>
       </div>
@@ -331,8 +335,7 @@ export function MobileShell({ windowManager }) {
         <AnimatePresence>
           {showNotification && !activeApp && (
             <NotificationBanner
-              onTap={() => { setShowNotification(false); handleOpen('terminal') }}
-              onDismiss={() => setShowNotification(false)}
+              onTap={() => { setShowNotification(false); handleOpen('about') }}
             />
           )}
         </AnimatePresence>
