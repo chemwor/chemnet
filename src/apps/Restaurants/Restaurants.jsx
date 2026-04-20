@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { supabase } from '../../lib/supabase'
 
 const CATEGORIES = [
   { id: 'been', label: 'Been To', icon: '✅' },
@@ -209,12 +210,13 @@ function MobileRestaurantDetail({ item, onBack }) {
   )
 }
 
-function MobileRestaurants() {
+function MobileRestaurants({ data }) {
+  const items = data || RESTAURANTS
   const [tab, setTab] = useState('been')
   const [openId, setOpenId] = useState(null)
 
-  const filtered = RESTAURANTS.filter(r => r.status === tab)
-  const openItem = RESTAURANTS.find(r => r.id === openId)
+  const filtered = items.filter(r => r.status === tab)
+  const openItem = items.find(r => r.id === openId)
 
   if (openItem) return <MobileRestaurantDetail item={openItem} onBack={() => setOpenId(null)} />
 
@@ -253,14 +255,36 @@ function MobileRestaurants() {
 
 export default function Restaurants() {
   const isMobile = useMediaQuery('(max-width: 768px)')
-
+  const [data, setData] = useState(RESTAURANTS) // fallback to hardcoded
+  const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('been')
   const [selectedId, setSelectedId] = useState(null)
 
-  if (isMobile) return <MobileRestaurants />
+  useEffect(() => {
+    async function load() {
+      try {
+        const controller = new AbortController()
+        setTimeout(() => controller.abort(), 3000)
+        const { data: rows, error } = await supabase
+          .from('restaurants')
+          .select('*')
+          .order('name')
+          .abortSignal(controller.signal)
+        if (!error && rows && rows.length > 0) setData(rows)
+      } catch {}
+      setLoading(false)
+    }
+    load()
+  }, [])
 
-  const filtered = RESTAURANTS.filter(r => r.status === tab)
-  const selected = RESTAURANTS.find(r => r.id === selectedId)
+  if (loading) {
+    return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#12100c', color: '#666', fontFamily: 'monospace' }}>Loading...</div>
+  }
+
+  if (isMobile) return <MobileRestaurants data={data} />
+
+  const filtered = data.filter(r => r.status === tab)
+  const selected = data.find(r => r.id === selectedId)
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#12100c', fontFamily: 'monospace', color: '#F0EBE1' }}>
