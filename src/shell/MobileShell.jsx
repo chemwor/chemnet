@@ -212,13 +212,69 @@ function Dock({ onTap }) {
   )
 }
 
+// ── Notification Banner (iOS style) ──
+function NotificationBanner({ onTap, onDismiss }) {
+  return (
+    <motion.div
+      className="absolute left-3 right-3"
+      style={{
+        top: 24,
+        zIndex: 200,
+        background: 'rgba(30,28,40,0.92)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: 14,
+        padding: '10px 14px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+      }}
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: -80, opacity: 0 }}
+      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      onClick={onTap}
+    >
+      <div className="flex items-center gap-2">
+        <div style={{
+          width: 28, height: 28, borderRadius: 6,
+          background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 14,
+        }}>
+          <AppIcon icon="terminal" size={16} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#F0EBE1', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>Terminal</span>
+            <span style={{ fontSize: 9, color: '#888', fontFamily: '-apple-system, sans-serif' }}>now</span>
+          </div>
+          <div style={{ fontSize: 11, color: '#A09AB0', fontFamily: '-apple-system, "Helvetica Neue", sans-serif', marginTop: 1 }}>
+            psst — there's a terminal here. type "ls -a" to find secrets.
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 // ── Main Shell ──
 export function MobileShell({ windowManager }) {
   const { openApp, closeApp } = windowManager
   const [activeAppId, setActiveAppId] = useState(null)
   const [page, setPage] = useState(0)
   const [gamesOpen, setGamesOpen] = useState(false)
+  const [showNotification, setShowNotification] = useState(false)
   const touchStart = useRef(null)
+
+  // Show terminal notification after 5 seconds (once per session)
+  useEffect(() => {
+    const shown = sessionStorage.getItem('chemnet_notif_shown')
+    if (shown) return
+    const timer = setTimeout(() => {
+      setShowNotification(true)
+      sessionStorage.setItem('chemnet_notif_shown', '1')
+      // Auto-dismiss after 6 seconds
+      setTimeout(() => setShowNotification(false), 6000)
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [])
 
   const activeApp = activeAppId ? APP_REGISTRY.find(a => a.id === activeAppId) : null
 
@@ -270,6 +326,16 @@ export function MobileShell({ windowManager }) {
       {/* Content layer */}
       <div className="flex flex-col w-full h-full relative" style={{ zIndex: 1 }}>
         <StatusBar />
+
+        {/* iOS-style notification */}
+        <AnimatePresence>
+          {showNotification && !activeApp && (
+            <NotificationBanner
+              onTap={() => { setShowNotification(false); handleOpen('terminal') }}
+              onDismiss={() => setShowNotification(false)}
+            />
+          )}
+        </AnimatePresence>
 
         {/* App grid area */}
         <div
