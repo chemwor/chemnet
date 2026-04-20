@@ -242,7 +242,7 @@ function DocumentViewer({ post, onBack }) {
 
 function MobileNotesList({ posts, onOpen }) {
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
       {/* Search bar */}
       <div style={{ padding: '8px 16px', background: '#f2f2f7' }}>
         <div style={{ background: '#e5e5ea', borderRadius: 10, padding: '8px 12px', fontSize: 14, color: '#8e8e93' }}>
@@ -298,7 +298,7 @@ function MobileNoteView({ post, onBack }) {
   }, [post.id])
 
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
       {/* Nav */}
       <div className="flex items-center justify-between px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
         <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>
@@ -371,7 +371,7 @@ export default function Blog() {
   }, [])
 
   if (loading) {
-    return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: '#888', fontFamily: 'monospace' }}>Loading...</div>
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#fff', color: '#888', fontFamily: 'monospace' }}>Loading...</div>
   }
 
   const openPost = posts.find(p => p.id === openPostId)

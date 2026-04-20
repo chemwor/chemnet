@@ -61,7 +61,7 @@ export function MobilePanel({ app, onClose }) {
       </div>
 
       {/* App content */}
-      <div className="flex-1" style={{ position: 'relative', overflow: 'hidden', minHeight: 0 }}>
+      <div className="flex-1 flex flex-col" style={{ position: 'relative', overflow: 'hidden', minHeight: 0 }}>
         <Suspense fallback={
           <div className="flex items-center justify-center h-full" style={{ color: 'var(--color-text-secondary)' }}>
             Loading...
