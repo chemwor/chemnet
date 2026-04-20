@@ -290,7 +290,7 @@ function MobileInbox({ messages, onSelect, onCompose }) {
       <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
         <span style={{ fontSize: 11, color: '#007AFF' }}>Mailboxes</span>
         <span style={{ fontSize: 16, fontWeight: 600 }}>Inbox</span>
-        <button onClick={onCompose} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 20 }}>✎</button>
+        <button onClick={onCompose} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 13, fontFamily: '-apple-system, sans-serif' }}>New Message</button>
       </div>
       <div className="flex-1 overflow-auto">
         {messages.map(m => (
