@@ -46,8 +46,23 @@ function StatusBar() {
   )
 }
 
+// ── iOS icon glyph map — clean white symbols like original iPhone ──
+const IOS_GLYPHS = {
+  about: '📋', terminal: '>_', projects: '📂', blog: '✏️',
+  pictures: '🌅', videos: '▶', messageboard: '💬', guestbook: '📖',
+  music: '♫', reviews: '📺', restaurants: '🍴', email: '✉️',
+  carmods: '🏎️', wishlist: '⭐', trips: '✈️',
+  stats: '🏆', solitaire: '♠', minesweeper: '💣', chess: '♟',
+  pong: '🏓', asteroids: '☄️', pacman: '👾', spaceinvaders: '👽',
+  arkanoid: '🧱', fighter: '🤖', snake: '🐍', '2048': '🔢',
+  flappybird: '🐤', tetris: '▦', sudoku: '9', doodlejump: '↑',
+  fruitninja: '🔪', admin: '⚙️',
+}
+
 // ── App Icon (iOS 1 glossy rounded square) ──
 function MobileAppIcon({ app, onTap }) {
+  const glyph = IOS_GLYPHS[app.id] || '•'
+
   return (
     <button
       className="flex flex-col items-center gap-1 border-none bg-transparent cursor-pointer"
@@ -55,32 +70,38 @@ function MobileAppIcon({ app, onTap }) {
       onClick={() => onTap(app.id)}
     >
       <div
-        className="flex items-center justify-center"
         style={{
-          width: 54,
-          height: 54,
-          borderRadius: 12,
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.1) 100%)',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
-          overflow: 'hidden',
+          width: 57,
+          height: 57,
+          borderRadius: 13,
           position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4)',
         }}
       >
-        {/* Colored background */}
+        {/* Colored gradient background */}
         <div style={{
           position: 'absolute', inset: 0,
           background: getIconBg(app.id),
-          borderRadius: 12,
         }} />
-        {/* Gloss overlay */}
+        {/* Gloss — top half shine (classic iOS 1 look) */}
         <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '50%',
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.05))',
-          borderRadius: '12px 12px 0 0',
+          position: 'absolute', top: 0, left: 0, right: 0, height: '48%',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 100%)',
+          borderRadius: '13px 13px 0 0',
         }} />
-        {/* Icon */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <AppIcon icon={app.icon} size={28} />
+        {/* Glyph — white centered symbol */}
+        <div style={{
+          position: 'relative', zIndex: 1,
+          width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: glyph.length <= 2 ? 26 : 20,
+          color: '#fff',
+          textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+          fontFamily: '-apple-system, "Helvetica Neue", sans-serif',
+          fontWeight: 300,
+        }}>
+          {glyph}
         </div>
       </div>
       <span
@@ -90,7 +111,7 @@ function MobileAppIcon({ app, onTap }) {
           fontSize: 10,
           fontFamily: '-apple-system, "Helvetica Neue", Arial, sans-serif',
           fontWeight: 500,
-          textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+          textShadow: '0 1px 3px rgba(0,0,0,0.9)',
           maxWidth: 72,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -104,34 +125,46 @@ function MobileAppIcon({ app, onTap }) {
 }
 
 function getIconBg(id) {
+  // Bold, saturated gradients like original iPhone icons
   const colors = {
-    about: 'linear-gradient(135deg, #1a1a1a, #333)',
-    projects: 'linear-gradient(135deg, #c99a2e, #a07818)',
-    blog: 'linear-gradient(135deg, #3366cc, #2244aa)',
-    pictures: 'linear-gradient(135deg, #e06030, #c04020)',
-    videos: 'linear-gradient(135deg, #cc2222, #aa1111)',
-    messageboard: 'linear-gradient(135deg, #2266cc, #1144aa)',
-    guestbook: 'linear-gradient(135deg, #8B4513, #5a2d0c)',
-    music: 'linear-gradient(135deg, #e04090, #c02070)',
-    reviews: 'linear-gradient(135deg, #333, #111)',
-    restaurants: 'linear-gradient(135deg, #e08020, #c06010)',
-    email: 'linear-gradient(135deg, #4488ff, #2266dd)',
-    terminal: 'linear-gradient(135deg, #1a1a1a, #000)',
-    stats: 'linear-gradient(135deg, #ddaa00, #bb8800)',
-    solitaire: 'linear-gradient(135deg, #1a5a1a, #0a3a0a)',
-    minesweeper: 'linear-gradient(135deg, #888, #555)',
-    chess: 'linear-gradient(135deg, #006600, #004400)',
-    pong: 'linear-gradient(135deg, #1B5E20, #0a3a0a)',
-    asteroids: 'linear-gradient(135deg, #111, #000)',
-    pacman: 'linear-gradient(135deg, #1a1a1a, #000)',
-    spaceinvaders: 'linear-gradient(135deg, #111, #000)',
-    arkanoid: 'linear-gradient(135deg, #2222aa, #111166)',
-    fighter: 'linear-gradient(135deg, #cc2222, #881111)',
+    about: 'linear-gradient(180deg, #4a4a4a, #1a1a1a)',
+    projects: 'linear-gradient(180deg, #FFD60A, #C8A200)',
+    blog: 'linear-gradient(180deg, #FFCC00, #FF9500)',
+    pictures: 'linear-gradient(180deg, #FF6B35, #D44500)',
+    videos: 'linear-gradient(180deg, #5856D6, #3634A3)',
+    messageboard: 'linear-gradient(180deg, #34C759, #248A3D)',
+    guestbook: 'linear-gradient(180deg, #A2845E, #7A5C3E)',
+    music: 'linear-gradient(180deg, #FC3D55, #D42040)',
+    reviews: 'linear-gradient(180deg, #2C2C2E, #1C1C1E)',
+    restaurants: 'linear-gradient(180deg, #FF9500, #CC7700)',
+    email: 'linear-gradient(180deg, #5AC8FA, #007AFF)',
+    terminal: 'linear-gradient(180deg, #2C2C2E, #000000)',
+    stats: 'linear-gradient(180deg, #FFD700, #CC9900)',
+    solitaire: 'linear-gradient(180deg, #34C759, #1B8C3A)',
+    minesweeper: 'linear-gradient(180deg, #8E8E93, #636366)',
+    chess: 'linear-gradient(180deg, #30D158, #1B8C3A)',
+    pong: 'linear-gradient(180deg, #30D158, #1B6C2A)',
+    asteroids: 'linear-gradient(180deg, #2C2C2E, #000000)',
+    pacman: 'linear-gradient(180deg, #FFD60A, #CC9900)',
+    spaceinvaders: 'linear-gradient(180deg, #30D158, #1B6C2A)',
+    arkanoid: 'linear-gradient(180deg, #5856D6, #3634A3)',
+    fighter: 'linear-gradient(180deg, #FF3B30, #CC2D26)',
+    snake: 'linear-gradient(180deg, #30D158, #1B6C2A)',
+    '2048': 'linear-gradient(180deg, #FF9500, #CC7700)',
+    flappybird: 'linear-gradient(180deg, #5AC8FA, #34AADC)',
+    tetris: 'linear-gradient(180deg, #5856D6, #3634A3)',
+    sudoku: 'linear-gradient(180deg, #FFFFFF, #E5E5EA)',
+    doodlejump: 'linear-gradient(180deg, #A2845E, #7A5C3E)',
+    fruitninja: 'linear-gradient(180deg, #FF3B30, #8B1A10)',
+    carmods: 'linear-gradient(180deg, #FF3B30, #CC2222)',
+    wishlist: 'linear-gradient(180deg, #FFD60A, #CC9900)',
+    trips: 'linear-gradient(180deg, #5AC8FA, #007AFF)',
+    admin: 'linear-gradient(180deg, #8E8E93, #4A4A4E)',
   }
-  return colors[id] || 'linear-gradient(135deg, #444, #222)'
+  return colors[id] || 'linear-gradient(180deg, #636366, #3A3A3C)'
 }
 
-// ── Games folder icon ──
+// ── Games folder icon — iOS folder style ──
 function GamesFolderIcon({ onTap }) {
   return (
     <button
@@ -140,34 +173,41 @@ function GamesFolderIcon({ onTap }) {
       onClick={onTap}
     >
       <div
-        className="flex items-center justify-center"
         style={{
-          width: 54,
-          height: 54,
-          borderRadius: 12,
-          background: 'linear-gradient(135deg, rgba(80,80,80,0.6), rgba(40,40,40,0.8))',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+          width: 57,
+          height: 57,
+          borderRadius: 13,
           position: 'relative',
           overflow: 'hidden',
+          boxShadow: '0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4)',
+          background: 'linear-gradient(180deg, #636366, #3A3A3C)',
         }}
       >
-        {/* Mini icon grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, padding: 6, position: 'relative', zIndex: 1 }}>
-          <AppIcon icon="cards" size={16} />
-          <AppIcon icon="ghost" size={16} />
-          <AppIcon icon="rocket" size={16} />
-          <AppIcon icon="chess" size={16} />
-        </div>
+        {/* Gloss */}
         <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '50%',
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0))',
-          borderRadius: '12px 12px 0 0',
+          position: 'absolute', top: 0, left: 0, right: 0, height: '48%',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.45), rgba(255,255,255,0.1))',
+          borderRadius: '13px 13px 0 0',
         }} />
+        {/* Mini icons grid */}
+        <div style={{
+          position: 'relative', zIndex: 1,
+          width: '100%', height: '100%',
+          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          alignItems: 'center', justifyItems: 'center',
+          padding: 10, gap: 2,
+          fontSize: 14,
+        }}>
+          <span>♠</span>
+          <span>👾</span>
+          <span>☄️</span>
+          <span>🐍</span>
+        </div>
       </div>
       <span style={{
         color: '#fff', fontSize: 10,
         fontFamily: '-apple-system, "Helvetica Neue", Arial, sans-serif',
-        fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+        fontWeight: 500, textShadow: '0 1px 3px rgba(0,0,0,0.9)',
       }}>
         Games
       </span>
