@@ -155,8 +155,8 @@ function DocumentViewer({ post, onBack }) {
 
   // Track view
   useEffect(() => {
-    if (post.id && !post.id.startsWith('fallback')) {
-      supabase.rpc('increment_blog_views', { post_id: post.id }).catch(() => {})
+    if (post.id && !String(post.id).startsWith('fallback')) {
+      try { supabase.rpc('increment_blog_views', { post_id: post.id }) } catch {}
     }
   }, [post.id])
 
@@ -293,7 +293,7 @@ function MobileNoteView({ post, onBack }) {
 
   useEffect(() => {
     if (post.id && !String(post.id).startsWith('fallback')) {
-      supabase.rpc('increment_blog_views', { post_id: post.id }).catch(() => {})
+      try { supabase.rpc('increment_blog_views', { post_id: post.id }) } catch {}
     }
   }, [post.id])
 
