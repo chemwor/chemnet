@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ── Mock data ──
 const INITIAL_THREADS = [
@@ -266,6 +267,208 @@ function NewThreadView({ onBack, onSubmit }) {
   )
 }
 
+// ══════════════════════════════════════════
+// MOBILE VIEW — iOS Messages style
+// ══════════════════════════════════════════
+
+function getAvatarColor(name) {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  const hue = Math.abs(hash) % 360
+  return `hsl(${hue}, 50%, 45%)`
+}
+
+function MobileThreadList({ threads, onOpen, onNew }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <div style={{ width: 50 }} />
+        <span style={{ fontSize: 16, fontWeight: 600, color: '#000' }}>Messages</span>
+        <button onClick={onNew} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 22, fontFamily: 'inherit' }}>✎</button>
+      </div>
+
+      {/* Thread list */}
+      <div className="flex-1 overflow-auto">
+        {threads.map(t => {
+          const lastPost = t.posts[t.posts.length - 1]
+          const preview = lastPost.body.slice(0, 50).replace(/\n/g, ' ')
+          return (
+            <div
+              key={t.id}
+              onClick={() => onOpen(t.id)}
+              className="flex items-center gap-3"
+              style={{ padding: '12px 16px', borderBottom: '0.5px solid #f0f0f0' }}
+            >
+              {/* Avatar */}
+              <div style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: getAvatarColor(t.author),
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 16, fontWeight: 600, shrink: 0,
+              }}>
+                {t.author.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>{t.subject}</span>
+                  <span style={{ fontSize: 12, color: '#8e8e93', shrink: 0 }}>
+                    {new Date(t.posts[t.posts.length - 1].date || t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+                <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {lastPost.author}: {preview}
+                </div>
+              </div>
+              <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function MobileThreadView({ thread, onBack, onReply }) {
+  const [message, setMessage] = useState('')
+  const [screenName, setScreenName] = useState('')
+  const [showNameInput, setShowNameInput] = useState(true)
+  const bottomRef = useRef(null)
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [thread.posts.length])
+
+  const handleSend = () => {
+    if (!message.trim()) return
+    if (!screenName.trim()) { setShowNameInput(true); return }
+    onReply({ screenName: screenName.trim(), body: message.trim() })
+    setMessage('')
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Header */}
+      <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea', background: '#f8f8f8' }}>
+        <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>
+          ‹ Back
+        </button>
+        <span className="flex-1 text-center truncate" style={{ fontSize: 15, fontWeight: 600, color: '#000', padding: '0 40px' }}>
+          {thread.subject}
+        </span>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-auto" style={{ background: '#e5e5ea', padding: '8px 12px' }}>
+        {thread.posts.map((post, i) => {
+          const isSysop = post.author === 'SysOp_Eric' || post.is_sysop
+          const isMe = post.author === screenName
+          const alignRight = isMe
+
+          return (
+            <div key={post.id || i} style={{ display: 'flex', justifyContent: alignRight ? 'flex-end' : 'flex-start', marginBottom: 6 }}>
+              <div style={{ maxWidth: '75%' }}>
+                {/* Name label */}
+                {!alignRight && (
+                  <div style={{ fontSize: 10, color: '#8e8e93', marginBottom: 2, paddingLeft: 10 }}>
+                    {post.author} {isSysop ? '· SysOp' : ''}
+                  </div>
+                )}
+                {/* Bubble */}
+                <div style={{
+                  padding: '8px 12px',
+                  borderRadius: 18,
+                  background: alignRight ? '#007AFF' : '#fff',
+                  color: alignRight ? '#fff' : '#000',
+                  fontSize: 14,
+                  lineHeight: 1.4,
+                  whiteSpace: 'pre-wrap',
+                  boxShadow: '0 0.5px 1px rgba(0,0,0,0.1)',
+                }}>
+                  {post.body}
+                </div>
+                <div style={{ fontSize: 9, color: '#8e8e93', marginTop: 2, textAlign: alignRight ? 'right' : 'left', paddingLeft: alignRight ? 0 : 10, paddingRight: alignRight ? 10 : 0 }}>
+                  {post.date ? new Date(post.date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Name input (shown once) */}
+      {showNameInput && !screenName && (
+        <div className="flex items-center gap-2 px-3 py-2 shrink-0" style={{ background: '#f8f8f8', borderTop: '0.5px solid #e5e5ea' }}>
+          <input
+            value={screenName}
+            onChange={(e) => setScreenName(e.target.value)}
+            placeholder="Enter your name first"
+            className="flex-1 px-3 py-1.5 border-none outline-none"
+            style={{ background: '#e5e5ea', borderRadius: 18, fontSize: 14, fontFamily: 'inherit' }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && screenName.trim()) setShowNameInput(false) }}
+          />
+          <button
+            onClick={() => { if (screenName.trim()) setShowNameInput(false) }}
+            className="border-none bg-transparent cursor-pointer"
+            style={{ color: screenName.trim() ? '#007AFF' : '#c7c7cc', fontSize: 14, fontWeight: 600, fontFamily: 'inherit' }}
+          >
+            Set
+          </button>
+        </div>
+      )}
+
+      {/* Message input */}
+      <div className="flex items-center gap-2 px-3 py-2 shrink-0" style={{ background: '#f8f8f8', borderTop: '0.5px solid #e5e5ea' }}>
+        <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder={screenName ? 'Message' : 'Set your name first'}
+          disabled={!screenName}
+          className="flex-1 px-3 py-1.5 border-none outline-none"
+          style={{ background: '#e5e5ea', borderRadius: 18, fontSize: 14, fontFamily: 'inherit' }}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleSend() }}
+        />
+        <button
+          onClick={handleSend}
+          className="border-none bg-transparent cursor-pointer"
+          style={{
+            width: 30, height: 30, borderRadius: '50%',
+            background: message.trim() && screenName ? '#007AFF' : '#e5e5ea',
+            color: '#fff', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          ↑
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function MobileNewThread({ onBack, onSubmit }) {
+  const [screenName, setScreenName] = useState('')
+  const [subject, setSubject] = useState('')
+  const [body, setBody] = useState('')
+
+  const handleSend = () => {
+    if (!screenName.trim() || !subject.trim() || !body.trim()) return
+    onSubmit({ screenName: screenName.trim(), subject: subject.trim(), body: body.trim() })
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>Cancel</button>
+        <span className="flex-1 text-center" style={{ fontSize: 15, fontWeight: 600 }}>New Message</span>
+        <button onClick={handleSend} className="border-none bg-transparent cursor-pointer" style={{ color: (screenName && subject && body) ? '#007AFF' : '#c7c7cc', fontSize: 15, fontWeight: 600, fontFamily: 'inherit' }}>Send</button>
+      </div>
+      <div className="flex-1 overflow-auto p-4">
+        <input value={screenName} onChange={e => setScreenName(e.target.value)} placeholder="Your name" className="w-full px-0 py-2 border-none outline-none" style={{ borderBottom: '0.5px solid #e5e5ea', fontSize: 15, fontFamily: 'inherit' }} />
+        <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject" className="w-full px-0 py-2 border-none outline-none" style={{ borderBottom: '0.5px solid #e5e5ea', fontSize: 15, fontFamily: 'inherit' }} />
+        <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Write your message..." className="w-full px-0 py-2 border-none outline-none resize-none" rows={6} style={{ fontSize: 15, fontFamily: 'inherit', lineHeight: 1.5 }} />
+      </div>
+    </div>
+  )
+}
+
 // ── Main ──
 export default function MessageBoard() {
   const [threads, setThreads] = useState(INITIAL_THREADS)
@@ -312,6 +515,16 @@ export default function MessageBoard() {
     setView('thread')
   }
 
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
+  // Mobile — iMessage style
+  if (isMobile) {
+    if (view === 'new') return <MobileNewThread onBack={() => setView('list')} onSubmit={handleNewThread} />
+    if (view === 'thread' && activeThread) return <MobileThreadView thread={activeThread} onBack={() => setView('list')} onReply={handleReply} />
+    return <MobileThreadList threads={threads} onOpen={handleOpenThread} onNew={() => setView('new')} />
+  }
+
+  // Desktop — BBS style
   if (view === 'new') {
     return <NewThreadView onBack={() => setView('list')} onSubmit={handleNewThread} />
   }
