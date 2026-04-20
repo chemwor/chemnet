@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 const FOLDERS = [
   { id: 'inbox', label: 'Inbox', icon: '📥', count: 3 },
@@ -279,6 +280,107 @@ function ComposeView({ onSend, onCancel }) {
   )
 }
 
+// ══════════════════════════════════════════
+// MOBILE VIEW — iOS Mail style
+// ══════════════════════════════════════════
+
+function MobileInbox({ messages, onSelect, onCompose }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <span style={{ fontSize: 11, color: '#007AFF' }}>Mailboxes</span>
+        <span style={{ fontSize: 16, fontWeight: 600 }}>Inbox</span>
+        <button onClick={onCompose} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 20 }}>✎</button>
+      </div>
+      <div className="flex-1 overflow-auto">
+        {messages.map(m => (
+          <div key={m.id} onClick={() => onSelect(m.id)} style={{ padding: '12px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea' }}>
+            <div className="flex items-center justify-between">
+              <span style={{ fontSize: 15, fontWeight: m.read ? 400 : 600, color: '#000' }}>{m.from}</span>
+              <span style={{ fontSize: 12, color: '#8e8e93' }}>{m.date}</span>
+            </div>
+            <div style={{ fontSize: 14, fontWeight: m.read ? 400 : 600, color: '#000', marginTop: 2 }}>{m.subject}</div>
+            <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {m.body.slice(0, 60).replace(/\n/g, ' ')}...
+            </div>
+            {!m.read && <div style={{ position: 'absolute', left: 6, width: 8, height: 8, borderRadius: '50%', background: '#007AFF' }} />}
+          </div>
+        ))}
+        {messages.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: '#8e8e93', fontSize: 14 }}>No messages</div>}
+      </div>
+    </div>
+  )
+}
+
+function MobileReadMessage({ message, onBack }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15 }}>‹ Inbox</button>
+      </div>
+      <div className="flex-1 overflow-auto p-4">
+        <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>{message.subject}</div>
+        <div className="flex items-center gap-2 mb-3 pb-3" style={{ borderBottom: '0.5px solid #e5e5ea' }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#007AFF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 600, fontSize: 14 }}>
+            {message.from.charAt(0)}
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>{message.from}</div>
+            <div style={{ fontSize: 12, color: '#8e8e93' }}>{message.date}</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 15, lineHeight: 1.6, color: '#333', whiteSpace: 'pre-wrap' }}>{message.body}</div>
+      </div>
+    </div>
+  )
+}
+
+function MobileCompose({ onSend, onCancel }) {
+  const [from, setFrom] = useState('')
+  const [subject, setSubject] = useState('')
+  const [body, setBody] = useState('')
+  const [sent, setSent] = useState(false)
+
+  if (sent) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', background: '#fff', fontFamily: '-apple-system, sans-serif' }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+        <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 4 }}>Sent!</div>
+        <div style={{ fontSize: 14, color: '#8e8e93', marginBottom: 20, textAlign: 'center', padding: '0 40px' }}>Your message was delivered. Eric reads these.</div>
+        <button onClick={onCancel} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 16, fontFamily: 'inherit' }}>Done</button>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      <div className="flex items-center justify-between px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <button onClick={onCancel} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>Cancel</button>
+        <span style={{ fontSize: 16, fontWeight: 600 }}>New Message</span>
+        <button onClick={() => { if (from && subject && body) { onSend({ from, subject, body }); setSent(true) } }} className="border-none bg-transparent cursor-pointer" style={{ color: (from && subject && body) ? '#007AFF' : '#c7c7cc', fontSize: 15, fontWeight: 600, fontFamily: 'inherit' }}>Send</button>
+      </div>
+      <div className="flex-1 overflow-auto">
+        <div style={{ padding: '0 16px', borderBottom: '0.5px solid #e5e5ea' }}>
+          <div className="flex items-center py-2" style={{ fontSize: 14 }}>
+            <span style={{ color: '#8e8e93', width: 50 }}>To:</span>
+            <span style={{ color: '#000' }}>eric@chemnet.dev</span>
+          </div>
+        </div>
+        <div style={{ padding: '0 16px', borderBottom: '0.5px solid #e5e5ea' }}>
+          <div className="flex items-center py-2">
+            <span style={{ color: '#8e8e93', width: 50, fontSize: 14 }}>From:</span>
+            <input value={from} onChange={e => setFrom(e.target.value)} placeholder="your@email.com" className="flex-1 border-none outline-none" style={{ fontSize: 14, fontFamily: 'inherit' }} />
+          </div>
+        </div>
+        <div style={{ padding: '0 16px', borderBottom: '0.5px solid #e5e5ea' }}>
+          <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject" className="w-full border-none outline-none py-2" style={{ fontSize: 14, fontFamily: 'inherit' }} />
+        </div>
+        <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Write your message..." className="w-full border-none outline-none p-4 flex-1 resize-none" style={{ fontSize: 15, fontFamily: 'inherit', lineHeight: 1.6, minHeight: 200 }} />
+      </div>
+    </div>
+  )
+}
+
 // ── Main ──
 export default function Email() {
   const [activeFolder, setActiveFolder] = useState('inbox')
@@ -317,6 +419,16 @@ export default function Email() {
     setComposing(false)
   }
 
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
+  // Mobile — iOS Mail style
+  if (isMobile) {
+    if (composing) return <MobileCompose onSend={handleSend} onCancel={() => setComposing(false)} />
+    if (selectedMessage) return <MobileReadMessage message={selectedMessage} onBack={() => setSelectedMsg(null)} />
+    return <MobileInbox messages={currentMessages} onSelect={handleSelect} onCompose={() => setComposing(true)} />
+  }
+
+  // Desktop — Outlook style
   if (composing) {
     return <ComposeView onSend={handleSend} onCancel={() => setComposing(false)} />
   }

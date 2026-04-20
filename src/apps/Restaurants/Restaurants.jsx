@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 const CATEGORIES = [
   { id: 'been', label: 'Been To', icon: '✅' },
@@ -161,9 +162,102 @@ function RestaurantCard({ item, isSelected, onClick }) {
   )
 }
 
+// ══════════════════════════════════════════
+// MOBILE VIEW — Yelp/Maps style
+// ══════════════════════════════════════════
+
+function MobileRestaurantDetail({ item, onBack }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>‹ Back</button>
+      </div>
+      <div className="flex-1 overflow-auto">
+        <div style={{ textAlign: 'center', padding: '20px 16px 12px' }}>
+          <div style={{ fontSize: 44, marginBottom: 8 }}>{item.icon}</div>
+          <div style={{ fontSize: 20, fontWeight: 700 }}>{item.name}</div>
+          <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 4 }}>{item.location} · {item.cuisine}</div>
+          {item.status === 'been' && item.rating > 0 && (
+            <div style={{ fontSize: 14, color: '#FF9500', marginTop: 8 }}>{'★'.repeat(Math.round(item.rating / 2))}{'☆'.repeat(5 - Math.round(item.rating / 2))} {item.rating}/10</div>
+          )}
+        </div>
+        {item.review && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <div style={{ fontSize: 15, lineHeight: 1.6, color: '#333' }}>{item.review}</div>
+          </div>
+        )}
+        {item.favorite && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#FF9500', marginBottom: 4 }}>ORDER THIS</div>
+            <div style={{ fontSize: 15, color: '#333' }}>{item.favorite}</div>
+          </div>
+        )}
+        {item.vibe && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 4 }}>VIBE</div>
+            <div style={{ fontSize: 15, color: '#333' }}>{item.vibe}</div>
+          </div>
+        )}
+        {item.why && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#007AFF', marginBottom: 4 }}>WHY I WANT TO GO</div>
+            <div style={{ fontSize: 15, color: '#333', lineHeight: 1.6 }}>{item.why}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function MobileRestaurants() {
+  const [tab, setTab] = useState('been')
+  const [openId, setOpenId] = useState(null)
+
+  const filtered = RESTAURANTS.filter(r => r.status === tab)
+  const openItem = RESTAURANTS.find(r => r.id === openId)
+
+  if (openItem) return <MobileRestaurantDetail item={openItem} onBack={() => setOpenId(null)} />
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Segmented control */}
+      <div style={{ padding: '8px 16px', background: '#f2f2f7' }}>
+        <div style={{ display: 'flex', background: '#e5e5ea', borderRadius: 8, padding: 2 }}>
+          {CATEGORIES.map(c => (
+            <button key={c.id} onClick={() => setTab(c.id)} className="flex-1 border-none cursor-pointer" style={{ padding: '6px 0', borderRadius: 6, fontSize: 12, fontWeight: 500, fontFamily: 'inherit', background: tab === c.id ? '#fff' : 'transparent', color: '#000', boxShadow: tab === c.id ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
+              {c.icon} {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex-1 overflow-auto">
+        {filtered.map(item => (
+          <div key={item.id} onClick={() => setOpenId(item.id)} style={{ padding: '12px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea', display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 8, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+              {item.icon}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>{item.name}</div>
+              <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>{item.location} · {item.cuisine}</div>
+              {item.status === 'been' && item.rating > 0 && (
+                <div style={{ fontSize: 11, color: '#FF9500', marginTop: 2 }}>{'★'.repeat(Math.round(item.rating / 2))} {item.rating}/10</div>
+              )}
+            </div>
+            <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Restaurants() {
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
   const [tab, setTab] = useState('been')
   const [selectedId, setSelectedId] = useState(null)
+
+  if (isMobile) return <MobileRestaurants />
 
   const filtered = RESTAURANTS.filter(r => r.status === tab)
   const selected = RESTAURANTS.find(r => r.id === selectedId)

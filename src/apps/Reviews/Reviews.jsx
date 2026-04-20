@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 const CATEGORIES = [
   { id: 'movies', label: 'Movies' },
@@ -243,11 +244,108 @@ function FullReview({ item, onBack }) {
   )
 }
 
+// ══════════════════════════════════════════
+// MOBILE VIEW — IMDb/streaming app style
+// ══════════════════════════════════════════
+
+function MobileReviewCard({ item, onTap }) {
+  return (
+    <div onClick={() => onTap(item.id)} style={{ padding: '12px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea', display: 'flex', gap: 12, alignItems: 'center', fontFamily: '-apple-system, sans-serif' }}>
+      <div style={{ width: 44, height: 44, borderRadius: 8, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, shrink: 0 }}>
+        {item.poster}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>
+        <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>
+          {item.year} · {item.tags.join(', ')}
+        </div>
+        {item.status === 'watched' && (
+          <div style={{ fontSize: 11, color: '#FF9500', marginTop: 2 }}>{'★'.repeat(Math.round(item.rating / 2))}{'☆'.repeat(5 - Math.round(item.rating / 2))} {item.rating}/10</div>
+        )}
+        {item.status === 'watchlist' && (
+          <div style={{ fontSize: 11, color: '#007AFF', marginTop: 2 }}>Watchlist</div>
+        )}
+      </div>
+      <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
+    </div>
+  )
+}
+
+function MobileReviewDetail({ item, onBack }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>‹ Back</button>
+      </div>
+      <div className="flex-1 overflow-auto">
+        <div style={{ textAlign: 'center', padding: '20px 16px 12px' }}>
+          <div style={{ fontSize: 50, marginBottom: 8 }}>{item.poster}</div>
+          <div style={{ fontSize: 20, fontWeight: 700 }}>{item.title}</div>
+          <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 4 }}>{item.year} · {item.tags.join(' · ')}</div>
+          {item.status === 'watched' && (
+            <div style={{ fontSize: 16, color: '#FF9500', marginTop: 8 }}>{'★'.repeat(Math.round(item.rating / 2))}{'☆'.repeat(5 - Math.round(item.rating / 2))} <span style={{ color: '#000', fontWeight: 600 }}>{item.rating}/10</span></div>
+          )}
+        </div>
+        {item.review && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>Quick Take</div>
+            <div style={{ fontSize: 15, lineHeight: 1.6, color: '#333' }}>{item.review}</div>
+          </div>
+        )}
+        {item.analysis && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>Full Analysis</div>
+            {item.analysis.split('\n\n').map((p, i) => (
+              <p key={i} style={{ fontSize: 15, lineHeight: 1.6, color: '#333', margin: '0 0 12px' }}>{p}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function MobileReviews() {
+  const [category, setCategory] = useState('movies')
+  const [openId, setOpenId] = useState(null)
+
+  const filtered = REVIEWS.filter(r => r.category === category).sort((a, b) => {
+    if (a.status === 'watchlist' && b.status !== 'watchlist') return 1
+    if (b.status === 'watchlist' && a.status !== 'watchlist') return -1
+    return b.rating - a.rating
+  })
+
+  const openItem = REVIEWS.find(r => r.id === openId)
+  if (openItem) return <MobileReviewDetail item={openItem} onBack={() => setOpenId(null)} />
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Segmented control */}
+      <div style={{ padding: '8px 16px', background: '#f2f2f7' }}>
+        <div style={{ display: 'flex', background: '#e5e5ea', borderRadius: 8, padding: 2 }}>
+          {[{ id: 'movies', label: 'Movies' }, { id: 'tv', label: 'TV Shows' }].map(c => (
+            <button key={c.id} onClick={() => setCategory(c.id)} className="flex-1 border-none cursor-pointer" style={{ padding: '6px 0', borderRadius: 6, fontSize: 13, fontWeight: 500, fontFamily: 'inherit', background: category === c.id ? '#fff' : 'transparent', color: '#000', boxShadow: category === c.id ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex-1 overflow-auto">
+        {filtered.map(item => <MobileReviewCard key={item.id} item={item} onTap={setOpenId} />)}
+      </div>
+    </div>
+  )
+}
+
 export default function Reviews() {
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
   const [category, setCategory] = useState('movies')
   const [filter, setFilter] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
-  const [openId, setOpenId] = useState(null) // full page view
+  const [openId, setOpenId] = useState(null)
+
+  if (isMobile) return <MobileReviews />
 
   const filtered = REVIEWS
     .filter(r => r.category === category)
