@@ -416,6 +416,11 @@ Date:   2026
         }
         break
 
+      case 'admin':
+        window.dispatchEvent(new CustomEvent('ericOS:openApp', { detail: 'admin' }))
+        addOutput('Opening admin panel...')
+        break
+
       case 'neofetch':
         addOutput(`        ╔══════╗      eric@chemnet
         ║ CHEM ║      ────────────

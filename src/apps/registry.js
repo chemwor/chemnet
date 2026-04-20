@@ -362,6 +362,19 @@ export const APP_REGISTRY = [
     category: 'games',
     mobile: true,
   },
+  // ── Hidden (admin only, not in menus) ──
+  {
+    id: 'admin',
+    label: 'Admin Panel',
+    icon: 'settings',
+    component: () => import('./Admin/Admin.jsx'),
+    defaultSize: { width: 600, height: 500 },
+    defaultPosition: { x: 100, y: 40 },
+    openOnBoot: false,
+    pinned: false,
+    auth: true,
+    category: 'hidden',
+  },
 ]
 
 // Category definitions for the Start Menu
