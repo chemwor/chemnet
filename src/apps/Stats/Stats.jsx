@@ -11,9 +11,12 @@ const GAME_NAMES = {
   tabletennis: 'Table Tennis',
   chess: 'Chess',
   fighter: "Rock'em Sock'em",
+  snake: 'Snake',
+  '2048': '2048',
+  flappybird: 'Flappy Bird',
 }
 
-const SCORE_GAMES = ['asteroids', 'pacman', 'spaceinvaders', 'arkanoid', 'solitaire']
+const SCORE_GAMES = ['asteroids', 'pacman', 'spaceinvaders', 'arkanoid', 'solitaire', 'snake', '2048', 'flappybird']
 const RECORD_GAMES = ['tabletennis', 'chess', 'fighter']
 
 const PERIODS = [

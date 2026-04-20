@@ -223,7 +223,7 @@ export function MobileShell({ windowManager }) {
   const activeApp = activeAppId ? APP_REGISTRY.find(a => a.id === activeAppId) : null
 
   const topLevelApps = APP_REGISTRY.filter(a => !a.category && !a.pinned)
-  const gameApps = APP_REGISTRY.filter(a => a.category === 'games')
+  const gameApps = APP_REGISTRY.filter(a => a.category === 'games' && a.mobile !== false)
 
   // Split into pages of 16 (4x4 grid) — include games folder on first page
   const pageSize = 16
