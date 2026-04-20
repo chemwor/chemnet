@@ -361,7 +361,8 @@ function MobileThreadView({ thread, onBack, onReply }) {
         {thread.posts.map((post, i) => {
           const isSysop = post.author === 'SysOp_Eric' || post.is_sysop
           const isMe = post.author === screenName
-          const alignRight = isMe
+          // Eric's messages (SysOp) are always blue/right — it's his phone
+          const alignRight = isSysop || isMe
 
           return (
             <div key={post.id || i} style={{ display: 'flex', justifyContent: alignRight ? 'flex-end' : 'flex-start', marginBottom: 6 }}>
