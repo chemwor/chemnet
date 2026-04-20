@@ -3,6 +3,7 @@ import { useState } from 'react'
 const CATEGORIES = [
   { id: 'been', label: 'Been To', icon: '✅' },
   { id: 'want', label: 'Want To Try', icon: '📍' },
+  { id: 'cook', label: 'Want To Cook', icon: '👨‍🍳' },
 ]
 
 const RESTAURANTS = [
@@ -86,6 +87,38 @@ const RESTAURANTS = [
     favorite: '',
     why: 'The 4-hour line is the price of admission. Brisket that people say changes your understanding of what meat can be.',
   },
+
+  // Want to cook
+  {
+    id: 30, status: 'cook', name: 'Birria Tacos', location: 'Home', cuisine: 'Mexican',
+    rating: 0, icon: '🌮',
+    review: '', favorite: '', vibe: '',
+    why: 'The consomme dip makes these. Saw a video and now I can\'t stop thinking about it. Need a dutch oven first.',
+  },
+  {
+    id: 31, status: 'cook', name: 'Homemade Ramen (Tonkotsu)', location: 'Home', cuisine: 'Japanese',
+    rating: 0, icon: '🍜',
+    review: '', favorite: '', vibe: '',
+    why: 'The broth takes 12+ hours. It\'s a weekend project. Want to nail the soft-boiled egg too.',
+  },
+  {
+    id: 32, status: 'cook', name: 'Pilau (Kenyan spiced rice)', location: 'Home', cuisine: 'Kenyan',
+    rating: 0, icon: '🍛',
+    review: '', favorite: '', vibe: '',
+    why: 'Mom makes the best pilau. Need to get her recipe and actually learn it properly instead of just eating it.',
+  },
+  {
+    id: 33, status: 'cook', name: 'Smash Burgers', location: 'Home', cuisine: 'American',
+    rating: 0, icon: '🍔',
+    review: '', favorite: '', vibe: '',
+    why: 'Cast iron, American cheese, Martin\'s potato bun. Simple but I want to perfect the technique.',
+  },
+  {
+    id: 34, status: 'cook', name: 'Beef Wellington', location: 'Home', cuisine: 'British',
+    rating: 0, icon: '🥩',
+    review: '', favorite: '', vibe: '',
+    why: 'The Gordon Ramsay of it all. This is the cooking boss fight. Probably going to fail the first time.',
+  },
 ]
 
 function StarRating({ rating }) {
@@ -117,6 +150,9 @@ function RestaurantCard({ item, isSelected, onClick }) {
           {item.status === 'been' && <StarRating rating={item.rating} />}
           {item.status === 'want' && (
             <span className="text-xs px-1" style={{ background: '#2a2218', color: '#FF6B35', fontSize: 8 }}>BUCKET LIST</span>
+          )}
+          {item.status === 'cook' && (
+            <span className="text-xs px-1" style={{ background: '#1a2a18', color: '#4ADE80', fontSize: 8 }}>WANT TO COOK</span>
           )}
         </div>
         <div className="text-xs" style={{ color: '#888' }}>{item.location} · {item.cuisine}</div>

@@ -2,6 +2,15 @@
 // These are original designs inspired by the retro computing era
 
 export const ICONS = {
+  // Car — car mods
+  car: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M2 10h12v3H2z" fill="#c00" stroke="#800" stroke-width=".5"/><path d="M3 7h10l1 3H2z" fill="#e00"/><rect x="3" y="10" width="3" height="2" rx="1" fill="#333"/><rect x="10" y="10" width="3" height="2" rx="1" fill="#333"/><rect x="4" y="7.5" width="3.5" height="2" rx=".3" fill="#8cf"/><rect x="8.5" y="7.5" width="3.5" height="2" rx=".3" fill="#8cf"/><rect x="1" y="9" width="1.5" height="1" fill="#ff0"/><rect x="13.5" y="9" width="1.5" height="1" fill="#f00"/></svg>`,
+
+  // Wish — star/sparkle
+  wish: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 1l2 4.5 5 .5-3.5 3.5 1 5L8 12l-4.5 2.5 1-5L1 6l5-.5z" fill="#FFD700" stroke="#B8860B" stroke-width=".5"/></svg>`,
+
+  // Travel — airplane
+  travel: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 1L6 6H1l2 2.5L1 14h2l5-3 5 3h2l-2-5.5L15 6h-5z" fill="#4488FF" stroke="#2266CC" stroke-width=".4"/><circle cx="8" cy="6" r="1" fill="#fff"/></svg>`,
+
   // Reviews — TV set
   reviews: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="9" rx="1" fill="#333" stroke="#888" stroke-width=".6"/><rect x="2" y="5" width="12" height="7" fill="#1a3a5a"/><path d="M5 1l3 3M11 1L8 4" stroke="#888" stroke-width=".7" fill="none"/><rect x="5" y="14" width="6" height="1" fill="#888"/><rect x="4" y="14.5" width="8" height=".5" fill="#666"/><path d="M6 8l5 0M6 10l3 0" stroke="#4af" stroke-width=".5"/></svg>`,
 
