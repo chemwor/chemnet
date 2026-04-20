@@ -8,6 +8,18 @@ export const ICONS = {
   // Restaurant — cake
   restaurant: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="2" y="8" width="12" height="6" rx="1" fill="#f5c542" stroke="#c99a2e" stroke-width=".5"/><rect x="2" y="8" width="12" height="2" fill="#e8a0b0"/><rect x="3" y="6" width="10" height="3" rx="1" fill="#fff0f5" stroke="#d88" stroke-width=".4"/><circle cx="5" cy="6" r="1" fill="#f00"/><circle cx="8" cy="5.5" r="1" fill="#f80"/><circle cx="11" cy="6" r="1" fill="#f00"/><rect x="7.5" y="2" width="1" height="4" fill="#c99a2e"/><ellipse cx="8" cy="2" rx="1.5" ry="1" fill="#ff6b35"/></svg>`,
 
+  // Tetris
+  tetris: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" fill="#111"/><rect x="2" y="10" width="4" height="4" fill="#00F0F0"/><rect x="6" y="10" width="4" height="4" fill="#F0F000"/><rect x="10" y="10" width="4" height="4" fill="#F00"/><rect x="6" y="6" width="4" height="4" fill="#A000F0"/><rect x="2" y="6" width="4" height="4" fill="#0000F0"/><rect x="6" y="2" width="4" height="4" fill="#00F000"/><rect x="10" y="6" width="4" height="4" fill="#F0A000"/></svg>`,
+
+  // Sudoku
+  sudoku: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" fill="#fff" stroke="#333" stroke-width="1"/><line x1="5.7" y1="1" x2="5.7" y2="15" stroke="#333" stroke-width=".8"/><line x1="10.3" y1="1" x2="10.3" y2="15" stroke="#333" stroke-width=".8"/><line x1="1" y1="5.7" x2="15" y2="5.7" stroke="#333" stroke-width=".8"/><line x1="1" y1="10.3" x2="15" y2="10.3" stroke="#333" stroke-width=".8"/><text x="3.3" y="5" fill="#333" font-size="4" font-family="Arial" font-weight="bold">5</text><text x="8" y="5" fill="#4A90D9" font-size="4" font-family="Arial">3</text><text x="12" y="9.5" fill="#333" font-size="4" font-family="Arial" font-weight="bold">7</text><text x="3.3" y="14" fill="#4A90D9" font-size="4" font-family="Arial">9</text></svg>`,
+
+  // Doodle Jump
+  doodlejump: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="0" y="0" width="16" height="16" fill="#F5F0E0"/><rect x="2" y="12" width="5" height="2" rx=".5" fill="#5CB85C"/><rect x="8" y="9" width="5" height="2" rx=".5" fill="#5CB85C"/><rect x="3" y="6" width="5" height="2" rx=".5" fill="#D9534F"/><circle cx="10" cy="4" r="3" fill="#3A3"/><circle cx="9" cy="3" r="1.2" fill="#fff"/><circle cx="11" cy="3" r="1.2" fill="#fff"/><circle cx="9.3" cy="3" r=".5" fill="#000"/><circle cx="11.3" cy="3" r=".5" fill="#000"/></svg>`,
+
+  // Fruit Ninja
+  fruitninja: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="0" y="0" width="16" height="16" fill="#2C1810"/><text x="4" y="8" font-size="7">🍉</text><path d="M2 14L14 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".6"/><text x="9" y="14" font-size="6">🍊</text></svg>`,
+
   // Snake
   snake: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" fill="#0a2a0a"/><rect x="3" y="7" width="3" height="3" fill="#22CC22"/><rect x="6" y="7" width="3" height="3" fill="#22CC22"/><rect x="9" y="7" width="3" height="3" fill="#22CC22"/><rect x="9" y="4" width="3" height="3" fill="#22CC22"/><rect x="3" y="7" width="3" height="3" fill="#44FF44"/><circle cx="12" cy="4" r="1.5" fill="#FF6B35"/></svg>`,
 
