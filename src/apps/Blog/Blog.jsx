@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { iconUrl } from '../../shell/icons'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // Fallback to hardcoded if DB is empty/fails
 import { AI_PAPER } from './ai-paper'
@@ -235,8 +236,116 @@ function DocumentViewer({ post, onBack }) {
   )
 }
 
+// ══════════════════════════════════════════
+// MOBILE VIEW — iOS Notes style
+// ══════════════════════════════════════════
+
+function MobileNotesList({ posts, onOpen }) {
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Search bar */}
+      <div style={{ padding: '8px 16px', background: '#f2f2f7' }}>
+        <div style={{ background: '#e5e5ea', borderRadius: 10, padding: '8px 12px', fontSize: 14, color: '#8e8e93' }}>
+          🔍 Search
+        </div>
+      </div>
+
+      {/* Notes list */}
+      <div className="flex-1 overflow-auto">
+        <div style={{ padding: '0 16px 4px', fontSize: 11, color: '#8e8e93', fontWeight: 600, textTransform: 'uppercase' }}>
+          {posts.length} Notes
+        </div>
+        {posts.map(post => {
+          const date = new Date(post.created_at)
+          const preview = post.content?.slice(0, 80).replace(/\n/g, ' ') + '...'
+          return (
+            <div
+              key={post.id}
+              onClick={() => onOpen(post.id)}
+              style={{
+                padding: '12px 16px',
+                background: '#fff',
+                borderBottom: '0.5px solid #e5e5ea',
+              }}
+            >
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#000', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {post.title}
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span style={{ fontSize: 12, color: '#8e8e93' }}>
+                  {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+                <span style={{ fontSize: 12, color: '#8e8e93', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {preview}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function MobileNoteView({ post, onBack }) {
+  const [showRaw, setShowRaw] = useState(false)
+  const bodyText = showRaw && post.raw ? post.raw : post.content
+
+  useEffect(() => {
+    if (post.id && !String(post.id).startsWith('fallback')) {
+      supabase.rpc('increment_blog_views', { post_id: post.id }).catch(() => {})
+    }
+  }, [post.id])
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Nav */}
+      <div className="flex items-center justify-between px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+        <button onClick={onBack} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>
+          ‹ Notes
+        </button>
+        {post.raw && (
+          <div className="flex" style={{ background: '#e5e5ea', borderRadius: 6, padding: 2 }}>
+            <button onClick={() => setShowRaw(false)} className="border-none cursor-pointer px-2 py-0.5" style={{ background: !showRaw ? '#fff' : 'transparent', borderRadius: 4, fontSize: 11, color: '#000', fontFamily: 'inherit', boxShadow: !showRaw ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
+              Polished
+            </button>
+            <button onClick={() => setShowRaw(true)} className="border-none cursor-pointer px-2 py-0.5" style={{ background: showRaw ? '#fff' : 'transparent', borderRadius: 4, fontSize: 11, color: '#000', fontFamily: 'inherit', boxShadow: showRaw ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
+              Raw
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Content — lined paper style */}
+      <div className="flex-1 overflow-auto" style={{ background: showRaw ? '#1a1a1a' : '#FFFDE7', padding: '16px 20px' }}>
+        <div style={{ fontSize: 10, color: showRaw ? '#555' : '#8e8e93', marginBottom: 8 }}>
+          {new Date(post.created_at).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+        </div>
+        <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 16px', color: showRaw ? '#33FF33' : '#000', fontFamily: showRaw ? '"Courier New", monospace' : 'inherit' }}>
+          {post.title}
+        </h1>
+        {post.note && !showRaw && (
+          <div style={{ fontSize: 12, color: '#8e8e93', fontStyle: 'italic', marginBottom: 16, paddingBottom: 8, borderBottom: '0.5px solid #e5e5ea' }}>{post.note}</div>
+        )}
+        {bodyText.split('\n\n').map((para, i) => (
+          <p key={i} style={{
+            margin: '0 0 14px',
+            fontSize: showRaw ? 13 : 15,
+            lineHeight: 1.6,
+            color: showRaw ? '#33FF33' : '#333',
+            fontFamily: showRaw ? '"Courier New", monospace' : 'inherit',
+          }}>
+            {para}
+          </p>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Main ──
 export default function Blog() {
+  const isMobile = useMediaQuery('(max-width: 768px)')
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [openPostId, setOpenPostId] = useState(null)
@@ -267,9 +376,13 @@ export default function Blog() {
 
   const openPost = posts.find(p => p.id === openPostId)
 
-  if (openPost) {
-    return <DocumentViewer post={openPost} onBack={() => setOpenPostId(null)} />
+  // Mobile — Notes style
+  if (isMobile) {
+    if (openPost) return <MobileNoteView post={openPost} onBack={() => setOpenPostId(null)} />
+    return <MobileNotesList posts={posts} onOpen={setOpenPostId} />
   }
 
+  // Desktop — Word style
+  if (openPost) return <DocumentViewer post={openPost} onBack={() => setOpenPostId(null)} />
   return <FileDirectory posts={posts} onOpen={setOpenPostId} sort={sort} setSort={setSort} category={category} setCategory={setCategory} />
 }
