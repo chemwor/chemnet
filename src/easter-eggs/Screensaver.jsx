@@ -1,24 +1,52 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import daytimeGif from '../assets/wallpapers/daytimescreensaver.gif'
-import nighttimeGif from '../assets/wallpapers/nighttimescreensaver.gif'
-import scaryGif from '../assets/wallpapers/scaryscreensaver.gif'
 
-function isDaytime() {
+function getScreensaverUrl() {
   const hour = new Date().getHours()
-  return hour >= 6 && hour < 18
+  if (hour === 3) return '/screensavers/scaryscreensaver.gif'
+  if (hour >= 6 && hour < 18) return '/screensavers/daytimescreensaver.gif'
+  return '/screensavers/nighttimescreensaver.gif'
+}
+
+// Fallback: animated starfield if GIFs aren't available
+function StarfieldFallback() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: '#000', overflow: 'hidden' }}>
+      {Array.from({ length: 80 }, (_, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            width: 2,
+            height: 2,
+            background: '#fff',
+            borderRadius: '50%',
+            animation: `twinkle ${1 + Math.random() * 3}s ease-in-out infinite`,
+            animationDelay: `${Math.random() * 3}s`,
+          }}
+        />
+      ))}
+      <div style={{
+        position: 'absolute', bottom: '20%', left: '50%', transform: 'translateX(-50%)',
+        color: '#333', fontSize: 12, fontFamily: 'monospace', textAlign: 'center',
+      }}>
+        ChemNet Screensaver
+      </div>
+      <style>{`
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </div>
+  )
 }
 
 export function Screensaver({ onDismiss }) {
-  const gif = useMemo(() => {
-    const hour = new Date().getHours()
-    // 3am-4am: scary screensaver
-    if (hour === 3) return scaryGif
-    // 6am-6pm: daytime
-    if (hour >= 6 && hour < 18) return daytimeGif
-    // everything else: nighttime
-    return nighttimeGif
-  }, [])
+  const url = useMemo(getScreensaverUrl, [])
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
     const handler = () => onDismiss()
@@ -41,17 +69,22 @@ export function Screensaver({ onDismiss }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <img
-        src={gif}
-        alt=""
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        }}
-      />
+      {loadFailed ? (
+        <StarfieldFallback />
+      ) : (
+        <img
+          src={url}
+          alt=""
+          onError={() => setLoadFailed(true)}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      )}
     </motion.div>
   )
 }
