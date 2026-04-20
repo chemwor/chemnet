@@ -354,16 +354,27 @@ export default function Blog() {
 
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
+      try {
+        // Timeout after 3 seconds — fall back to hardcoded if slow/offline
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 3000)
 
-      if (error || !data || data.length === 0) {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+          .abortSignal(controller.signal)
+
+        clearTimeout(timeout)
+
+        if (error || !data || data.length === 0) {
+          setPosts(FALLBACK_POSTS)
+        } else {
+          setPosts(data)
+        }
+      } catch {
         setPosts(FALLBACK_POSTS)
-      } else {
-        setPosts(data)
       }
       setLoading(false)
     }

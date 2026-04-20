@@ -60,14 +60,16 @@ export function MobilePanel({ app, onClose }) {
         <div style={{ width: 50 }} />
       </div>
 
-      {/* App content */}
-      <div className="flex-1 flex flex-col" style={{ position: 'relative', overflow: 'hidden', minHeight: 0 }}>
+      {/* App content — uses calc to guarantee height */}
+      <div style={{ height: 'calc(100% - 44px)', overflow: 'hidden' }}>
         <Suspense fallback={
-          <div className="flex items-center justify-center h-full" style={{ color: 'var(--color-text-secondary)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)' }}>
             Loading...
           </div>
         }>
-          <AppComponent />
+          <div style={{ height: '100%' }}>
+            <AppComponent />
+          </div>
         </Suspense>
       </div>
     </motion.div>
