@@ -51,7 +51,7 @@ const IOS_GLYPHS = {
   about: '📋', terminal: '>_', projects: '📂', blog: '✏️',
   pictures: '🌅', videos: '▶', messageboard: '💬', guestbook: '📖',
   music: '♫', reviews: '📺', restaurants: '🍴', email: '✉️',
-  carmods: '🏎️', wishlist: '⭐', trips: '✈️',
+  carmods: '🏎️', wishlist: '🛒', trips: '✈️',
   stats: '🏆', solitaire: '♠', minesweeper: '💣', chess: '♟',
   pong: '🏓', asteroids: '☄️', pacman: '👾', spaceinvaders: '👽',
   arkanoid: '🧱', fighter: '🤖', snake: '🐍', '2048': '🔢',
