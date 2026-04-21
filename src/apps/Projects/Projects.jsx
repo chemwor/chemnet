@@ -14,6 +14,12 @@ const PROJECTS = [
 The idea came from personal frustration — dealing with an HOA that operated without transparency or accountability. The tools that exist for homeowners are scattered and confusing. DMHOA puts everything in one place.`,
     stack: ['React', 'Node.js', 'PostgreSQL', 'Stripe'],
     links: [],
+    learnings: [
+      'Dealing with legal-adjacent content requires careful disclaimers and user expectations management.',
+      'HOA regulations vary wildly by state — the platform needs to be flexible enough to handle that without overcomplicating the UX.',
+      'Users in this space are frustrated by the time they find you. Onboarding has to be fast and the first action has to feel like progress.',
+    ],
+    notes: 'Looking into partnerships with local attorneys who specialize in HOA disputes. Also exploring whether AI can help draft initial response letters based on the specific violation type.',
   },
   {
     id: 'mgn',
@@ -27,6 +33,12 @@ The idea came from personal frustration — dealing with an HOA that operated wi
 The gap it fills is that existing neighborhood platforms are either too broad (Nextdoor) or too limited (group chats). MGN focuses specifically on safety and mutual aid at the block level.`,
     stack: ['Next.js', 'Supabase', 'Mapbox'],
     links: [],
+    learnings: [
+      'Hyperlocal is hard — getting density in a single neighborhood before expanding is the chicken-and-egg problem.',
+      'Trust is everything in a safety platform. Anonymous reporting can be both a feature and a liability.',
+      'Mapbox is powerful but the learning curve is steep for custom interactive features.',
+    ],
+    notes: 'Exploring how to handle the cold start problem. Thinking about launching neighborhood by neighborhood instead of city-wide. Also considering partnerships with local community organizations.',
   },
   {
     id: 'chemnet',
@@ -41,22 +53,52 @@ Built to chase the feeling of the old internet. A tech garden free from the homo
 
 The site itself is the project. It will always be a work in progress.`,
     stack: ['React', 'Vite', 'react95', 'Tailwind', 'Framer Motion', 'Supabase'],
-    links: [{ label: 'GitHub', url: 'https://github.com/chemwor/chemnet' }],
+    links: [],
+    learnings: [
+      'Building a fake OS is basically building a real UI framework — window management, z-indexing, and state isolation between apps are real problems.',
+      'The retro aesthetic has constraints that force creative solutions. Win95 bevels look wrong if the colors are even slightly off.',
+      'Having fun with a project is the best productivity hack. Added more features to this in two weeks than I have to work projects in months.',
+    ],
+    notes: '',
+    roadmap: [
+      { item: 'Wire all apps to read from Supabase (Blog done, Reviews done, Restaurants done)', done: true },
+      { item: 'Admin Panel for content management', done: true },
+      { item: 'Layer 3-5 puzzle system — unlock deeper content', done: false },
+      { item: 'Boot sequence animation on first visit', done: false },
+      { item: 'Photo uploads via admin for Projects, Trips, Car Mods', done: false },
+      { item: 'Real-time Guestbook and Message Board via Supabase', done: false },
+      { item: 'Push notifications / email integration for ChemMail', done: false },
+      { item: 'Custom domain + SSL (ericchemwor.com)', done: false },
+      { item: 'PWA support — installable on phone home screen', done: false },
+      { item: 'Shared high scores leaderboard (Supabase backed)', done: false },
+      { item: 'More mobile-native app views (Guestbook, Trips, etc.)', done: false },
+      { item: 'Music player that actually plays audio', done: false },
+      { item: 'Dark mode toggle for mobile', done: false },
+      { item: 'Visitor analytics (privacy-respecting)', done: false },
+    ],
   },
   {
     id: 'bmo',
     name: 'BMO',
     icon: '🤖',
     status: 'planning',
-    type: 'tech',
-    tagline: 'Personal AI assistant. Named after the best Adventure Time character.',
+    type: 'hybrid',
+    tagline: 'Personal AI assistant. Software + hardware.',
     description: `BMO is a personal AI assistant project — the idea is to build something that actually knows me. Not a generic chatbot, but an assistant trained on my preferences, schedule, habits, and goals.
 
 Think of it as a digital companion that can help with task management, research, and decision-making in a way that's personalized to how I think and work. Named after BMO from Adventure Time because that's the energy.
 
-Still in the planning phase. Exploring what the right architecture looks like — whether it's a fine-tuned model, a RAG system, or something else entirely.`,
-    stack: ['Python', 'LangChain', 'OpenAI', 'TBD'],
+The software side is an AI agent with memory, context, and personality. The hardware side is a physical device — a small screen with a speaker that sits on the desk. Something you can talk to and that talks back.
+
+Still in the planning phase. Exploring what the right architecture looks like.`,
+    stack: ['Python', 'LangChain', 'OpenAI', 'Raspberry Pi', 'Speaker/Mic', 'Small Display'],
     links: [],
+    learnings: [
+      'The gap between a chatbot and a useful assistant is context. It needs to remember things across conversations.',
+      'Hardware adds a whole layer of complexity — audio processing, wake words, display rendering. It might need to be software-first, hardware-second.',
+      'The "personality" part is the hardest to get right. It needs to feel like talking to someone, not querying a database.',
+    ],
+    notes: 'Investigating RAG (Retrieval Augmented Generation) for personal knowledge base. Considering whether to use OpenAI, Anthropic, or a local model. The hardware enclosure could be 3D printed with a Raspberry Pi + small touchscreen.',
   },
   {
     id: 'bathroom',
@@ -113,7 +155,7 @@ const STATUS_STYLES = {
   completed: { color: '#888', label: 'DONE', bg: '#2a2a2a' },
 }
 
-const TYPE_LABELS = { tech: '💻 Software', physical: '🔧 Physical' }
+const TYPE_LABELS = { tech: '💻 Software', physical: '🔧 Physical', hybrid: '⚡ Software + Hardware' }
 
 // ── Desktop View ──
 function DesktopProjects() {
@@ -179,7 +221,38 @@ function DesktopProjects() {
               </div>
             )}
 
-            {selected.links.length > 0 && (
+            {selected.learnings?.length > 0 && (
+              <div className="mb-3">
+                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>What I've Learned</div>
+                {selected.learnings.map((l, i) => (
+                  <div key={i} className="text-xs mb-1.5 pl-2" style={{ color: '#888', lineHeight: 1.4, borderLeft: '2px solid #2a2a3a' }}>{l}</div>
+                ))}
+              </div>
+            )}
+
+            {selected.notes && (
+              <div className="mb-3">
+                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>Notes</div>
+                <div className="text-xs" style={{ color: '#888', lineHeight: 1.4 }}>{selected.notes}</div>
+              </div>
+            )}
+
+            {selected.roadmap?.length > 0 && (
+              <div className="mb-3">
+                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>Roadmap</div>
+                {selected.roadmap.map((r, i) => (
+                  <div key={i} className="text-xs mb-1 flex items-start gap-1" style={{ color: r.done ? '#4ADE80' : '#666' }}>
+                    <span>{r.done ? '✓' : '○'}</span>
+                    <span style={{ textDecoration: r.done ? 'line-through' : 'none', opacity: r.done ? 0.6 : 1 }}>{r.item}</span>
+                  </div>
+                ))}
+                <div className="text-xs mt-1" style={{ color: '#444' }}>
+                  {selected.roadmap.filter(r => r.done).length}/{selected.roadmap.length} done
+                </div>
+              </div>
+            )}
+
+            {selected.links?.length > 0 && (
               <div>
                 {selected.links.map((l, i) => (
                   <a key={i} href={l.url} target={l.url.startsWith('#') ? undefined : '_blank'} rel="noopener noreferrer" className="text-xs block mb-1" style={{ color: '#4A90D9' }}>🔗 {l.label}</a>
@@ -229,7 +302,37 @@ function MobileProjects() {
                 </div>
               </div>
             )}
-            {selected.links.length > 0 && (
+            {selected.learnings?.length > 0 && (
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: '0.5px solid #e5e5ea' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>What I've Learned</div>
+                {selected.learnings.map((l, i) => (
+                  <div key={i} style={{ fontSize: 14, color: '#555', lineHeight: 1.5, marginBottom: 8, paddingLeft: 10, borderLeft: '2px solid #e5e5ea' }}>{l}</div>
+                ))}
+              </div>
+            )}
+
+            {selected.notes && (
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: '0.5px solid #e5e5ea' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>Notes</div>
+                <div style={{ fontSize: 14, color: '#555', lineHeight: 1.5 }}>{selected.notes}</div>
+              </div>
+            )}
+
+            {selected.roadmap?.length > 0 && (
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: '0.5px solid #e5e5ea' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>
+                  Roadmap ({selected.roadmap.filter(r => r.done).length}/{selected.roadmap.length})
+                </div>
+                {selected.roadmap.map((r, i) => (
+                  <div key={i} style={{ fontSize: 14, marginBottom: 6, display: 'flex', gap: 8, color: r.done ? '#34C759' : '#333' }}>
+                    <span>{r.done ? '✓' : '○'}</span>
+                    <span style={{ textDecoration: r.done ? 'line-through' : 'none', opacity: r.done ? 0.6 : 1 }}>{r.item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selected.links?.length > 0 && (
               <div style={{ marginTop: 16 }}>
                 {selected.links.map((l, i) => (
                   <a key={i} href={l.url} target={l.url.startsWith('#') ? undefined : '_blank'} rel="noopener noreferrer" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#007AFF', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none', marginBottom: 8 }}>
