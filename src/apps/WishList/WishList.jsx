@@ -1,123 +1,196 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { supabase } from '../../lib/supabase'
 
 const CATEGORIES = [
   { id: 'all', label: 'All' },
-  { id: 'tech', label: 'Tech' },
-  { id: 'gear', label: 'Gear' },
-  { id: 'experiences', label: 'Experiences' },
-  { id: 'home', label: 'Home' },
+  { id: 'tech', label: '💻 Tech' },
+  { id: 'fashion', label: '👟 Fashion' },
+  { id: 'home', label: '🏠 Home' },
+  { id: 'gear', label: '⚙️ Gear' },
+  { id: 'experiences', label: '🎯 Experiences' },
+  { id: 'food', label: '🍕 Food' },
+  { id: 'other', label: '📦 Other' },
 ]
 
-const ITEMS = [
-  // Tech
-  { id: 1, name: 'Studio Display', category: 'tech', price: 1599, priority: 'high', link: 'apple.com', notes: 'The monitor upgrade. 5K, great speakers, one cable to the MacBook.', acquired: false },
-  { id: 2, name: 'Teenage Engineering OP-1 Field', category: 'tech', price: 2199, priority: 'medium', link: 'teenage.engineering', notes: 'The ultimate portable synth/sampler. Way overpriced but I want it anyway.', acquired: false },
-  { id: 3, name: 'Stream Deck XL', category: 'tech', price: 249, priority: 'low', link: 'elgato.com', notes: 'For automating workflows. Could map shortcuts, launch apps, control music.', acquired: false },
-
-  // Gear
-  { id: 4, name: 'Fender American Pro II Stratocaster', category: 'gear', price: 1799, priority: 'high', link: 'fender.com', notes: 'Upgrade from the MIM. The neck profile on the Pro II is perfect.', acquired: false },
-  { id: 5, name: 'Peloton Bike', category: 'gear', price: 1445, priority: 'medium', link: 'onepeloton.com', notes: 'Cardio at home without having to drive to the gym. The classes keep it interesting.', acquired: false },
-  { id: 6, name: 'Shoyoroll Gi', category: 'gear', price: 250, priority: 'low', link: 'shoyoroll.com', notes: 'If they ever drop one I actually like. The limited drops are annoying.', acquired: false },
-
-  // Experiences
-  { id: 7, name: 'Skydiving', category: 'experiences', price: 300, priority: 'high', link: '', notes: 'Been saying I\'ll do this for years. Just need to commit and book it.', acquired: false },
-  { id: 8, name: 'Scuba Certification', category: 'experiences', price: 500, priority: 'medium', link: '', notes: 'PADI Open Water cert. Want to dive in Mombasa and Zanzibar.', acquired: false },
-  { id: 9, name: 'Track Day (Autocross)', category: 'experiences', price: 150, priority: 'medium', link: '', notes: 'Take the Accord out on a track day. See what the 2.0T can really do.', acquired: false },
-
-  // Home
-  { id: 10, name: 'Espresso Machine', category: 'home', price: 700, priority: 'high', link: '', notes: 'Breville Bambino Plus. Tired of spending $6/day on lattes.', acquired: false },
-  { id: 11, name: 'Standing Desk (FlexiSpot E7)', category: 'home', price: 479, priority: 'medium', link: 'flexispot.com', notes: 'The one with the programmable height presets. Need to stop sitting 10 hours.', acquired: false },
+// Fallback data until DB is wired
+const FALLBACK_ITEMS = [
+  { id: 1, name: 'Add your wish list items', category: 'other', price: 0, priority: 'medium', link: '', image: '', notes: 'Use the Admin Panel or Supabase to add items. Paste a product URL and the name, price, and image will be pulled automatically.', acquired: false },
 ]
 
-const PRIORITY_COLORS = {
-  high: { color: '#FF6B35', label: '!!!' },
-  medium: { color: '#FBBF24', label: '!!' },
-  low: { color: '#888', label: '!' },
+function PriorityBadge({ priority }) {
+  const styles = {
+    high: { bg: '#3a1a1a', color: '#FF6B35', label: 'WANT' },
+    medium: { bg: '#2a2a1a', color: '#FBBF24', label: 'NICE' },
+    low: { bg: '#1a1a2a', color: '#60A5FA', label: 'SOMEDAY' },
+  }
+  const s = styles[priority] || styles.medium
+  return <span style={{ background: s.bg, color: s.color, fontSize: 8, padding: '2px 5px' }}>{s.label}</span>
 }
 
-export default function WishList() {
+// ── Desktop View ──
+function DesktopWishList({ items }) {
   const [category, setCategory] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
 
-  const filtered = ITEMS.filter(i => category === 'all' || i.category === category)
-  const selected = ITEMS.find(i => i.id === selectedId)
-  const totalWant = filtered.reduce((sum, i) => sum + i.price, 0)
+  const filtered = category === 'all' ? items : items.filter(i => i.category === category)
+  const selected = items.find(i => i.id === selectedId)
+  const totalWant = filtered.reduce((sum, i) => sum + (i.price || 0), 0)
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#0f0a14', fontFamily: 'monospace', color: '#F0EBE1' }}>
-      {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 shrink-0" style={{ background: '#1a1020', borderBottom: '1px solid #2a2030' }}>
         <div className="flex items-center gap-1">
           <span>✨</span>
           <span className="font-bold text-sm">Wish List</span>
         </div>
-        <span className="text-xs" style={{ color: '#888' }}>Total: ${totalWant.toLocaleString()}</span>
+        <span className="text-xs" style={{ color: '#888' }}>
+          {filtered.length} items · ${totalWant.toLocaleString()}
+        </span>
       </div>
 
-      {/* Category filter */}
-      <div className="flex items-center gap-1 px-3 py-1 shrink-0" style={{ background: '#12101a', borderBottom: '1px solid #2a2030' }}>
+      <div className="flex items-center gap-1 px-3 py-1 shrink-0 flex-wrap" style={{ background: '#12101a', borderBottom: '1px solid #2a2030' }}>
         {CATEGORIES.map(c => (
-          <button
-            key={c.id}
-            onClick={() => { setCategory(c.id); setSelectedId(null) }}
-            className="px-2 py-0.5 text-xs border-none cursor-pointer"
-            style={{
-              background: category === c.id ? '#FF6B35' : 'transparent',
-              color: category === c.id ? '#000' : '#666',
-              fontFamily: 'inherit',
-            }}
-          >
+          <button key={c.id} onClick={() => { setCategory(c.id); setSelectedId(null) }} className="px-2 py-0.5 text-xs border-none cursor-pointer" style={{ background: category === c.id ? '#FF6B35' : 'transparent', color: category === c.id ? '#000' : '#666', fontFamily: 'inherit' }}>
             {c.label}
           </button>
         ))}
       </div>
 
-      {/* Content */}
       <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-        {/* List */}
         <div className="flex-1 overflow-auto">
-          {filtered.map(item => {
-            const pri = PRIORITY_COLORS[item.priority]
-            return (
-              <div
-                key={item.id}
-                className="flex items-center gap-2 px-3 py-2 cursor-pointer"
-                style={{
-                  background: selectedId === item.id ? '#1a1030' : 'transparent',
-                  borderBottom: '1px solid #1a1018',
-                }}
-                onClick={() => setSelectedId(item.id)}
-              >
-                <span className="text-xs shrink-0" style={{ color: pri.color }}>{pri.label}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm truncate" style={{ color: item.acquired ? '#4ADE80' : '#F0EBE1' }}>
-                    {item.acquired && '✓ '}{item.name}
-                  </div>
-                  <div className="text-xs" style={{ color: '#555' }}>{item.category}</div>
+          {filtered.map(item => (
+            <div
+              key={item.id}
+              className="flex items-center gap-3 px-3 py-2 cursor-pointer"
+              style={{ background: selectedId === item.id ? '#1a1030' : 'transparent', borderBottom: '1px solid #1a1018' }}
+              onClick={() => setSelectedId(item.id)}
+            >
+              {item.image ? (
+                <img src={item.image} alt="" style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: 40, height: 40, borderRadius: 4, background: '#1a1a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🎁</div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="text-sm truncate" style={{ color: item.acquired ? '#4ADE80' : '#F0EBE1' }}>
+                  {item.acquired && '✓ '}{item.name}
                 </div>
-                <span className="text-xs shrink-0" style={{ color: '#888' }}>${item.price.toLocaleString()}</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <PriorityBadge priority={item.priority} />
+                  <span className="text-xs" style={{ color: '#555' }}>{item.category}</span>
+                </div>
               </div>
-            )
-          })}
+              <span className="text-xs shrink-0" style={{ color: '#888' }}>
+                {item.price > 0 ? `$${item.price.toLocaleString()}` : ''}
+              </span>
+            </div>
+          ))}
         </div>
 
-        {/* Detail panel */}
         {selected && (
-          <div className="shrink-0 overflow-auto p-3" style={{ width: 200, background: '#12101a', borderLeft: '1px solid #2a2030' }}>
+          <div className="shrink-0 overflow-auto p-3" style={{ width: 220, background: '#12101a', borderLeft: '1px solid #2a2030' }}>
+            {selected.image && <img src={selected.image} alt="" style={{ width: '100%', borderRadius: 6, marginBottom: 8, objectFit: 'cover', maxHeight: 160 }} />}
             <div className="font-bold text-sm mb-1">{selected.name}</div>
-            <div className="text-xs mb-1" style={{ color: '#888' }}>{selected.category} · ${selected.price}</div>
-            <div className="text-xs mb-2" style={{ color: PRIORITY_COLORS[selected.priority].color }}>
-              Priority: {selected.priority}
+            {selected.price > 0 && <div className="text-xs mb-1" style={{ color: '#FF6B35' }}>${selected.price.toLocaleString()}</div>}
+            <div className="flex gap-1 mb-2">
+              <PriorityBadge priority={selected.priority} />
+              <span className="text-xs" style={{ color: '#555' }}>{selected.category}</span>
             </div>
-            {selected.notes && (
-              <div className="text-xs leading-relaxed mb-2" style={{ color: '#aaa' }}>{selected.notes}</div>
-            )}
-            {selected.link && (
-              <div className="text-xs" style={{ color: '#555' }}>🔗 {selected.link}</div>
-            )}
+            {selected.notes && <div className="text-xs leading-relaxed mb-2" style={{ color: '#aaa' }}>{selected.notes}</div>}
+            {selected.link && <a href={selected.link} target="_blank" rel="noopener noreferrer" className="text-xs" style={{ color: '#4A90D9' }}>🔗 View Product</a>}
           </div>
         )}
       </div>
     </div>
   )
+}
+
+// ── Mobile View — iOS Shopping List style ��─
+function MobileWishList({ items }) {
+  const [category, setCategory] = useState('all')
+  const [selectedId, setSelectedId] = useState(null)
+
+  const filtered = category === 'all' ? items : items.filter(i => i.category === category)
+  const selected = items.find(i => i.id === selectedId)
+
+  if (selected) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+        <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #e5e5ea' }}>
+          <button onClick={() => setSelectedId(null)} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>‹ Back</button>
+        </div>
+        <div className="flex-1 overflow-auto">
+          {selected.image && <img src={selected.image} alt="" style={{ width: '100%', maxHeight: 250, objectFit: 'cover' }} />}
+          <div style={{ padding: 16 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{selected.name}</div>
+            {selected.price > 0 && <div style={{ fontSize: 18, color: '#FF9500', fontWeight: 600, marginBottom: 8 }}>${selected.price.toLocaleString()}</div>}
+            <div className="flex gap-2 mb-3">
+              <span style={{ fontSize: 12, padding: '3px 8px', background: '#f2f2f7', borderRadius: 10, color: '#666' }}>{selected.category}</span>
+              <span style={{ fontSize: 12, padding: '3px 8px', background: '#f2f2f7', borderRadius: 10, color: '#666' }}>{selected.priority}</span>
+            </div>
+            {selected.notes && <div style={{ fontSize: 15, color: '#333', lineHeight: 1.6, marginBottom: 16 }}>{selected.notes}</div>}
+            {selected.link && (
+              <a href={selected.link} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#007AFF', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
+                View Product
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Category pills */}
+      <div style={{ padding: '8px 12px', overflowX: 'auto', display: 'flex', gap: 6, background: '#f2f2f7' }}>
+        {CATEGORIES.map(c => (
+          <button key={c.id} onClick={() => setCategory(c.id)} className="border-none cursor-pointer shrink-0" style={{ padding: '6px 12px', borderRadius: 16, fontSize: 12, background: category === c.id ? '#007AFF' : '#e5e5ea', color: category === c.id ? '#fff' : '#333', fontFamily: 'inherit' }}>
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {filtered.map(item => (
+          <div key={item.id} onClick={() => setSelectedId(item.id)} style={{ padding: '12px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea', display: 'flex', gap: 12, alignItems: 'center' }}>
+            {item.image ? (
+              <img src={item.image} alt="" style={{ width: 50, height: 50, borderRadius: 8, objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: 50, height: 50, borderRadius: 8, background: '#f2f2f7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🎁</div>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: item.acquired ? '#34C759' : '#000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {item.acquired && '✓ '}{item.name}
+              </div>
+              <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>{item.category}</div>
+            </div>
+            <div style={{ textAlign: 'right', shrink: 0 }}>
+              {item.price > 0 && <div style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>${item.price}</div>}
+              <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Main ──
+export default function WishList() {
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  const [items, setItems] = useState(FALLBACK_ITEMS)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // TODO: Load from Supabase wishlist table when created
+    // For now use fallback
+    setLoading(false)
+  }, [])
+
+  if (loading) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#0f0a14', color: '#555', fontFamily: 'monospace' }}>Loading...</div>
+  }
+
+  return isMobile ? <MobileWishList items={items} /> : <DesktopWishList items={items} />
 }
