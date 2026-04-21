@@ -126,13 +126,13 @@ function DesktopWishList() {
                   borderRadius: 2,
                 }}
               >
-                {/* Product image placeholder */}
+                {/* Product image — square */}
                 <div style={{
-                  width: '100%', height: 80, background: '#f7f7f7', borderRadius: 2,
+                  width: '100%', aspectRatio: '1', background: '#f7f7f7', borderRadius: 2,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28, marginBottom: 6, border: '1px solid #eee',
+                  fontSize: 28, marginBottom: 6, border: '1px solid #eee', overflow: 'hidden',
                 }}>
-                  {item.image ? <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 2 }} /> : '🎁'}
+                  {item.image ? <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4 }} /> : '🎁'}
                 </div>
 
                 {/* Title */}
@@ -269,8 +269,8 @@ function MobileWishList() {
               onClick={() => setSelectedId(item.id)}
               style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 4, padding: 8, cursor: 'pointer' }}
             >
-              <div style={{ width: '100%', height: 70, background: '#f9f9f9', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 6 }}>
-                {item.image ? <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} /> : '🎁'}
+              <div style={{ width: '100%', aspectRatio: '1', background: '#f9f9f9', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 6, overflow: 'hidden' }}>
+                {item.image ? <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4 }} /> : '🎁'}
               </div>
               <div style={{ fontSize: 11, color: '#0066c0', fontWeight: 600, lineHeight: 1.3, marginBottom: 3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                 {item.name}
