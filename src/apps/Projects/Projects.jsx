@@ -27,18 +27,27 @@ The idea came from personal frustration — dealing with an HOA that operated wi
     icon: '🛡️',
     status: 'active',
     type: 'tech',
-    tagline: 'Community safety, neighbor to neighbor.',
-    description: `My Guardian Neighbor connects communities through a hyperlocal safety and communication network. Think of it as a neighborhood watch powered by modern tech — real-time alerts, incident tracking, and direct communication between neighbors.
+    tagline: 'Neighbors helping neighbors. Built for Metro Atlanta.',
+    description: `My Guardian Neighbor (MGN) is a free, community-powered platform connecting Metro Atlanta families navigating hardship with local volunteers ready to show up. Groceries when the month runs long. A ride to a medical appointment. Help rewriting a resume after a layoff. A check-in on an aging parent whose kids live out of state.
 
-The gap it fills is that existing neighborhood platforms are either too broad (Nextdoor) or too limited (group chats). MGN focuses specifically on safety and mutual aid at the block level.`,
-    stack: ['Next.js', 'Supabase', 'Mapbox'],
+No paywall. No gatekeepers. No 40-page application. Just a simple, direct way to ask for help — or to offer it — in your own neighborhood.
+
+Atlanta is a city full of people who would help if they knew how. The problem isn't a shortage of kindness — it's a shortage of infrastructure. Families facing hardship get routed through fragmented nonprofits, overloaded 211 lines, and social services with months-long waitlists. Meanwhile, neighbors two streets over have a truck, a free Saturday, and no idea anyone nearby needs them.
+
+MGN is built for that gap — the in-between moments where someone needs a hand today, and the system isn't fast enough to respond. The single parent between paychecks. The elder whose family lives three states away. The veteran reentering civilian life.
+
+We're not trying to replace nonprofits, churches, or mutual aid networks. We're trying to make them all work faster by making the connection between need and neighbor as frictionless as possible.
+
+Free, forever. Hyperlocal by design. Infrastructure, not charity. Built to last.`,
+    stack: ['Next.js', 'Supabase', 'Mapbox', 'AI Moderation', 'SMS Integration'],
     links: [],
     learnings: [
-      'Hyperlocal is hard — getting density in a single neighborhood before expanding is the chicken-and-egg problem.',
-      'Trust is everything in a safety platform. Anonymous reporting can be both a feature and a liability.',
-      'Mapbox is powerful but the learning curve is steep for custom interactive features.',
+      'The strongest safety net isn\'t built by institutions — it\'s built by neighbors who know each other and have easy ways to help.',
+      'SMS-first coordination matters — participation can\'t require a smartphone or a data plan if you want to reach everyone.',
+      'Hyperlocal density is the chicken-and-egg problem. Launching neighborhood by neighborhood is better than going city-wide and being thin everywhere.',
+      'Trust and moderation have to be built in from day one, not bolted on later.',
     ],
-    notes: 'Exploring how to handle the cold start problem. Thinking about launching neighborhood by neighborhood instead of city-wide. Also considering partnerships with local community organizations.',
+    notes: 'Verified volunteer matching, request/fulfillment pipeline, AI-assisted moderation, career tools (resume review, cover letter generator, skills-matching quiz). Designed for Metro Atlanta communities first — every feature tuned for local, not generic national.',
   },
   {
     id: 'chemnet',
