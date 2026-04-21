@@ -27,12 +27,12 @@ You paid for your home. You should be able to defend it.`,
     stack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'AI Letter Generation'],
     links: [],
     learnings: [
-      'The system is stacked against homeowners — management companies have lawyers and templates, homeowners have Google and a deadline.',
-      'Most disputes never get filed not because people are wrong, but because the process feels overwhelming. Reducing friction is the whole product.',
-      'Flat pricing ($49) removes the biggest barrier. People will pay to respond properly — they won\'t pay to start a subscription they might use once.',
+      'The system is stacked against homeowners. Management companies have lawyers and templates. Homeowners have Google and a deadline.',
+      'Most disputes never get filed not because people are wrong but because the process feels overwhelming. Reducing friction is the whole product.',
+      'Flat pricing ($49) removes the biggest barrier. People will pay to respond properly. They won\'t pay to start a subscription they might use once.',
       'Tone matters as much as content. Letters that are firm but measured get taken seriously. Angry midnight emails get ignored.',
     ],
-    notes: 'Platform informed by how management companies actually respond to disputes — and what kinds of letters they take seriously versus ignore. Private by default — violation details, property info, and letter content stay with the user. No data selling.',
+    notes: 'Platform informed by how management companies actually respond to disputes and what kinds of letters they take seriously versus ignore. Private by default. Violation details, property info, and letter content stay with the user. No data selling.',
   },
   {
     id: 'mgn',
@@ -55,12 +55,12 @@ Free, forever. Hyperlocal by design. Infrastructure, not charity. Built to last.
     stack: ['Next.js', 'Supabase', 'Mapbox', 'AI Moderation', 'SMS Integration'],
     links: [],
     learnings: [
-      'The strongest safety net isn\'t built by institutions — it\'s built by neighbors who know each other and have easy ways to help.',
-      'SMS-first coordination matters — participation can\'t require a smartphone or a data plan if you want to reach everyone.',
+      'The strongest safety net isn\'t built by institutions. It\'s built by neighbors who know each other and have easy ways to help.',
+      'SMS-first coordination matters. Participation can\'t require a smartphone or a data plan if you want to reach everyone.',
       'Hyperlocal density is the chicken-and-egg problem. Launching neighborhood by neighborhood is better than going city-wide and being thin everywhere.',
       'Trust and moderation have to be built in from day one, not bolted on later.',
     ],
-    notes: 'Verified volunteer matching, request/fulfillment pipeline, AI-assisted moderation, career tools (resume review, cover letter generator, skills-matching quiz). Designed for Metro Atlanta communities first — every feature tuned for local, not generic national.',
+    notes: 'Verified volunteer matching, request/fulfillment pipeline, AI-assisted moderation, career tools (resume review, cover letter generator, skills-matching quiz). Designed for Metro Atlanta communities first. Every feature tuned for local, not generic national.',
   },
   {
     id: 'chemnet',
@@ -69,7 +69,7 @@ Free, forever. Hyperlocal by design. Infrastructure, not charity. Built to last.
     status: 'active',
     type: 'tech',
     tagline: "You're looking at it.",
-    description: `This site. A personal space styled as a Win95 desktop OS — because the internet should be fun again.
+    description: `This site. A personal space styled as a Win95 desktop OS because the internet should be fun again.
 
 Built to chase the feeling of the old internet. A tech garden free from the homogeny of social media. Games, blogs, a terminal with secrets, hidden layers, and easter eggs tucked everywhere.
 
@@ -77,7 +77,7 @@ The site itself is the project. It will always be a work in progress.`,
     stack: ['React', 'Vite', 'react95', 'Tailwind', 'Framer Motion', 'Supabase'],
     links: [],
     learnings: [
-      'Building a fake OS is basically building a real UI framework — window management, z-indexing, and state isolation between apps are real problems.',
+      'Building a fake OS is basically building a real UI framework. Window management, z-indexing, and keeping state isolated between apps are all real problems.',
       'The retro aesthetic has constraints that force creative solutions. Win95 bevels look wrong if the colors are even slightly off.',
       'Having fun with a project is the best productivity hack. Added more features to this in two weeks than I have to work projects in months.',
     ],
@@ -85,13 +85,13 @@ The site itself is the project. It will always be a work in progress.`,
     roadmap: [
       { item: 'Wire all apps to read from Supabase (Blog done, Reviews done, Restaurants done)', done: true },
       { item: 'Admin Panel for content management', done: true },
-      { item: 'Layer 3-5 puzzle system — unlock deeper content', done: false },
+      { item: 'Layer 3-5 puzzle system to unlock deeper content', done: false },
       { item: 'Boot sequence animation on first visit', done: false },
       { item: 'Photo uploads via admin for Projects, Trips, Car Mods', done: false },
       { item: 'Real-time Guestbook and Message Board via Supabase', done: false },
       { item: 'Push notifications / email integration for ChemMail', done: false },
       { item: 'Custom domain + SSL (ericchemwor.com)', done: false },
-      { item: 'PWA support — installable on phone home screen', done: false },
+      { item: 'PWA support so it can be installed on phone home screen', done: false },
       { item: 'Shared high scores leaderboard (Supabase backed)', done: false },
       { item: 'More mobile-native app views (Guestbook, Trips, etc.)', done: false },
       { item: 'Music player that actually plays audio', done: false },
@@ -106,21 +106,21 @@ The site itself is the project. It will always be a work in progress.`,
     status: 'planning',
     type: 'hybrid',
     tagline: 'Personal AI assistant. Software + hardware.',
-    description: `BMO is a personal AI assistant project — the idea is to build something that actually knows me. Not a generic chatbot, but an assistant trained on my preferences, schedule, habits, and goals.
+    description: `BMO is a personal AI assistant project. The idea is to build something that actually knows me. Not a generic chatbot but an assistant trained on my preferences, schedule, habits, and goals.
 
-Think of it as a digital companion that can help with task management, research, and decision-making in a way that's personalized to how I think and work. Named after BMO from Adventure Time because that's the energy.
+A digital companion that can help with task management, research, and decision making in a way that fits how I think and work. Named after BMO from Adventure Time because that's the energy.
 
-The software side is an AI agent with memory, context, and personality. The hardware side is a physical device — a small screen with a speaker that sits on the desk. Something you can talk to and that talks back.
+Software side is an AI agent with memory, context, and personality. Hardware side is a physical device. Small screen with a speaker that sits on the desk. Something you can talk to and that talks back.
 
-Still in the planning phase. Exploring what the right architecture looks like.`,
+Still in the planning phase. Figuring out what the right architecture looks like.`,
     stack: ['Python', 'LangChain', 'OpenAI', 'Raspberry Pi', 'Speaker/Mic', 'Small Display'],
     links: [],
     learnings: [
       'The gap between a chatbot and a useful assistant is context. It needs to remember things across conversations.',
-      'Hardware adds a whole layer of complexity — audio processing, wake words, display rendering. It might need to be software-first, hardware-second.',
-      'The "personality" part is the hardest to get right. It needs to feel like talking to someone, not querying a database.',
+      'Hardware adds a whole layer of complexity. Audio processing, wake words, display rendering. Might need to be software first, hardware second.',
+      'The personality part is the hardest to get right. It needs to feel like talking to someone, not querying a database.',
     ],
-    notes: 'Investigating RAG (Retrieval Augmented Generation) for personal knowledge base. Considering whether to use OpenAI, Anthropic, or a local model. The hardware enclosure could be 3D printed with a Raspberry Pi + small touchscreen.',
+    notes: 'Investigating RAG (Retrieval Augmented Generation) for personal knowledge base. Considering OpenAI, Anthropic, or a local model. The hardware enclosure could be 3D printed with a Raspberry Pi and small touchscreen.',
   },
   {
     id: 'bathroom',
@@ -129,9 +129,9 @@ Still in the planning phase. Exploring what the right architecture looks like.`,
     status: 'planned',
     type: 'physical',
     tagline: 'First real home renovation project.',
-    description: `Planning a full bathroom renovation. Gut and redo — new tile, vanity, fixtures, lighting. The current setup is dated and the layout could be better.
+    description: `Planning a full bathroom renovation. Gut and redo. New tile, vanity, fixtures, lighting. The current setup is dated and the layout could be better.
 
-This is the first big hands-on project. Learning as I go — watching way too many YouTube videos on waterproofing and tile work. The goal is to do as much of it myself as possible and document the process.
+First big hands-on project. Learning as I go. Watching way too many YouTube videos on waterproofing and tile work. The goal is to do as much of it myself as possible and document the process.
 
 Budget and timeline TBD. Waiting on quotes and finalizing the design.`,
     stack: [],
@@ -144,9 +144,9 @@ Budget and timeline TBD. Waiting on quotes and finalizing the design.`,
     status: 'active',
     type: 'physical',
     tagline: 'Turning the V6 into something special.',
-    description: `The Camaro project — a 2016 LT V6 (3.6L LGX) that I'm building into an SS-level daily over time. Phase by phase, mod by mod.
+    description: `The Camaro project. A 2016 LT V6 (3.6L LGX) that I'm building into an SS-level daily over time. Phase by phase, mod by mod.
 
-Current focus: catch-up maintenance (spark plugs, alignment), then Phase 1 (exhaust, brakes, tint, badge delete). Full interior carbon fiber treatment and exterior ZL1 conversion planned.
+Current focus is catch-up maintenance (spark plugs, alignment), then Phase 1 (exhaust, brakes, tint, badge delete). Full interior carbon fiber treatment and exterior ZL1 conversion planned.
 
 The full mod list, prices, and links are tracked in the Car Mods app on this site.`,
     stack: [],
@@ -159,11 +159,11 @@ The full mod list, prices, and links are tracked in the Car Mods app on this sit
     status: 'concept',
     type: 'physical',
     tagline: 'LED-powered dice board game.',
-    description: `An idea for a custom board game that uses LED-lit dice and an interactive board. Think of a tabletop game where the dice results trigger different light patterns on the board, creating a visual experience on top of the gameplay.
+    description: `An idea for a custom board game that uses LED-lit dice and an interactive board. Tabletop game where the dice results trigger different light patterns on the board, creating a visual experience on top of the gameplay.
 
-Still in the concept phase — sketching out the electronics (LED strips, microcontroller), the game mechanics, and the physical design. The goal is to make something that feels premium and fun to play in person.
+Still in the concept phase. Sketching out the electronics (LED strips, microcontroller), the game mechanics, and the physical design. The goal is to make something that feels premium and fun to play in person.
 
-This might end up being an Arduino or Raspberry Pi project with a custom PCB.`,
+Probably going to be an Arduino or Raspberry Pi project with a custom PCB.`,
     stack: ['Arduino/RPi', 'LED Strips', 'Custom PCB', 'Game Design'],
     links: [],
   },
