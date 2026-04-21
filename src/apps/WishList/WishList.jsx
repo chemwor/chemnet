@@ -77,9 +77,12 @@ function DesktopWishList({ items }) {
                   <span className="text-xs" style={{ color: '#555' }}>{item.category}</span>
                 </div>
               </div>
-              <span className="text-xs shrink-0" style={{ color: '#888' }}>
-                {item.price > 0 ? `$${item.price.toLocaleString()}` : ''}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs" style={{ color: '#888' }}>
+                  {item.price > 0 ? `$${item.price.toLocaleString()}` : ''}
+                </span>
+                {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-xs" style={{ color: '#4A90D9' }}>🔗</a>}
+              </div>
             </div>
           ))}
         </div>
@@ -162,8 +165,9 @@ function MobileWishList({ items }) {
               </div>
               <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>{item.category}</div>
             </div>
-            <div style={{ textAlign: 'right', shrink: 0 }}>
+            <div style={{ textAlign: 'right', shrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
               {item.price > 0 && <div style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>${item.price}</div>}
+              {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#007AFF', fontSize: 12, textDecoration: 'none' }}>Link</a>}
               <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
             </div>
           </div>
