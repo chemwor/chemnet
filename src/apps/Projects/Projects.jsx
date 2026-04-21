@@ -8,18 +8,31 @@ const PROJECTS = [
     icon: '🏠',
     status: 'active',
     type: 'tech',
-    tagline: 'Fighting HOA overreach with tech.',
-    description: `Dispute My HOA is a platform that helps homeowners navigate and challenge unfair HOA practices. It streamlines the dispute process by guiding users through their rights, generating formal response letters, and tracking case progress.
+    tagline: 'The tool homeowners wish they had the first time their HOA sent a letter.',
+    description: `Dispute My HOA (DMHOA) helps homeowners fight back against unfair, incorrect, or overreaching HOA violations — without hiring a lawyer, without spending weeks writing letters, and without getting steamrolled by a management company that does this every day.
 
-The idea came from personal frustration — dealing with an HOA that operated without transparency or accountability. The tools that exist for homeowners are scattered and confusing. DMHOA puts everything in one place.`,
-    stack: ['React', 'Node.js', 'PostgreSQL', 'Stripe'],
+You upload your violation notice, answer a few questions about your situation, and DMHOA generates a professional, legally-aware dispute letter tailored to your case — ready to send to your HOA or management company. One letter. Forty-nine dollars. No subscriptions, no retainers, no games.
+
+HOAs hold real power over homeowners — fines, liens, forced compliance, even foreclosure in extreme cases. And the system is stacked: management companies have lawyers, templates, and years of experience. The average homeowner has a violation notice, a deadline, and Google.
+
+Most disputes never get filed, not because homeowners are in the wrong, but because the process feels overwhelming. The violation language is vague or contradicts the CC&Rs. Deadlines are short. Hiring an attorney costs more than just paying the fine. Writing a proper dispute letter requires knowing what to cite, what tone to use, and what not to say.
+
+DMHOA closes that gap. It gives homeowners the same kind of structured, professional response that a paid attorney would draft — in minutes, for a flat fee, with no legal background required.
+
+Handles: lawn/landscaping, architectural modifications, parking, trash/storage, holiday decorations, fines, selective enforcement, procedural errors, hearing requests, and record inspection.
+
+DMHOA is not a law firm. It's a tool that gives homeowners leverage they didn't have before — clearly, affordably, and on their schedule.
+
+You paid for your home. You should be able to defend it.`,
+    stack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'AI Letter Generation'],
     links: [],
     learnings: [
-      'Dealing with legal-adjacent content requires careful disclaimers and user expectations management.',
-      'HOA regulations vary wildly by state — the platform needs to be flexible enough to handle that without overcomplicating the UX.',
-      'Users in this space are frustrated by the time they find you. Onboarding has to be fast and the first action has to feel like progress.',
+      'The system is stacked against homeowners — management companies have lawyers and templates, homeowners have Google and a deadline.',
+      'Most disputes never get filed not because people are wrong, but because the process feels overwhelming. Reducing friction is the whole product.',
+      'Flat pricing ($49) removes the biggest barrier. People will pay to respond properly — they won\'t pay to start a subscription they might use once.',
+      'Tone matters as much as content. Letters that are firm but measured get taken seriously. Angry midnight emails get ignored.',
     ],
-    notes: 'Looking into partnerships with local attorneys who specialize in HOA disputes. Also exploring whether AI can help draft initial response letters based on the specific violation type.',
+    notes: 'Platform informed by how management companies actually respond to disputes — and what kinds of letters they take seriously versus ignore. Private by default — violation details, property info, and letter content stay with the user. No data selling.',
   },
   {
     id: 'mgn',
