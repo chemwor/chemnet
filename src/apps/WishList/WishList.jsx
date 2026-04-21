@@ -13,10 +13,7 @@ const CATEGORIES = [
   { id: 'other', label: '📦 Other' },
 ]
 
-// Fallback data until DB is wired
-const FALLBACK_ITEMS = [
-  { id: 1, name: 'Add your wish list items', category: 'other', price: 0, priority: 'medium', link: '', image: '', notes: 'Use the Admin Panel or Supabase to add items. Paste a product URL and the name, price, and image will be pulled automatically.', acquired: false },
-]
+import { WISHLIST_ITEMS } from './wishlist-data'
 
 function PriorityBadge({ priority }) {
   const styles = {
@@ -179,7 +176,7 @@ function MobileWishList({ items }) {
 // ── Main ──
 export default function WishList() {
   const isMobile = useMediaQuery('(max-width: 768px)')
-  const [items, setItems] = useState(FALLBACK_ITEMS)
+  const [items, setItems] = useState(WISHLIST_ITEMS)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
