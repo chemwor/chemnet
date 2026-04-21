@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { supabase } from '../../lib/supabase'
 
 const CATEGORIES = [
   { id: 'movies', label: 'Movies' },
   { id: 'tv', label: 'TV Shows' },
+  { id: 'anime', label: 'Anime' },
 ]
 
 const REVIEWS = [
@@ -305,17 +307,18 @@ function MobileReviewDetail({ item, onBack }) {
   )
 }
 
-function MobileReviews() {
+function MobileReviews({ data }) {
+  const items = data || REVIEWS
   const [category, setCategory] = useState('movies')
   const [openId, setOpenId] = useState(null)
 
-  const filtered = REVIEWS.filter(r => r.category === category).sort((a, b) => {
+  const filtered = filterByCategory(items, category).sort((a, b) => {
     if (a.status === 'watchlist' && b.status !== 'watchlist') return 1
     if (b.status === 'watchlist' && a.status !== 'watchlist') return -1
-    return b.rating - a.rating
+    return (b.rating || 0) - (a.rating || 0)
   })
 
-  const openItem = REVIEWS.find(r => r.id === openId)
+  const openItem = items.find(r => r.id === openId)
   if (openItem) return <MobileReviewDetail item={openItem} onBack={() => setOpenId(null)} />
 
   return (
@@ -323,7 +326,7 @@ function MobileReviews() {
       {/* Segmented control */}
       <div style={{ padding: '8px 16px', background: '#f2f2f7' }}>
         <div style={{ display: 'flex', background: '#e5e5ea', borderRadius: 8, padding: 2 }}>
-          {[{ id: 'movies', label: 'Movies' }, { id: 'tv', label: 'TV Shows' }].map(c => (
+          {CATEGORIES.map(c => (
             <button key={c.id} onClick={() => setCategory(c.id)} className="flex-1 border-none cursor-pointer" style={{ padding: '6px 0', borderRadius: 6, fontSize: 13, fontWeight: 500, fontFamily: 'inherit', background: category === c.id ? '#fff' : 'transparent', color: '#000', boxShadow: category === c.id ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
               {c.label}
             </button>
@@ -337,27 +340,55 @@ function MobileReviews() {
   )
 }
 
+// Filter helper — anime is tv category with Anime tag
+function filterByCategory(items, cat) {
+  if (cat === 'anime') return items.filter(r => r.tags?.includes('Anime'))
+  if (cat === 'tv') return items.filter(r => r.category === 'tv' && !r.tags?.includes('Anime'))
+  return items.filter(r => r.category === cat)
+}
+
 export default function Reviews() {
   const isMobile = useMediaQuery('(max-width: 768px)')
-
+  const [data, setData] = useState(REVIEWS)
+  const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('movies')
   const [filter, setFilter] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
   const [openId, setOpenId] = useState(null)
 
-  if (isMobile) return <MobileReviews />
+  useEffect(() => {
+    async function load() {
+      try {
+        const controller = new AbortController()
+        setTimeout(() => controller.abort(), 3000)
+        const { data: rows, error } = await supabase
+          .from('reviews')
+          .select('*')
+          .order('title')
+          .abortSignal(controller.signal)
+        if (!error && rows && rows.length > 0) setData(rows)
+      } catch {}
+      setLoading(false)
+    }
+    load()
+  }, [])
 
-  const filtered = REVIEWS
-    .filter(r => r.category === category)
+  if (loading) {
+    return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f1a', color: '#555', fontFamily: 'monospace' }}>Loading...</div>
+  }
+
+  if (isMobile) return <MobileReviews data={data} />
+
+  const filtered = filterByCategory(data, category)
     .filter(r => filter === 'all' || r.status === filter)
     .sort((a, b) => {
       if (a.status === 'watchlist' && b.status !== 'watchlist') return 1
       if (b.status === 'watchlist' && a.status !== 'watchlist') return -1
-      return b.rating - a.rating
+      return (b.rating || 0) - (a.rating || 0)
     })
 
-  const selected = REVIEWS.find(r => r.id === selectedId)
-  const openItem = REVIEWS.find(r => r.id === openId)
+  const selected = data.find(r => r.id === selectedId)
+  const openItem = data.find(r => r.id === openId)
 
   if (openItem) {
     return <FullReview item={openItem} onBack={() => setOpenId(null)} />
