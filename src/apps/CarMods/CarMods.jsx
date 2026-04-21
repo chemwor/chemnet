@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { supabase } from '../../lib/supabase'
 
 const PROJECT = {
   name: 'The Camaro',
@@ -89,6 +90,183 @@ const PHASES = [
   },
 ]
 
+const PHOTO_CATEGORIES = [
+  { id: 'all', label: 'All' },
+  { id: 'exterior', label: 'Exterior' },
+  { id: 'interior', label: 'Interior' },
+  { id: 'engine', label: 'Engine' },
+  { id: 'before', label: 'Before' },
+  { id: 'after', label: 'After' },
+  { id: 'progress', label: 'Progress' },
+]
+
+// Photos will load from Supabase Storage bucket 'car-photos'
+function useCarPhotos() {
+  const [photos, setPhotos] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const { data, error } = await supabase.storage.from('car-photos').list('', { limit: 100 })
+        if (!error && data) {
+          const photoList = data
+            .filter(f => f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i))
+            .map(f => {
+              const { data: urlData } = supabase.storage.from('car-photos').getPublicUrl(f.name)
+              // Parse category from filename: "exterior_front-angle.jpg" → "exterior"
+              const cat = f.name.split('_')[0]
+              const validCat = PHOTO_CATEGORIES.find(c => c.id === cat) ? cat : 'all'
+              return {
+                name: f.name,
+                url: urlData.publicUrl,
+                category: validCat,
+                date: f.created_at,
+              }
+            })
+          setPhotos(photoList)
+        }
+      } catch {}
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  return { photos, loading }
+}
+
+// ── Desktop Photo Gallery ──
+function DesktopPhotoGallery() {
+  const { photos, loading } = useCarPhotos()
+  const [filter, setFilter] = useState('all')
+  const [selected, setSelected] = useState(null)
+
+  const filtered = filter === 'all' ? photos : photos.filter(p => p.category === filter)
+
+  return (
+    <div className="flex-1 overflow-auto">
+      {/* Filter bar */}
+      <div className="flex gap-1 px-3 py-1.5" style={{ borderBottom: '1px solid #2a2a3a' }}>
+        {PHOTO_CATEGORIES.map(c => (
+          <button
+            key={c.id}
+            onClick={() => setFilter(c.id)}
+            className="px-1.5 py-0.5 text-xs border-none cursor-pointer"
+            style={{ background: filter === c.id ? '#FF6B35' : 'transparent', color: filter === c.id ? '#000' : '#555', fontFamily: 'monospace' }}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="p-8 text-center text-xs" style={{ color: '#555' }}>Loading photos...</div>
+      ) : filtered.length === 0 ? (
+        <div className="p-8 text-center" style={{ color: '#555' }}>
+          <div className="text-2xl mb-2">📷</div>
+          <div className="text-xs mb-1">No photos yet</div>
+          <div className="text-xs" style={{ color: '#444' }}>
+            Upload to the "car-photos" bucket in Supabase Storage.
+            <br />Name files like: exterior_front.jpg, interior_dash.jpg, before_stock.jpg
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-1 p-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}>
+            {filtered.map((photo, i) => (
+              <div
+                key={i}
+                onClick={() => setSelected(photo)}
+                className="cursor-pointer"
+                style={{ aspectRatio: '1', borderRadius: 4, overflow: 'hidden', border: selected?.name === photo.name ? '2px solid #FF6B35' : '2px solid transparent' }}
+              >
+                <img src={photo.url} alt={photo.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ))}
+          </div>
+
+          {/* Lightbox */}
+          {selected && (
+            <div
+              onClick={() => setSelected(null)}
+              style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <img src={selected.url} alt={selected.name} style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain', borderRadius: 4 }} />
+              <div style={{ position: 'absolute', bottom: 20, color: '#888', fontSize: 11, fontFamily: 'monospace' }}>
+                {selected.name} · {selected.category} · Click to close
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Mobile Photo Gallery ──
+function MobilePhotoGallery() {
+  const { photos, loading } = useCarPhotos()
+  const [filter, setFilter] = useState('all')
+  const [selected, setSelected] = useState(null)
+
+  const filtered = filter === 'all' ? photos : photos.filter(p => p.category === filter)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#000' }}>
+      {/* Filter */}
+      <div style={{ padding: '8px 12px', overflowX: 'auto', display: 'flex', gap: 6, background: '#111', borderBottom: '0.5px solid #333' }}>
+        {PHOTO_CATEGORIES.map(c => (
+          <button
+            key={c.id}
+            onClick={() => setFilter(c.id)}
+            className="border-none cursor-pointer shrink-0"
+            style={{ padding: '4px 10px', borderRadius: 14, fontSize: 12, background: filter === c.id ? '#FF6B35' : '#222', color: filter === c.id ? '#000' : '#888', fontFamily: '-apple-system, sans-serif' }}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: 14 }}>Loading...</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+          <div style={{ fontSize: 15, color: '#888', fontFamily: '-apple-system, sans-serif' }}>No photos yet</div>
+          <div style={{ fontSize: 12, color: '#555', marginTop: 4, fontFamily: '-apple-system, sans-serif' }}>Photos will appear here</div>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-auto" style={{ padding: 2 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+            {filtered.map((photo, i) => (
+              <div
+                key={i}
+                onClick={() => setSelected(photo)}
+                style={{ aspectRatio: '1', overflow: 'hidden' }}
+              >
+                <img src={photo.url} alt={photo.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen view */}
+      {selected && (
+        <div
+          onClick={() => setSelected(null)}
+          style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <img src={selected.url} alt={selected.name} style={{ maxWidth: '100%', maxHeight: '85%', objectFit: 'contain' }} />
+          <div style={{ position: 'absolute', bottom: 40, color: '#888', fontSize: 12, fontFamily: '-apple-system, sans-serif' }}>
+            Tap to close
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const STATUS_COLORS = {
   done: { bg: '#1a3a1a', color: '#4ADE80', label: 'DONE' },
   planned: { bg: '#1a1a3a', color: '#60A5FA', label: 'PLANNED' },
@@ -98,6 +276,7 @@ const STATUS_COLORS = {
 
 // ── Desktop View ──
 function DesktopCarMods() {
+  const [tab, setTab] = useState('mods') // mods | photos
   const [activePhase, setActivePhase] = useState('phase1')
   const phase = PHASES.find(p => p.id === activePhase)
 
@@ -113,9 +292,15 @@ function DesktopCarMods() {
             <div className="font-bold text-sm">{PROJECT.name}</div>
             <div className="text-xs" style={{ color: '#888' }}>{PROJECT.car}</div>
           </div>
-          <span className="ml-auto text-xs" style={{ color: '#555' }}>{PROJECT.miles} · {doneAll}/{totalAll} mods</span>
+          <div className="flex gap-1 ml-auto">
+            <button onClick={() => setTab('mods')} className="px-2 py-0.5 text-xs border-none cursor-pointer" style={{ background: tab === 'mods' ? '#FF6B35' : '#1a1a2a', color: tab === 'mods' ? '#000' : '#666', fontFamily: 'monospace' }}>🔧 Mods</button>
+            <button onClick={() => setTab('photos')} className="px-2 py-0.5 text-xs border-none cursor-pointer" style={{ background: tab === 'photos' ? '#FF6B35' : '#1a1a2a', color: tab === 'photos' ? '#000' : '#666', fontFamily: 'monospace' }}>📷 Photos</button>
+          </div>
         </div>
       </div>
+
+      {tab === 'photos' ? <DesktopPhotoGallery /> : (
+      <>
 
       <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
         {/* Phase sidebar */}
@@ -154,9 +339,11 @@ function DesktopCarMods() {
           })}
         </div>
       </div>
+      </>
+      )}
 
       <div className="px-3 py-1.5 shrink-0" style={{ background: '#12121a', borderTop: '1px solid #2a2a3a' }}>
-        <div className="text-xs" style={{ color: '#555' }}>{PROJECT.notes}</div>
+        <div className="text-xs" style={{ color: '#555' }}>{PROJECT.miles} · {doneAll}/{totalAll} mods</div>
       </div>
     </div>
   )
@@ -166,6 +353,19 @@ function DesktopCarMods() {
 function MobileCarMods() {
   const [activePhase, setActivePhase] = useState(null)
   const phase = PHASES.find(p => p.id === activePhase)
+
+  if (activePhase === 'photos') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#000', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+        <div className="flex items-center px-3 shrink-0" style={{ height: 44, borderBottom: '0.5px solid #333', background: '#111' }}>
+          <button onClick={() => setActivePhase(null)} className="border-none bg-transparent cursor-pointer" style={{ color: '#007AFF', fontSize: 15, fontFamily: 'inherit' }}>‹ Back</button>
+          <span className="flex-1 text-center" style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Photos</span>
+          <div style={{ width: 40 }} />
+        </div>
+        <MobilePhotoGallery />
+      </div>
+    )
+  }
 
   if (phase) {
     return (
@@ -220,6 +420,16 @@ function MobileCarMods() {
             </div>
           )
         })}
+
+        {/* Photos entry */}
+        <div style={{ padding: '4px 16px 0', fontSize: 11, color: '#8e8e93', fontWeight: 600, textTransform: 'uppercase', marginTop: 8 }}>Gallery</div>
+        <div onClick={() => setActivePhase('photos')} style={{ padding: '14px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea', display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 600 }}>📷 Photos</div>
+            <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>Before & after, progress, detail shots</div>
+          </div>
+          <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
+        </div>
       </div>
     </div>
   )
