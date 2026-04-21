@@ -147,7 +147,11 @@ function ReviewCard({ item, isSelected, onClick, onDoubleClick }) {
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >
-      <span className="text-2xl shrink-0">{item.poster}</span>
+      {item.image ? (
+        <img src={item.image} alt="" style={{ width: 36, height: 52, borderRadius: 3, objectFit: 'cover', shrink: 0 }} />
+      ) : (
+        <span className="text-2xl shrink-0">{item.poster}</span>
+      )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-bold text-sm truncate" style={{ color: '#F0EBE1' }}>{item.title}</span>
@@ -164,10 +168,11 @@ function ReviewCard({ item, isSelected, onClick, onDoubleClick }) {
           )}
         </div>
         <div className="flex gap-1 mt-1">
-          {item.tags.map(t => (
+          {(item.tags || []).map(t => (
             <span key={t} className="text-xs px-1" style={{ background: '#1a1a30', color: '#666', fontSize: 9 }}>{t}</span>
           ))}
         </div>
+        {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-xs mt-1 block" style={{ color: '#4A90D9', fontSize: 9 }}>IMDb ↗</a>}
       </div>
     </div>
   )
@@ -197,11 +202,16 @@ function FullReview({ item, onBack }) {
         <div style={{ maxWidth: 560, margin: '0 auto', padding: '20px 24px' }}>
           {/* Hero */}
           <div className="text-center mb-4">
-            <div className="text-5xl mb-2">{item.poster}</div>
+            {item.image ? (
+              <img src={item.image} alt="" style={{ width: 120, height: 170, borderRadius: 6, objectFit: 'cover', margin: '0 auto 8px', display: 'block', boxShadow: '0 2px 10px rgba(0,0,0,0.5)' }} />
+            ) : (
+              <div className="text-5xl mb-2">{item.poster}</div>
+            )}
             <h1 style={{ fontSize: 20, fontWeight: 'bold', margin: '0 0 4px', color: '#F0EBE1' }}>{item.title}</h1>
-            <div className="text-xs mb-2" style={{ color: '#666' }}>{item.year} · {item.tags.join(' · ')}</div>
+            <div className="text-xs mb-2" style={{ color: '#666' }}>{item.year} · {(item.tags || []).join(' · ')}</div>
             <StarRating rating={item.rating} size={14} />
             <div className="text-xs mt-1" style={{ color: '#888' }}>{item.rating}/10</div>
+            {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-xs mt-2 inline-block" style={{ color: '#4A90D9' }}>View on IMDb ↗</a>}
           </div>
 
           {/* Divider */}
@@ -253,13 +263,15 @@ function FullReview({ item, onBack }) {
 function MobileReviewCard({ item, onTap }) {
   return (
     <div onClick={() => onTap(item.id)} style={{ padding: '12px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea', display: 'flex', gap: 12, alignItems: 'center', fontFamily: '-apple-system, sans-serif' }}>
-      <div style={{ width: 44, height: 44, borderRadius: 8, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, shrink: 0 }}>
-        {item.poster}
-      </div>
+      {item.image ? (
+        <img src={item.image} alt="" style={{ width: 40, height: 58, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
+      ) : (
+        <div style={{ width: 40, height: 58, borderRadius: 4, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{item.poster}</div>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: '#000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>
         <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>
-          {item.year} · {item.tags.join(', ')}
+          {item.year} · {(item.tags || []).join(', ')}
         </div>
         {item.status === 'watched' && (
           <div style={{ fontSize: 11, color: '#FF9500', marginTop: 2 }}>{'★'.repeat(Math.round(item.rating / 2))}{'☆'.repeat(5 - Math.round(item.rating / 2))} {item.rating}/10</div>
@@ -281,12 +293,17 @@ function MobileReviewDetail({ item, onBack }) {
       </div>
       <div className="flex-1 overflow-auto">
         <div style={{ textAlign: 'center', padding: '20px 16px 12px' }}>
-          <div style={{ fontSize: 50, marginBottom: 8 }}>{item.poster}</div>
-          <div style={{ fontSize: 20, fontWeight: 700 }}>{item.title}</div>
-          <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 4 }}>{item.year} · {item.tags.join(' · ')}</div>
-          {item.status === 'watched' && (
-            <div style={{ fontSize: 16, color: '#FF9500', marginTop: 8 }}>{'★'.repeat(Math.round(item.rating / 2))}{'☆'.repeat(5 - Math.round(item.rating / 2))} <span style={{ color: '#000', fontWeight: 600 }}>{item.rating}/10</span></div>
+          {item.image ? (
+            <img src={item.image} alt="" style={{ width: 120, height: 170, borderRadius: 8, objectFit: 'cover', margin: '0 auto 8px', display: 'block', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }} />
+          ) : (
+            <div style={{ fontSize: 50, marginBottom: 8 }}>{item.poster}</div>
           )}
+          <div style={{ fontSize: 20, fontWeight: 700 }}>{item.title}</div>
+          <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 4 }}>{item.year} · {(item.tags || []).join(' · ')}</div>
+          {item.status === 'watched' && (
+            <div style={{ fontSize: 16, color: '#FF9500', marginTop: 8 }}>{'★'.repeat(Math.round((item.rating || 0) / 2))}{'☆'.repeat(5 - Math.round((item.rating || 0) / 2))} <span style={{ color: '#000', fontWeight: 600 }}>{item.rating || 0}/10</span></div>
+          )}
+          {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 8, fontSize: 13, color: '#007AFF', textDecoration: 'none' }}>View on IMDb ↗</a>}
         </div>
         {item.review && (
           <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
