@@ -55,13 +55,15 @@ const PHASES = [
     id: 'interior',
     label: '🪑 Interior Mods',
     mods: [
-      { name: 'Premium Leatherette Seat Covers', status: 'planned', cost: '$520', priority: 'HIGH IMPACT', notes: 'Front & rear. All black honeycomb. AmericanMuscle.' },
-      { name: 'TruShield Floor Liners', status: 'planned', cost: '$99.99', priority: 'PRACTICAL', notes: 'Front & rear precision molded. Black.' },
+      { name: 'Custom Leather Seat Covers', status: 'planned', cost: '$469–850', priority: 'HIGH IMPACT', notes: 'Precision fit for 2016+ Camaro Coupe. Compatible with seat heaters and airbags. Multiple color options.', link: 'https://kustominterior.com/collections/chevrolet-camaro-interior-parts-accessories/products/2016-chevrolet-camaro-coupe-seat-covers' },
+      { name: 'Leather Knee Pads Cover Kit (4pc)', status: 'planned', cost: '$129.99', priority: 'HIGH IMPACT', notes: 'Premium leather over factory area. Center console + door knee pads. OEM-style fitment.', link: 'https://kustominterior.com/collections/chevrolet-camaro-interior-parts-accessories/products/6th-gen-camaro-leather-knee-pads-cover-kit-interior-trim' },
+      { name: 'Witamats Diamond Line Galaxy Floor Mats', status: 'planned', cost: '$199.95', priority: 'PRACTICAL', notes: 'Custom-fit microfiber leather. Waterproof, extended coverage wraps up the sides. Dual-layer cushion.', link: 'https://witamats.com/products/witamats-diamond-line-galaxy/' },
       { name: 'Husky WeatherBeater Trunk Liner', status: 'planned', cost: '$107.99', priority: 'PRACTICAL', notes: 'Protect that trunk.' },
+      { name: 'BloomCar LED Door Sill Pro', status: 'planned', cost: '$69.99', priority: 'NICE', notes: 'LED light-up door sills. Custom fit for Camaro.', link: 'https://thebloomcar.com/products/bloomcar-led-light-pedal' },
       { name: 'CF Gear Shifter Console Trim', status: 'planned', cost: '$84.99', priority: 'HIGH IMPACT', notes: 'Carbon fiber. NextGenSpeed.' },
       { name: 'CF Air Vent Bezel Cover', status: 'planned', cost: '$76.99', priority: 'HIGH IMPACT', notes: 'Carbon fiber. NextGenSpeed.' },
       { name: 'CF Radio Trim Surround', status: 'planned', cost: '$84.99', priority: 'HIGH IMPACT', notes: 'Carbon fiber 8" radio trim. NextGenSpeed.' },
-      { name: 'Custom CF Steering Wheel', status: 'researching', cost: '$1,065.99', priority: 'SPLURGE', notes: 'The big one. AutoAddictUSA.' },
+      { name: 'CF Steering Wheel', status: 'researching', cost: '$599–1,099', priority: 'SPLURGE', notes: 'Carbon fiber with ergonomic grips, premium stitching. LED display options available.', link: 'https://kustominterior.com/collections/chevrolet-camaro-interior-parts-accessories/products/6th-gen-camaro-carbon-fiber-steering-wheel' },
       { name: 'SpeedForm Pedal Covers', status: 'planned', cost: '$31.99', priority: 'NICE', notes: 'Stainless steel. AmericanMuscle.' },
       { name: 'CF Push Start Button Cover', status: 'planned', cost: '$22.99', priority: 'NICE', notes: 'Small detail, big feel.' },
       { name: 'CF Door Sill Covers', status: 'planned', cost: '$44.99', priority: 'NICE', notes: 'NextGenSpeed.' },
@@ -76,9 +78,9 @@ const PHASES = [
       { name: 'OEM Replica Sequential LED Headlights', status: 'planned', cost: '$598.74', priority: 'HIGH IMPACT', notes: 'AutoAddictUSA.' },
       { name: 'ZL1 Style Rear Spoiler (Gloss Black)', status: 'planned', cost: '$324.99', priority: 'HIGH IMPACT', notes: 'AmericanMuscle.' },
       { name: 'SS-Style Front Splitter', status: 'planned', cost: '$150–300', priority: 'MID', notes: 'Aggressive lower front. RPI Designs or ACS.' },
-      { name: 'LED Rear Marker Lights (Red)', status: 'planned', cost: 'TBD', priority: 'NICE', notes: 'Axial. AmericanMuscle.' },
-      { name: 'LED Third Brake Light (Smoked)', status: 'planned', cost: 'TBD', priority: 'NICE', notes: 'Axial. AmericanMuscle.' },
-      { name: '1LE Side Skirts (Gloss Black)', status: 'planned', cost: 'TBD', priority: 'MID', notes: 'AmericanMuscle.' },
+      { name: 'LED Rear Marker Lights (Red)', status: 'planned', cost: '$44.99', priority: 'NICE', notes: 'Raxiom Axial Series. Razor sharp LED strip, no cutting/splicing. Plug and play.', link: 'https://www.americanmuscle.com/axial-camaro-led-rear-marker-lights-red-cc14391.html' },
+      { name: 'LED Third Brake Light (Smoked)', status: 'planned', cost: '$59.99', priority: 'NICE', notes: 'Raxiom Axial Series. Super bright red LEDs, smoked lens. 15 min plug and play install.', link: 'https://www.americanmuscle.com/axial-camaro-led-third-brake-light-smoked-cc2930.html' },
+      { name: '1LE Style Side Skirts (Gloss Black)', status: 'planned', cost: '$204.99', priority: 'MID', notes: 'Rocker panel extensions. Durable ABS plastic, no-drill install. All hardware included.', link: 'https://www.americanmuscle.com/camaro-1le-style-side-skirts-gloss-black-ss-441-v2-abs.html' },
     ],
   },
 ]
@@ -141,6 +143,7 @@ function DesktopCarMods() {
                   </div>
                   {mod.priority && <span className="text-xs" style={{ color: '#FF6B35' }}>{mod.priority}</span>}
                   {mod.notes && <div className="text-xs mt-0.5" style={{ color: '#666', lineHeight: 1.4 }}>{mod.notes}</div>}
+                  {mod.link && <a href={mod.link} target="_blank" rel="noopener noreferrer" className="text-xs mt-1 block" style={{ color: '#4A90D9' }}>🔗 View Part</a>}
                 </div>
               </div>
             )
@@ -176,8 +179,11 @@ function MobileCarMods() {
               </div>
               {mod.priority && <div style={{ fontSize: 11, color: '#FF9500', marginTop: 2 }}>{mod.priority}</div>}
               {mod.notes && <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 4, lineHeight: 1.4 }}>{mod.notes}</div>}
-              <div style={{ fontSize: 11, marginTop: 4, color: mod.status === 'done' ? '#34C759' : mod.status === 'researching' ? '#FF9500' : '#007AFF' }}>
-                {mod.status === 'done' ? '✓ Done' : mod.status === 'researching' ? '🔍 Researching' : '○ Planned'}
+              <div className="flex items-center gap-3" style={{ marginTop: 4 }}>
+                <span style={{ fontSize: 11, color: mod.status === 'done' ? '#34C759' : mod.status === 'researching' ? '#FF9500' : '#007AFF' }}>
+                  {mod.status === 'done' ? '✓ Done' : mod.status === 'researching' ? '🔍 Researching' : '○ Planned'}
+                </span>
+                {mod.link && <a href={mod.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#007AFF' }}>View Part →</a>}
               </div>
             </div>
           ))}
