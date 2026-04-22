@@ -36,12 +36,35 @@ const PAGE_HEIGHT = 680
 const PAGE_PADDING = 40
 
 function paginateContent(text, isTitle) {
-  const paragraphs = text.split('\n\n')
+  // Split by double newline, but also break up very long single paragraphs
+  // by splitting on sentence boundaries so they fit on pages
+  let paragraphs = text.split('\n\n')
+
+  // If there's only 1 paragraph and it's very long, split by sentences
+  const expandedParas = []
+  for (const para of paragraphs) {
+    if (para.length > 800) {
+      // Split into chunks of ~400 chars at sentence boundaries
+      const sentences = para.match(/[^.!?]+[.!?]+\s*/g) || [para]
+      let chunk = ''
+      for (const s of sentences) {
+        if (chunk.length + s.length > 400 && chunk.length > 0) {
+          expandedParas.push(chunk.trim())
+          chunk = ''
+        }
+        chunk += s
+      }
+      if (chunk.trim()) expandedParas.push(chunk.trim())
+    } else {
+      expandedParas.push(para)
+    }
+  }
+
   const pages = [[]]
   let currentHeight = isTitle ? 80 : 0
   const lineHeight = 22
   const charsPerLine = 65
-  for (const para of paragraphs) {
+  for (const para of expandedParas) {
     const lines = Math.max(1, Math.ceil(para.length / charsPerLine))
     const paraHeight = lines * lineHeight + 16
     if (currentHeight + paraHeight > PAGE_HEIGHT && pages[pages.length - 1].length > 0) {
