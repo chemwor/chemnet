@@ -1,13 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-
-const INITIAL_ENTRIES = [
-  { id: 1, name: 'nightcoder_42', location: 'San Francisco, CA', date: '2026-04-02', message: 'This is the coolest personal site I\'ve ever seen. The terminal with the hidden files is genius.' },
-  { id: 2, name: 'explorer_jane', location: 'London, UK', date: '2026-04-05', message: 'Stumbled onto this from Twitter. Played Asteroids for way too long. Signed the book before I forget. ✌️' },
-  { id: 3, name: 'k3nyan_dev', location: 'Nairobi, Kenya', date: '2026-04-06', message: 'Mkenya mwenzangu! Love seeing Kenyan devs build cool things. The chess Swahili names are a nice touch. Hongera!' },
-  { id: 4, name: 'pixel_punk', location: 'Tokyo, Japan', date: '2026-04-08', message: 'The Win95 aesthetic is perfect. Reminds me of my first computer. Never stop building weird stuff on the internet.' },
-  { id: 5, name: 'curious_cat', location: 'Toronto, Canada', date: '2026-04-10', message: 'Found the social media manifesto in .hidden. "The algorithm just isn\'t going to hand it to you." — real talk. Signing as proof I was here.' },
-  { id: 6, name: 'anon', location: 'The Internet', date: '2026-04-12', message: 'sudo rm -rf / 😂 you got me with that one. GG.' },
-]
+import { supabase } from '../../lib/supabase'
 
 function GuestEntry({ entry }) {
   return (
@@ -17,7 +9,9 @@ function GuestEntry({ entry }) {
         {entry.location && (
           <span style={{ color: '#555', fontSize: 10 }}>from {entry.location}</span>
         )}
-        <span className="ml-auto" style={{ color: '#444', fontSize: 10 }}>{entry.date}</span>
+        <span className="ml-auto" style={{ color: '#444', fontSize: 10 }}>
+          {new Date(entry.created_at).toLocaleDateString()}
+        </span>
       </div>
       <div style={{ color: '#aab', lineHeight: 1.5, paddingLeft: 16 }}>{entry.message}</div>
     </div>
@@ -25,7 +19,8 @@ function GuestEntry({ entry }) {
 }
 
 export default function Guestbook() {
-  const [entries, setEntries] = useState(INITIAL_ENTRIES)
+  const [entries, setEntries] = useState([])
+  const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
   const [location, setLocation] = useState('')
   const [message, setMessage] = useState('')
@@ -33,19 +28,44 @@ export default function Guestbook() {
   const [error, setError] = useState('')
   const bottomRef = useRef(null)
 
-  const handleSign = () => {
+  useEffect(() => {
+    loadEntries()
+  }, [])
+
+  async function loadEntries() {
+    try {
+      const { data, error } = await supabase
+        .from('guestbook_entries')
+        .select('*')
+        .order('created_at', { ascending: true })
+      if (!error && data) setEntries(data)
+    } catch {}
+    setLoading(false)
+  }
+
+  const handleSign = async () => {
     if (!name.trim()) { setError('Name required — even a fake one'); return }
     if (!message.trim()) { setError('Say something! Anything.'); return }
     setError('')
 
     const newEntry = {
-      id: Date.now(),
       name: name.trim(),
       location: location.trim() || null,
-      date: new Date().toISOString().split('T')[0],
       message: message.trim(),
     }
-    setEntries(prev => [...prev, newEntry])
+
+    const { data, error: insertErr } = await supabase
+      .from('guestbook_entries')
+      .insert(newEntry)
+      .select()
+      .single()
+
+    if (insertErr) {
+      setError('Failed to sign. Try again.')
+      return
+    }
+
+    setEntries(prev => [...prev, data])
     setName('')
     setLocation('')
     setMessage('')
@@ -67,9 +87,15 @@ export default function Guestbook() {
           ─── {entries.length} signature(s) ───
         </div>
 
-        {entries.map(entry => (
-          <GuestEntry key={entry.id} entry={entry} />
-        ))}
+        {loading ? (
+          <div className="text-center py-4" style={{ color: '#555' }}>Loading...</div>
+        ) : entries.length === 0 ? (
+          <div className="text-center py-4" style={{ color: '#555' }}>No signatures yet. Be the first!</div>
+        ) : (
+          entries.map(entry => (
+            <GuestEntry key={entry.id} entry={entry} />
+          ))
+        )}
 
         {signed && (
           <div className="text-center py-2" style={{ color: '#44DD44', fontSize: 11 }}>

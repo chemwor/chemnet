@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { supabase } from '../../lib/supabase'
 
-// ── Mock data ──
+// ── Mock data (fallback if DB empty) ──
 const INITIAL_THREADS = [
   {
     id: 1,
@@ -472,9 +473,40 @@ function MobileNewThread({ onBack, onSubmit }) {
 
 // ── Main ──
 export default function MessageBoard() {
-  const [threads, setThreads] = useState(INITIAL_THREADS)
-  const [view, setView] = useState('list') // list, thread, new
+  const [threads, setThreads] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [view, setView] = useState('list')
   const [activeThreadId, setActiveThreadId] = useState(null)
+
+  useEffect(() => { loadThreads() }, [])
+
+  async function loadThreads() {
+    try {
+      const { data: threadData } = await supabase
+        .from('message_threads')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (threadData && threadData.length > 0) {
+        // Load posts for each thread
+        const { data: postData } = await supabase
+          .from('message_posts')
+          .select('*')
+          .order('created_at', { ascending: true })
+
+        const threadsWithPosts = threadData.map(t => ({
+          ...t,
+          date: t.created_at,
+          posts: (postData || []).filter(p => p.thread_id === t.id).map(p => ({
+            ...p,
+            date: p.created_at,
+          })),
+        }))
+        setThreads(threadsWithPosts)
+      }
+    } catch {}
+    setLoading(false)
+  }
 
   const activeThread = threads.find(t => t.id === activeThreadId)
 
@@ -483,56 +515,74 @@ export default function MessageBoard() {
     setView('thread')
   }
 
-  const handleReply = ({ screenName, body }) => {
-    setThreads(prev => prev.map(t => {
-      if (t.id !== activeThreadId) return t
-      return {
-        ...t,
-        posts: [...t.posts, {
-          id: Date.now(),
-          author: screenName,
-          date: new Date().toISOString().replace('T', ' ').slice(0, 16),
-          body,
-        }],
-      }
-    }))
+  const handleReply = async ({ screenName, body, email }) => {
+    const { data, error } = await supabase
+      .from('message_posts')
+      .insert({
+        thread_id: activeThreadId,
+        author: screenName,
+        email: email || null,
+        body,
+        is_sysop: false,
+      })
+      .select()
+      .single()
+
+    if (!error && data) {
+      setThreads(prev => prev.map(t => {
+        if (t.id !== activeThreadId) return t
+        return { ...t, posts: [...t.posts, { ...data, date: data.created_at }] }
+      }))
+    }
   }
 
-  const handleNewThread = ({ screenName, subject, body }) => {
-    const newThread = {
-      id: Date.now(),
-      subject,
-      author: screenName,
-      date: new Date().toISOString().replace('T', ' ').slice(0, 16),
-      posts: [{
-        id: Date.now() + 1,
+  const handleNewThread = async ({ screenName, subject, body, email }) => {
+    const { data: thread, error: thErr } = await supabase
+      .from('message_threads')
+      .insert({ subject, author: screenName })
+      .select()
+      .single()
+
+    if (thErr || !thread) return
+
+    const { data: post } = await supabase
+      .from('message_posts')
+      .insert({
+        thread_id: thread.id,
         author: screenName,
-        date: new Date().toISOString().replace('T', ' ').slice(0, 16),
+        email: email || null,
         body,
-      }],
+        is_sysop: false,
+      })
+      .select()
+      .single()
+
+    const newThread = {
+      ...thread,
+      date: thread.created_at,
+      posts: post ? [{ ...post, date: post.created_at }] : [],
     }
+
     setThreads(prev => [newThread, ...prev])
-    setActiveThreadId(newThread.id)
+    setActiveThreadId(thread.id)
     setView('thread')
   }
 
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  // Mobile — iMessage style
+  if (loading) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#000', color: '#555', fontFamily: 'monospace' }}>Loading...</div>
+  }
+
+  // Mobile
   if (isMobile) {
     if (view === 'new') return <MobileNewThread onBack={() => setView('list')} onSubmit={handleNewThread} />
     if (view === 'thread' && activeThread) return <MobileThreadView thread={activeThread} onBack={() => setView('list')} onReply={handleReply} />
     return <MobileThreadList threads={threads} onOpen={handleOpenThread} onNew={() => setView('new')} />
   }
 
-  // Desktop — BBS style
-  if (view === 'new') {
-    return <NewThreadView onBack={() => setView('list')} onSubmit={handleNewThread} />
-  }
-
-  if (view === 'thread' && activeThread) {
-    return <ThreadView thread={activeThread} onBack={() => setView('list')} onReply={handleReply} />
-  }
-
+  // Desktop
+  if (view === 'new') return <NewThreadView onBack={() => setView('list')} onSubmit={handleNewThread} />
+  if (view === 'thread' && activeThread) return <ThreadView thread={activeThread} onBack={() => setView('list')} onReply={handleReply} />
   return <ThreadList threads={threads} onOpen={handleOpenThread} onNew={() => setView('new')} />
 }
