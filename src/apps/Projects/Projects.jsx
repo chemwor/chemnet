@@ -137,12 +137,12 @@ Software side is an AI agent with memory and personality. Hardware side is a phy
   },
   {
     id: 'bathroom',
-    name: 'Bathroom Renovation',
+    name: 'Master Bathroom Renovation',
     icon: '🚿',
     status: 'planned',
     type: 'physical',
     tagline: 'First real home renovation. Moody, warm, full gut.',
-    description: `Full bathroom — gut and redo. Tile, vanity, fixtures, lighting, layout where it makes sense. The current setup is dated and feels like a rental.
+    description: `Full master bath — gut and redo. Tile, vanity, fixtures, lighting, layout where it makes sense. The current setup is dated and feels like a rental.
 
 The direction is moody and warm. Deep green herringbone tile in the shower with brass fixtures, and a pebble mosaic accent to break up the geometry with something organic. Sahara Carrara polished hexagon marble is the alternative if the green ends up feeling like too much. The whole palette pulls toward burnt orange, warm wood, and brass — a long way from the cold beige standard.
 
@@ -165,6 +165,35 @@ Budget and timeline TBD.`,
       { item: 'Tile install', done: false },
       { item: 'Vanity + fixtures install', done: false },
       { item: 'Paint, mirror, hardware, lighting', done: false },
+    ],
+    links: [],
+  },
+  {
+    id: 'bathroom2',
+    name: 'Secondary Bathroom Renovation',
+    icon: '🐚',
+    status: 'planned',
+    type: 'physical',
+    tagline: 'Beach theme — sand floors, blue shower.',
+    description: `Second bathroom. Beach-themed direction — bright and washed out, the opposite end of the spectrum from the master's moody warm palette.
+
+Floor leaning toward Floor & Decor's Napoli Sands — 24"×48" Italian matte porcelain with a soft travertine veining (~$4.49). Shower tile in dusty blue, still deciding between a scallop / fish-scale pattern and an elongated picket, both in the same seafoam family. A white + seafoam pebble mosaic is in the running for either the shower floor or a thin accent strip.
+
+Paint color is undecided. Probably soft and washed out — pale blue, off-white, or a warm sand to tie back to the floor.
+
+Plan is less developed than the master. Tile and palette first, fixtures and the rest after.`,
+    stack: [],
+    photos: [
+      { src: '/projects/bathroom2/blue-tile-options.jpg', caption: 'Shower tile contenders — scallop and elongated picket in dusty blue (Floor & Decor)' },
+      { src: '/projects/bathroom2/napoli-sands-floor.jpg', caption: 'Napoli Sands 24"×48" matte porcelain — sand-colored floor (Made in Italy, ~$4.49, Floor & Decor)' },
+      { src: '/projects/bathroom2/seafoam-pebble.jpg', caption: 'White + seafoam pebble mosaic — option for shower floor or accent strip' },
+    ],
+    roadmap: [
+      { item: 'Pick shower tile (scallop vs picket)', done: false },
+      { item: 'Confirm Napoli Sands as floor', done: false },
+      { item: 'Decide on paint color', done: false },
+      { item: 'Get plumbing + electrical quotes', done: false },
+      { item: 'Finalize fixtures + vanity', done: false },
     ],
     links: [],
   },
