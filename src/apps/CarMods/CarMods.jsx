@@ -30,6 +30,7 @@ const PHASES = [
       { name: 'Slotted/Drilled Rotors', status: 'planned', cost: '$150–300', priority: '#2', notes: 'Pair with pads — same job. PowerStop or EBC.' },
       { name: 'Window Tint', status: 'planned', cost: '$150–250', priority: 'EASY WIN', notes: 'Easy visual win, immediate premium look. 35% or 20%.' },
       { name: 'Black Badge Delete', status: 'planned', cost: '$20–50', priority: 'EASY WIN', notes: 'Cheapest visual upgrade possible. 3M wrap or OEM badges.' },
+      { name: 'LED Side Markers / Turn Signals', status: 'done', cost: '$60–120', priority: 'EASY WIN', notes: 'Done. White LEDs replacing the OEM amber. Install was simple and basic — fronts went in fast. Rears were a fight without removing the wheels; eventually pulled them for clean access.' },
     ],
   },
   {

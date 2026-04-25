@@ -206,10 +206,19 @@ Plan is less developed than the master. Tile and palette first, fixtures and the
     tagline: 'Turning the V6 into something special.',
     description: `The Camaro project. A 2016 LT V6 (3.6L LGX) that I'm building into an SS-level daily over time. Phase by phase, mod by mod.
 
-Current focus is catch-up maintenance (spark plugs, alignment), then Phase 1 (exhaust, brakes, tint, badge delete). Full interior carbon fiber treatment and exterior ZL1 conversion planned.
+Current focus is catch-up maintenance (alignment) and Phase 1 visual wins (exhaust, brakes, tint, badge delete, LED side markers). Full interior carbon fiber treatment and exterior ZL1 conversion planned.
 
 The full mod list, prices, and links are tracked in the Car Mods app on this site.`,
     stack: [],
+    photosLabel: 'Build Log',
+    photos: [
+      { src: '/projects/carmods/turn-signal-amber-before.jpg', caption: 'Before — OEM amber side marker on the rear quarter' },
+      { src: '/projects/carmods/turn-signal-removed.jpg', caption: 'Mid-install — old amber lens unscrewed and dangling' },
+      { src: '/projects/carmods/turn-signal-led-front.jpg', caption: 'Front — clear LED installed flush in the fender' },
+      { src: '/projects/carmods/turn-signal-led-rear.jpg', caption: 'Rear — clear LED in. Had to pull the wheel for clean access' },
+      { src: '/projects/carmods/camaro-night-leds.jpg', caption: 'Night shot — fresh white LEDs glowing front and back' },
+      { src: '/projects/carmods/camaro-side-day.jpg', caption: 'Daytime profile — clean, no more amber breaks in the body line' },
+    ],
     links: [{ label: 'Open Car Mods', url: '#carmods' }],
   },
   {
