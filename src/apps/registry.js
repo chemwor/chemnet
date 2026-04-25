@@ -169,6 +169,18 @@ export const APP_REGISTRY = [
     category: null,
   },
   {
+    id: 'digest',
+    label: 'Daily Digest',
+    icon: 'digest',
+    component: () => import('./Digest/Digest.jsx'),
+    defaultSize: { width: 520, height: 480 },
+    defaultPosition: { x: 130, y: 50 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+    category: null,
+  },
+  {
     id: 'email',
     label: 'ChemMail',
     icon: 'email',

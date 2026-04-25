@@ -104,6 +104,14 @@ function ArtsTab() {
       <Row label="Piano" value="Active" />
       <Row label="Guitar" value="Active" />
       <Row label="Violin" value="Played 6th through 9th grade. Picking it back up." />
+
+      <SectionLabel>Piano Songs to Learn</SectionLabel>
+      <Row label="1" value="Igor's Theme" />
+      <Row label="2" value="Congratulations" />
+      <Row label="3" value="Heartbeat" />
+      <Row label="4" value="La Valse d'Amelie" />
+      <Row label="5" value="Gymnopedie No.1" />
+      <Row label="6" value="Superstar" />
     </div>
   )
 }
@@ -159,6 +167,9 @@ function FoodTab() {
       <Row label="Donut" value="Cruller" />
       <Row label="Cookie" value="White chocolate macadamia nut" />
       <Row label="Soda" value="Black Currant Fanta" accent />
+
+      <SectionLabel>Spots</SectionLabel>
+      <Row label="Butcher" value="Kingship Butcher" accent />
     </div>
   )
 }
@@ -351,6 +362,14 @@ function MobileArtsTab() {
       <MobileRow label="Piano" value="Active" />
       <MobileRow label="Guitar" value="Active" />
       <MobileRow label="Violin" value="Returning" sub="Played 6th through 9th grade. Picking it back up." />
+
+      <MobileSectionHeader>Piano Songs to Learn</MobileSectionHeader>
+      <MobileRow label="1" value="Igor's Theme" />
+      <MobileRow label="2" value="Congratulations" />
+      <MobileRow label="3" value="Heartbeat" />
+      <MobileRow label="4" value="La Valse d'Amelie" />
+      <MobileRow label="5" value="Gymnopedie No.1" />
+      <MobileRow label="6" value="Superstar" />
     </>
   )
 }
@@ -394,6 +413,9 @@ function MobileFoodTab() {
       <MobileRow label="Donut" value="Cruller" />
       <MobileRow label="Cookie" value="White choc macadamia" />
       <MobileRow label="Soda" value="Black Currant Fanta" accent />
+
+      <MobileSectionHeader>Spots</MobileSectionHeader>
+      <MobileRow label="Butcher" value="Kingship Butcher" accent />
     </>
   )
 }

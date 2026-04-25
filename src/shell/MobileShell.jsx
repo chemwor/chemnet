@@ -48,7 +48,7 @@ function StatusBar() {
 
 // ── iOS icon glyph map — clean white symbols like original iPhone ──
 const IOS_GLYPHS = {
-  about: '📋', aboutme: '🖥️', terminal: '>_', projects: '📂', blog: '✏️',
+  about: '📋', aboutme: '🖥️', digest: '📰', terminal: '>_', projects: '📂', blog: '✏️',
   pictures: '🌅', videos: '▶', messageboard: '💬', guestbook: '📖',
   music: '♫', reviews: '📺', restaurants: '🍴', email: '✉️',
   carmods: '🏎️', wishlist: '🛒', trips: '✈️',
@@ -129,6 +129,7 @@ function getIconBg(id) {
   const colors = {
     about: 'linear-gradient(180deg, #4a4a4a, #1a1a1a)',
     aboutme: 'linear-gradient(180deg, #007AFF, #0055CC)',
+    digest: 'linear-gradient(180deg, #FF6B35, #CC4400)',
     projects: 'linear-gradient(180deg, #FFD60A, #C8A200)',
     blog: 'linear-gradient(180deg, #FFCC00, #FF9500)',
     pictures: 'linear-gradient(180deg, #FF6B35, #D44500)',

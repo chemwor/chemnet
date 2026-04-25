@@ -514,6 +514,76 @@ function MessagesView() {
   )
 }
 
+// ── Section: Digest Manager ──
+function DigestManager() {
+  const [entries, setEntries] = useState([])
+  const [msg, setMsg] = useState('')
+  const [form, setForm] = useState({ title: '', url: '', video_url: '', note: '', source: '', published_date: new Date().toISOString().split('T')[0] })
+
+  useEffect(() => { loadEntries() }, [])
+
+  async function loadEntries() {
+    const { data } = await supabase.from('digest_entries').select('*').order('published_date', { ascending: false }).order('created_at', { ascending: false })
+    setEntries(data || [])
+  }
+
+  async function save() {
+    if (!form.title.trim()) { setMsg('Error: Title required'); return }
+    const { error } = await supabase.from('digest_entries').insert({
+      title: form.title.trim(),
+      url: form.url.trim() || null,
+      video_url: form.video_url.trim() || null,
+      note: form.note.trim() || null,
+      source: form.source.trim() || null,
+      published_date: form.published_date,
+    })
+    if (error) setMsg(`Error: ${error.message}`)
+    else {
+      setMsg('Entry added!')
+      setForm({ title: '', url: '', video_url: '', note: '', source: '', published_date: form.published_date })
+      loadEntries()
+    }
+  }
+
+  async function deleteEntry(id) {
+    if (!confirm('Delete this entry?')) return
+    const { error } = await supabase.from('digest_entries').delete().eq('id', id)
+    if (error) setMsg(`Error: ${error.message}`)
+    else loadEntries()
+  }
+
+  return (
+    <div className="p-3 overflow-auto h-full" style={{ fontSize: 12, fontFamily: 'monospace' }}>
+      <span className="font-bold" style={{ color: '#ccc' }}>Add to Daily Digest</span>
+      <StatusMsg msg={msg} />
+
+      <div className="flex flex-col gap-1.5 mb-4 p-2 mt-2" style={{ background: '#1a1a1a', border: '1px solid #333' }}>
+        <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Title / headline" className="w-full px-2 py-1 border-none outline-none text-sm" style={inputStyle} />
+        <input value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="Link URL (optional)" className="w-full px-2 py-1 border-none outline-none text-sm" style={inputStyle} />
+        <input value={form.video_url} onChange={e => setForm({ ...form, video_url: e.target.value })} placeholder="YouTube URL (optional)" className="w-full px-2 py-1 border-none outline-none text-sm" style={inputStyle} />
+        <textarea value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} placeholder="Your thoughts / why this is interesting" rows={3} className="w-full px-2 py-1 border-none outline-none text-sm resize-y" style={inputStyle} />
+        <div className="flex gap-2">
+          <input value={form.source} onChange={e => setForm({ ...form, source: e.target.value })} placeholder="Source (e.g. YouTube, Reddit)" className="flex-1 px-2 py-1 border-none outline-none text-sm" style={inputStyle} />
+          <input type="date" value={form.published_date} onChange={e => setForm({ ...form, published_date: e.target.value })} className="px-2 py-1 border-none outline-none text-sm" style={inputStyle} />
+        </div>
+        <button onClick={save} className="px-3 py-1.5 text-sm font-bold border-none cursor-pointer" style={btnSave}>Add Entry</button>
+      </div>
+
+      <span className="font-bold" style={{ color: '#ccc' }}>Recent Entries ({entries.length})</span>
+      {entries.slice(0, 20).map(e => (
+        <div key={e.id} className="flex items-center gap-2 px-2 py-1.5 mb-1 mt-1" style={{ background: '#1a1a1a', borderLeft: e.video_url ? '2px solid #FF6B35' : '2px solid #4A90D9' }}>
+          <div className="flex-1 min-w-0">
+            <div className="truncate" style={{ color: '#ccc' }}>{e.title}</div>
+            <div className="text-xs" style={{ color: '#555' }}>{e.published_date} {e.video_url ? '· Video' : ''} {e.source ? `· ${e.source}` : ''}</div>
+          </div>
+          <button onClick={() => deleteEntry(e.id)} className="text-xs border-none bg-transparent cursor-pointer shrink-0" style={btnDanger}>X</button>
+        </div>
+      ))}
+      {entries.length === 0 && <div className="text-xs py-2 text-center mt-1" style={{ color: '#555' }}>No entries yet. Add your first find!</div>}
+    </div>
+  )
+}
+
 // ── Section: Scores Manager ──
 function ScoresManager() {
   const [scores, setScores] = useState([])
@@ -566,6 +636,7 @@ const SECTIONS = [
   { id: 'blog', label: '📝 Blog', component: BlogManager },
   { id: 'hidden', label: '🔒 Hidden', component: HiddenFilesManager },
   { id: 'quickadd', label: '➕ Add', component: QuickAdd },
+  { id: 'digest', label: '📰 Digest', component: DigestManager },
   { id: 'photos', label: '📷 Photos', component: PhotosManager },
   { id: 'messages', label: '📧 Mail', component: MessagesView },
   { id: 'scores', label: '🏆 Scores', component: ScoresManager },
