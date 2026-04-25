@@ -17,6 +17,7 @@ const PHASES = [
     label: '🔧 Catch-Up Repairs',
     mods: [
       { name: 'Spark Plugs (V6 LGX)', status: 'done', cost: '$40–200', priority: 'HIGH', notes: 'Done.', link: 'https://www.youtube.com/watch?v=SErRFQspaZ4' },
+      { name: 'Serpentine Belt Replaced', status: 'done', cost: '$30–80', priority: 'MEDIUM', notes: 'Done. Ordered the parts and did it myself. Intimidating going in but not too bad once the initial fear went away. Getting the belt back on was the hardest part — leaving the tensioner pulley for last is the trick to landing it.' },
       { name: 'Wheel Alignment', status: 'planned', cost: '$80–130', priority: 'MEDIUM', notes: 'Last done at 26k mi — 80k miles ago. New wheels/tires deserve a fresh one.' },
       { name: 'BG GDI Air Induction Service', status: 'researching', cost: 'TBD', priority: 'MEDIUM', notes: 'Carbon buildup cleaning for direct injection engine.' },
     ],
