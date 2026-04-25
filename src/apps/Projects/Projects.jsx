@@ -141,13 +141,31 @@ Software side is an AI agent with memory and personality. Hardware side is a phy
     icon: '🚿',
     status: 'planned',
     type: 'physical',
-    tagline: 'First real home renovation project.',
-    description: `Planning a full bathroom renovation. Gut and redo. New tile, vanity, fixtures, lighting. The current setup is dated and the layout could be better.
+    tagline: 'First real home renovation. Moody, warm, full gut.',
+    description: `Full bathroom — gut and redo. Tile, vanity, fixtures, lighting, layout where it makes sense. The current setup is dated and feels like a rental.
 
-First big hands-on project. Learning as I go. Watching way too many YouTube videos on waterproofing and tile work. The goal is to do as much of it myself as possible and document the process.
+The direction is moody and warm. Deep green herringbone tile in the shower with brass fixtures, and a pebble mosaic accent to break up the geometry with something organic. Sahara Carrara polished hexagon marble is the alternative if the green ends up feeling like too much. The whole palette pulls toward burnt orange, warm wood, and brass — a long way from the cold beige standard.
 
-Budget and timeline TBD. Waiting on quotes and finalizing the design.`,
+Plan to do as much hands-on as possible. Watching way too many YouTube videos on waterproofing, Schluter, and cutting tile around fixtures. Quotes still pending for the parts I won't do myself (plumbing rough-in, electrical).
+
+Budget and timeline TBD.`,
     stack: [],
+    photos: [
+      { src: '/projects/bathroom/green-herringbone-shower.jpg', caption: 'Green herringbone shower walls + floor with pebble accent — Floor & Decor' },
+      { src: '/projects/bathroom/pebble-mosaic-accent.jpg', caption: 'Pebble mosaic — accent wall option, organic texture against the herringbone' },
+      { src: '/projects/bathroom/sahara-carrara-hexagon.jpg', caption: 'Sahara Carrara Polished hex marble — alt floor candidate ($14.99/sqft)' },
+      { src: '/projects/bathroom/burnt-orange-mood.webp', caption: 'Color & material mood — burnt orange, brass, warm earth tones' },
+    ],
+    roadmap: [
+      { item: 'Finalize tile selection (green herringbone vs Carrara hex)', done: false },
+      { item: 'Get plumbing + electrical quotes', done: false },
+      { item: 'Demo', done: false },
+      { item: 'Rough plumbing + electrical', done: false },
+      { item: 'Waterproofing + tile prep', done: false },
+      { item: 'Tile install', done: false },
+      { item: 'Vanity + fixtures install', done: false },
+      { item: 'Paint, mirror, hardware, lighting', done: false },
+    ],
     links: [],
   },
   {
@@ -258,6 +276,23 @@ function DesktopProjects() {
               ))}
             </div>
 
+            {/* Inspiration / photos */}
+            {selected.photos?.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>INSPIRATION</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {selected.photos.map((p, i) => (
+                    <a key={i} href={p.src} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none' }}>
+                      <img src={p.src} alt={p.caption || ''} style={{ width: '100%', height: 120, objectFit: 'cover', border: '1px solid #2a2a3a', display: 'block' }} loading="lazy" />
+                      {p.caption && (
+                        <div className="text-xs mt-1" style={{ color: '#777', lineHeight: 1.4 }}>{p.caption}</div>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Video */}
             {selected.video && getYouTubeId(selected.video) && (
               <div className="mb-4">
@@ -362,6 +397,21 @@ function MobileProjects() {
             {selected.description.split('\n\n').map((para, i) => (
               <p key={i} style={{ fontSize: 15, lineHeight: 1.6, color: '#333', margin: '0 0 12px' }}>{para}</p>
             ))}
+            {selected.photos?.length > 0 && (
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: '0.5px solid #e5e5ea' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 8, textTransform: 'uppercase' }}>Inspiration</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {selected.photos.map((p, i) => (
+                    <a key={i} href={p.src} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none' }}>
+                      <img src={p.src} alt={p.caption || ''} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 8, display: 'block' }} loading="lazy" />
+                      {p.caption && (
+                        <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 4, lineHeight: 1.4 }}>{p.caption}</div>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
             {selected.stack.length > 0 && (
               <div style={{ marginTop: 16, paddingTop: 12, borderTop: '0.5px solid #e5e5ea' }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>Tech Stack</div>

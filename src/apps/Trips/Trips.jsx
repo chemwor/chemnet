@@ -2,40 +2,6 @@ import { useState } from 'react'
 
 const TRIPS = [
   {
-    id: 1, destination: 'Kilimanjaro, Tanzania', status: 'completed',
-    dates: 'Dec 10-20, 2025', icon: '🏔️',
-    summary: 'Summited Uhuru Peak (5,895m). The hardest and most rewarding thing I\'ve ever done. Pole pole.',
-    highlights: [
-      'Midnight summit push — headlamps in a line up the mountain',
-      'Sunrise from the top — clouds below, glaciers glowing orange',
-      'Meeting people from all over the world on the trail',
-      'The relief of getting back to Moshi and eating real food',
-    ],
-    photos: [],
-    notes: 'Would do it again. Would train legs more. The altitude is no joke above 5000m.',
-  },
-  {
-    id: 2, destination: 'Mombasa, Kenya', status: 'completed',
-    dates: 'Aug 2025', icon: '🏖️',
-    summary: 'Coast trip. Diani Beach, Old Town, Fort Jesus. Swahili food tour. Perfect escape from Nairobi cold.',
-    highlights: [
-      'Diani Beach — whitest sand I\'ve seen',
-      'Old Town walk through narrow streets',
-      'Seafood at Tamarind',
-      'Dhow cruise at sunset',
-    ],
-    photos: [],
-    notes: 'Mombasa is underrated. The coast culture is completely different from Nairobi. Go in August — perfect weather.',
-  },
-  {
-    id: 3, destination: 'Cape Town, South Africa', status: 'planned',
-    dates: 'TBD 2026', icon: '🇿🇦',
-    summary: 'Table Mountain. Stellenbosch wine region. Cape Point. Boulders Beach penguins.',
-    highlights: [],
-    photos: [],
-    notes: 'Everyone says Cape Town is incredible. Want to hike Table Mountain and do a wine tour. Maybe combine with a BJJ gym visit.',
-  },
-  {
     id: 4, destination: 'Tokyo, Japan', status: 'planned',
     dates: 'TBD 2026', icon: '🇯🇵',
     summary: 'Sushi Saito. Shibuya. Akihabara. Temples in Kyoto. Ramen.',
@@ -160,7 +126,7 @@ export default function Trips() {
 
       {/* Filter */}
       <div className="flex items-center gap-1 px-3 py-1 shrink-0" style={{ background: '#12121f', borderBottom: '1px solid #2a2a4a' }}>
-        {['all', 'completed', 'planned'].map(f => (
+        {['all', 'planned'].map(f => (
           <button
             key={f}
             onClick={() => { setFilter(f); setSelectedId(null) }}
@@ -171,7 +137,7 @@ export default function Trips() {
               fontFamily: 'inherit',
             }}
           >
-            {f === 'all' ? 'All' : f === 'completed' ? 'Been' : 'Planned'}
+            {f === 'all' ? 'All' : 'Planned'}
           </button>
         ))}
       </div>
