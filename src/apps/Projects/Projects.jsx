@@ -227,6 +227,7 @@ Currently debugging why the assembled board isn't turning on. Some current is be
 
 Once this works end-to-end, the long-term plan is the bigger version: custom PCB with more LEDs, an interactive board around the dice. Probably Arduino or Raspberry Pi with a custom board.`,
     stack: ['Arduino/RPi', 'LED Strips', 'Custom PCB', 'Game Design'],
+    photosLabel: 'Build Log',
     photos: [
       { src: '/projects/lightdice/workbench-and-kit.jpg', caption: 'Workbench setup — multimeter, soldering iron, components, blank SOLDR PCB' },
       { src: '/projects/lightdice/blank-pcb-front.jpg', caption: 'Blank SOLDR board — NE555 + CD4017 layout, 7-LED dice pattern, press button' },
@@ -321,10 +322,10 @@ function DesktopProjects() {
               ))}
             </div>
 
-            {/* Inspiration / photos */}
+            {/* Inspiration / build log / photos */}
             {selected.photos?.length > 0 && (
               <div className="mb-4">
-                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>INSPIRATION</div>
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>{(selected.photosLabel || 'INSPIRATION').toUpperCase()}</div>
                 <div className="grid grid-cols-2 gap-2">
                   {selected.photos.map((p, i) => (
                     <a key={i} href={p.src} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none' }}>
@@ -444,7 +445,7 @@ function MobileProjects() {
             ))}
             {selected.photos?.length > 0 && (
               <div style={{ marginTop: 16, paddingTop: 12, borderTop: '0.5px solid #e5e5ea' }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 8, textTransform: 'uppercase' }}>Inspiration</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 8, textTransform: 'uppercase' }}>{selected.photosLabel || 'Inspiration'}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   {selected.photos.map((p, i) => (
                     <a key={i} href={p.src} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none' }}>
