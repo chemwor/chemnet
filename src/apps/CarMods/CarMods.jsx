@@ -31,6 +31,7 @@ const PHASES = [
       { name: 'Window Tint', status: 'planned', cost: '$150–250', priority: 'EASY WIN', notes: 'Easy visual win, immediate premium look. 35% or 20%.' },
       { name: 'Black Badge Delete', status: 'planned', cost: '$20–50', priority: 'EASY WIN', notes: 'Cheapest visual upgrade possible. 3M wrap or OEM badges.' },
       { name: 'LED Side Markers / Turn Signals', status: 'done', cost: '$60–120', priority: 'EASY WIN', notes: 'Done. White LEDs replacing the OEM amber. Install was simple and basic — fronts went in fast. Rears were a fight without removing the wheels; eventually pulled them for clean access.' },
+      { name: 'Brake Caliper Covers (Red)', status: 'done', cost: '$60–150', priority: 'EASY WIN', notes: 'Done. Bright red covers over the stock calipers. The kit came bare, so added a Brembo-style sticker to give it more of a design element. Install wasn\'t too difficult — just needed the car jacked and the wheels off.' },
     ],
   },
   {
