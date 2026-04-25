@@ -27,6 +27,7 @@ const MANIFESTATIONS = [
   { text: `If you're going through hell, keep going.`, attribution: 'Winston Churchill' },
   { text: `What you do every day matters more than what you do once in a while.` },
   { text: `Memento mori. Remember you will die.` },
+  { text: `Life moves pretty fast. If you don't stop and look around once in a while, you could miss it.`, attribution: 'Ferris Bueller' },
 ]
 
 export default function Manifestations() {
