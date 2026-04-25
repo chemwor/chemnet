@@ -49,11 +49,15 @@ export function DesktopShell({ windowManager }) {
   const { windows, openApp, closeApp, minimizeApp, maximizeApp, focusApp } = windowManager
   const bootedRef = useRef(false)
 
-  // Open boot apps on first mount
+  // Open boot apps on first mount, but only on the user's first ever visit
   useEffect(() => {
     if (bootedRef.current) return
     bootedRef.current = true
-    APP_REGISTRY.filter(a => a.openOnBoot).forEach(a => openApp(a.id))
+    const hasVisited = (() => { try { return localStorage.getItem('ericOS_visited') === '1' } catch { return false } })()
+    if (!hasVisited) {
+      APP_REGISTRY.filter(a => a.openOnBoot).forEach(a => openApp(a.id))
+      try { localStorage.setItem('ericOS_visited', '1') } catch {}
+    }
   }, [openApp])
 
   // Easter egg hooks
