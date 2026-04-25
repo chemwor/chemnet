@@ -216,15 +216,31 @@ The full mod list, prices, and links are tracked in the Car Mods app on this sit
     id: 'lightdice',
     name: 'Light Dice Board',
     icon: '🎲',
-    status: 'concept',
+    status: 'active',
     type: 'physical',
     tagline: 'LED-powered dice board game.',
     description: `An idea for a custom board game that uses LED-lit dice and an interactive board. Tabletop game where the dice results trigger different light patterns on the board, creating a visual experience on top of the gameplay.
 
-Still in the concept phase. Sketching out the electronics (LED strips, microcontroller), the game mechanics, and the physical design. The goal is to make something that feels premium and fun to play in person.
+Started with a SOLDR "I Can Solder" beginner kit — a small electronic dice PCB with seven LEDs and a press-to-roll button — to get hands-on with the iron before designing my own. Soldering is done. First time with a soldering iron and it's not bad. One of those things I feel like I'd get better at with reps.
 
-Probably going to be an Arduino or Raspberry Pi project with a custom PCB.`,
+Currently debugging why the assembled board isn't turning on. Some current is being pulled when USB is plugged in, so it's not completely dead — that's a start. Multimeter is out, working through the joints.
+
+Once this works end-to-end, the long-term plan is the bigger version: custom PCB with more LEDs, an interactive board around the dice. Probably Arduino or Raspberry Pi with a custom board.`,
     stack: ['Arduino/RPi', 'LED Strips', 'Custom PCB', 'Game Design'],
+    photos: [
+      { src: '/projects/lightdice/workbench-and-kit.jpg', caption: 'Workbench setup — multimeter, soldering iron, components, blank SOLDR PCB' },
+      { src: '/projects/lightdice/blank-pcb-front.jpg', caption: 'Blank SOLDR board — NE555 + CD4017 layout, 7-LED dice pattern, press button' },
+      { src: '/projects/lightdice/soldered-front.jpg', caption: 'Fully soldered top — yellow LEDs in dice pattern, USB-C, button, capacitors' },
+      { src: '/projects/lightdice/soldered-back.jpg', caption: 'Backside — "I CAN SOLDER!" message visible through the joints' },
+    ],
+    roadmap: [
+      { item: 'Solder SOLDR beginner kit', done: true },
+      { item: 'Debug power — get the kit booting from USB', done: false },
+      { item: 'Verify dice + button logic end-to-end', done: false },
+      { item: 'Sketch custom PCB design', done: false },
+      { item: 'Order custom PCB', done: false },
+      { item: 'Game mechanics + interactive board', done: false },
+    ],
     links: [],
   },
 ]
