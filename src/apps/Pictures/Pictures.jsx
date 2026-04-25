@@ -2,6 +2,75 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
+// Build the full slide list for a photo entry. Each slide is
+// { url, type: 'image'|'video', locked: bool }. Slide 0 is always
+// the entry's primary url; additional images come from photo.slides;
+// an optional locked_video_url becomes the final slide.
+function buildAllSlides(photo, unlocked) {
+  if (!photo) return []
+  const slides = [{ url: photo.url, type: 'image', locked: false }]
+  for (const url of photo.slides || []) slides.push({ url, type: 'image', locked: false })
+  if (photo.locked_video_url) {
+    slides.push({ url: photo.locked_video_url, type: 'video', locked: !unlocked })
+  }
+  return slides
+}
+
+// Read/write per-photo unlock flag in localStorage so a viewer who
+// solved the riddle once doesn't have to redo it on every visit.
+function useUnlocked(photoId) {
+  const key = photoId ? `photo-unlocked-${photoId}` : null
+  const [unlocked, setUnlocked] = useState(() => {
+    if (!key) return false
+    try { return localStorage.getItem(key) === '1' } catch { return false }
+  })
+  useEffect(() => {
+    if (!key) return
+    try { setUnlocked(localStorage.getItem(key) === '1') } catch {}
+  }, [key])
+  const unlock = () => {
+    setUnlocked(true)
+    if (key) { try { localStorage.setItem(key, '1') } catch {} }
+  }
+  return [unlocked, unlock]
+}
+
+function LockedSlide({ hint, onUnlock, expected, dark = true }) {
+  const [value, setValue] = useState('')
+  const [error, setError] = useState(false)
+  const submit = () => {
+    if ((value || '').trim().toLowerCase() === (expected || '').trim().toLowerCase()) {
+      onUnlock()
+    } else {
+      setError(true)
+    }
+  }
+  const onKey = e => { if (e.key === 'Enter') submit() }
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20, background: dark ? '#0a0a18' : '#000', color: '#F0EBE1', textAlign: 'center', gap: 10 }}>
+      <div style={{ fontSize: 36 }}>🔒</div>
+      <div style={{ fontSize: 13, fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase', color: '#FF6B35' }}>Locked</div>
+      {hint && <div style={{ fontSize: 13, color: '#A09AB0', maxWidth: 320, lineHeight: 1.5 }}>{hint}</div>}
+      <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+        <input
+          type="text"
+          autoFocus
+          value={value}
+          onChange={e => { setValue(e.target.value); setError(false) }}
+          onKeyDown={onKey}
+          placeholder="answer"
+          style={{ padding: '6px 10px', fontSize: 13, background: '#1c1c1e', color: '#fff', border: error ? '1px solid #FF4444' : '1px solid #4A4555', outline: 'none', fontFamily: 'inherit', minWidth: 160 }}
+        />
+        <button
+          onClick={submit}
+          style={{ padding: '6px 12px', fontSize: 13, background: '#FF6B35', color: '#000', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 'bold' }}
+        >Unlock</button>
+      </div>
+      {error && <div style={{ fontSize: 11, color: '#FF4444' }}>Not quite. Try again.</div>}
+    </div>
+  )
+}
+
 // ══════════════════════════════════════════
 // DESKTOP — Win95 File Browser with thumbnail grid
 // ══════════════════════════════════════════
@@ -13,6 +82,7 @@ function DesktopPictures() {
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
   const [yearFilter, setYearFilter] = useState('all')
+  const [unlocked, unlock] = useUnlocked(selected?.id)
 
   useEffect(() => {
     async function load() {
@@ -33,8 +103,9 @@ function DesktopPictures() {
     })
 
   if (selected) {
-    const allSlides = [selected.url, ...(selected.slides || [])]
+    const allSlides = buildAllSlides(selected, unlocked)
     const hasSlides = allSlides.length > 1
+    const current = allSlides[slideIdx] || allSlides[0]
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#1e1c28', fontFamily: '"Courier New", monospace' }}>
         {/* Toolbar */}
@@ -48,11 +119,17 @@ function DesktopPictures() {
         <div className="flex-1 overflow-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 16 }}>
           <div style={{ maxWidth: 600, width: '100%' }}>
             <div style={{ position: 'relative', background: '#0a0a18', border: '2px inset #4A4555', width: '100%', height: 'min(60vh, 500px)', overflow: 'hidden' }}>
-              <img
-                src={allSlides[slideIdx] || selected.url}
-                alt={selected.title}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-              />
+              {current.locked ? (
+                <LockedSlide hint={selected.unlock_hint} expected={selected.unlock_code} onUnlock={unlock} />
+              ) : current.type === 'video' ? (
+                <video src={current.url} controls preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: '#000' }} />
+              ) : (
+                <img
+                  src={current.url}
+                  alt={selected.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              )}
               {hasSlides && (
                 <>
                   <button
@@ -153,9 +230,9 @@ function DesktopPictures() {
               >
                 <div style={{ position: 'relative', width: '100%', aspectRatio: '1', background: '#f0f0f0', border: '1px solid #ccc', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img src={photo.url} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  {photo.slides?.length > 0 && (
+                  {(photo.slides?.length > 0 || photo.locked_video_url) && (
                     <span style={{ position: 'absolute', top: 3, right: 3, padding: '1px 4px', background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: 9, fontFamily: 'Tahoma, sans-serif' }}>
-                      🖼 {photo.slides.length + 1}
+                      🖼 {1 + (photo.slides?.length || 0) + (photo.locked_video_url ? 1 : 0)}{photo.locked_video_url ? ' 🔒' : ''}
                     </span>
                   )}
                 </div>
@@ -187,6 +264,7 @@ function MobilePictures() {
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
   const [yearFilter, setYearFilter] = useState('all')
+  const [unlocked, unlock] = useUnlocked(selected?.id)
 
   useEffect(() => {
     async function load() {
@@ -207,8 +285,9 @@ function MobilePictures() {
     })
 
   if (selected) {
-    const allSlides = [selected.url, ...(selected.slides || [])]
+    const allSlides = buildAllSlides(selected, unlocked)
     const hasSlides = allSlides.length > 1
+    const current = allSlides[slideIdx] || allSlides[0]
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#000', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
         {/* Nav bar */}
@@ -221,7 +300,13 @@ function MobilePictures() {
         {/* Full image */}
         <div className="flex-1 overflow-auto" style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ position: 'relative', width: '100%', height: '55vh', background: '#000', overflow: 'hidden', flexShrink: 0 }}>
-            <img src={allSlides[slideIdx] || selected.url} alt={selected.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+            {current.locked ? (
+              <LockedSlide hint={selected.unlock_hint} expected={selected.unlock_code} onUnlock={unlock} dark={false} />
+            ) : current.type === 'video' ? (
+              <video src={current.url} controls preload="metadata" playsInline style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: '#000' }} />
+            ) : (
+              <img src={current.url} alt={selected.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+            )}
             {hasSlides && (
               <>
                 <button
@@ -306,9 +391,9 @@ function MobilePictures() {
                 style={{ position: 'relative', aspectRatio: '1', overflow: 'hidden', cursor: 'pointer' }}
               >
                 <img src={photo.url} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                {photo.slides?.length > 0 && (
+                {(photo.slides?.length > 0 || photo.locked_video_url) && (
                   <span style={{ position: 'absolute', top: 4, right: 4, padding: '2px 5px', background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 10, borderRadius: 4 }}>
-                    🖼 {photo.slides.length + 1}
+                    🖼 {1 + (photo.slides?.length || 0) + (photo.locked_video_url ? 1 : 0)}{photo.locked_video_url ? ' 🔒' : ''}
                   </span>
                 )}
               </div>
