@@ -220,6 +220,8 @@ The full mod list, prices, and links are tracked in the Car Mods app on this sit
       { src: '/projects/carmods/caliper-cover-mid-install.jpg', caption: 'Caliper covers — new red covers laid out next to the brake' },
       { src: '/projects/carmods/caliper-cover-installed.jpg', caption: 'Caliper covers — installed on the rotor, before the wheel goes back on' },
       { src: '/projects/carmods/caliper-cover-wheel-on.jpg', caption: 'Caliper covers — wheel back on, Brembo sticker added for the design element' },
+      { src: '/projects/carmods/brakes-rotors-fresh-wheel.jpg', caption: 'Brakes + rotors — fresh discs and pads, done by R&E Motors' },
+      { src: '/projects/carmods/brakes-rotors-driveway.jpg', caption: 'Brakes + rotors — back on the driveway, the new setup paired with the red covers' },
       { src: '/projects/carmods/camaro-night-leds.jpg', caption: 'Night shot — fresh white LEDs glowing front and back' },
       { src: '/projects/carmods/camaro-side-day.jpg', caption: 'Daytime profile — LEDs in, red calipers showing through the spokes' },
     ],

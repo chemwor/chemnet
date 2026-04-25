@@ -26,7 +26,7 @@ const PHASES = [
     label: '⚡ Phase 1 — Do Now',
     mods: [
       { name: 'Cat-Back Exhaust', status: 'planned', cost: '$400–900', priority: '#1', notes: 'Biggest immediate transformation — sound + feel. Looking at Borla, Corsa, or Axle-back.' },
-      { name: 'Brakes Replaced', status: 'done', cost: '$80–150', priority: '#2', notes: 'Done. Brakes replaced recently.' },
+      { name: 'Brakes + Rotors Replaced', status: 'done', cost: '$80–150', priority: '#2', notes: 'Done at R&E Motors. Pads and rotors swapped together for a clean reset before any of the performance mods. Pairs with the red caliper covers — fresh rotors look right behind them.' },
       { name: 'Slotted/Drilled Rotors', status: 'planned', cost: '$150–300', priority: '#2', notes: 'Pair with pads — same job. PowerStop or EBC.' },
       { name: 'Window Tint', status: 'planned', cost: '$150–250', priority: 'EASY WIN', notes: 'Easy visual win, immediate premium look. 35% or 20%.' },
       { name: 'Black Badge Delete', status: 'planned', cost: '$20–50', priority: 'EASY WIN', notes: 'Cheapest visual upgrade possible. 3M wrap or OEM badges.' },
