@@ -47,11 +47,11 @@ function DesktopPictures() {
         {/* Image + caption */}
         <div className="flex-1 overflow-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 16 }}>
           <div style={{ maxWidth: 600, width: '100%' }}>
-            <div style={{ position: 'relative', background: '#0a0a18', border: '2px inset #4A4555', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+            <div style={{ position: 'relative', background: '#0a0a18', border: '2px inset #4A4555', width: '100%', height: 'min(60vh, 500px)', overflow: 'hidden' }}>
               <img
                 src={allSlides[slideIdx] || selected.url}
                 alt={selected.title}
-                style={{ maxWidth: '100%', maxHeight: 500, objectFit: 'contain', display: 'block' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
               />
               {hasSlides && (
                 <>
@@ -220,8 +220,8 @@ function MobilePictures() {
 
         {/* Full image */}
         <div className="flex-1 overflow-auto" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', minHeight: 200 }}>
-            <img src={allSlides[slideIdx] || selected.url} alt={selected.title} style={{ maxWidth: '100%', maxHeight: '55vh', objectFit: 'contain' }} />
+          <div style={{ position: 'relative', width: '100%', height: '55vh', background: '#000', overflow: 'hidden', flexShrink: 0 }}>
+            <img src={allSlides[slideIdx] || selected.url} alt={selected.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
             {hasSlides && (
               <>
                 <button
