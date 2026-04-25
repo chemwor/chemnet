@@ -10,6 +10,8 @@ function DesktopPictures() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+  const [sortDir, setSortDir] = useState('desc')
+  const [yearFilter, setYearFilter] = useState('all')
 
   useEffect(() => {
     async function load() {
@@ -19,6 +21,15 @@ function DesktopPictures() {
     }
     load()
   }, [])
+
+  const years = [...new Set(photos.map(p => new Date(p.created_at).getFullYear()))].sort((a, b) => b - a)
+  const visible = photos
+    .filter(p => yearFilter === 'all' || new Date(p.created_at).getFullYear() === yearFilter)
+    .sort((a, b) => {
+      const da = new Date(a.created_at).getTime()
+      const db = new Date(b.created_at).getTime()
+      return sortDir === 'desc' ? db - da : da - db
+    })
 
   if (selected) {
     return (
@@ -66,15 +77,38 @@ function DesktopPictures() {
         </div>
       </div>
 
+      {/* Sort + filter row */}
+      <div className="flex items-center gap-3 px-3 py-1 shrink-0" style={{ background: '#c0c0c0', borderBottom: '1px solid #888', fontFamily: 'Tahoma, sans-serif' }}>
+        <label style={{ fontSize: 11, color: '#000' }}>Sort:</label>
+        <select
+          value={sortDir}
+          onChange={e => setSortDir(e.target.value)}
+          style={{ fontSize: 11, padding: '1px 4px', border: '1px inset #888', background: '#fff', color: '#000', fontFamily: 'inherit' }}
+        >
+          <option value="desc">Newest first</option>
+          <option value="asc">Oldest first</option>
+        </select>
+        <label style={{ fontSize: 11, color: '#000', marginLeft: 8 }}>Year:</label>
+        <select
+          value={yearFilter}
+          onChange={e => setYearFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+          style={{ fontSize: 11, padding: '1px 4px', border: '1px inset #888', background: '#fff', color: '#000', fontFamily: 'inherit' }}
+        >
+          <option value="all">All</option>
+          {years.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <span className="ml-auto" style={{ fontSize: 11, color: '#444' }}>{visible.length} of {photos.length}</span>
+      </div>
+
       {/* Thumbnail grid */}
       <div className="flex-1 overflow-auto p-3" style={{ background: '#fff' }}>
         {loading ? (
           <div className="text-center py-8" style={{ color: '#888', fontSize: 12 }}>Loading...</div>
-        ) : photos.length === 0 ? (
-          <div className="text-center py-8" style={{ color: '#888', fontSize: 12 }}>No pictures yet.</div>
+        ) : visible.length === 0 ? (
+          <div className="text-center py-8" style={{ color: '#888', fontSize: 12 }}>{photos.length === 0 ? 'No pictures yet.' : 'No pictures match the filter.'}</div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
-            {photos.map(photo => (
+            {visible.map(photo => (
               <div
                 key={photo.id}
                 onClick={() => setSelected(photo)}
@@ -111,6 +145,8 @@ function MobilePictures() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+  const [sortDir, setSortDir] = useState('desc')
+  const [yearFilter, setYearFilter] = useState('all')
 
   useEffect(() => {
     async function load() {
@@ -120,6 +156,15 @@ function MobilePictures() {
     }
     load()
   }, [])
+
+  const years = [...new Set(photos.map(p => new Date(p.created_at).getFullYear()))].sort((a, b) => b - a)
+  const visible = photos
+    .filter(p => yearFilter === 'all' || new Date(p.created_at).getFullYear() === yearFilter)
+    .sort((a, b) => {
+      const da = new Date(a.created_at).getTime()
+      const db = new Date(b.created_at).getTime()
+      return sortDir === 'desc' ? db - da : da - db
+    })
 
   if (selected) {
     return (
@@ -155,18 +200,38 @@ function MobilePictures() {
       {/* Header */}
       <div className="flex items-center justify-between px-3 shrink-0" style={{ height: 44, background: '#1c1c1e', borderBottom: '0.5px solid #38383a' }}>
         <span style={{ color: '#fff', fontSize: 17, fontWeight: 600 }}>Photos</span>
-        <span style={{ color: '#8e8e93', fontSize: 13 }}>{photos.length} photos</span>
+        <span style={{ color: '#8e8e93', fontSize: 13 }}>{visible.length}{visible.length !== photos.length ? ` of ${photos.length}` : ''}</span>
+      </div>
+
+      {/* Sort + filter row */}
+      <div className="flex items-center gap-2 px-3 py-2 shrink-0" style={{ background: '#1c1c1e', borderBottom: '0.5px solid #38383a' }}>
+        <select
+          value={sortDir}
+          onChange={e => setSortDir(e.target.value)}
+          style={{ fontSize: 13, padding: '5px 8px', background: '#2c2c2e', color: '#fff', border: 'none', borderRadius: 6, fontFamily: 'inherit' }}
+        >
+          <option value="desc">Newest first</option>
+          <option value="asc">Oldest first</option>
+        </select>
+        <select
+          value={yearFilter}
+          onChange={e => setYearFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+          style={{ fontSize: 13, padding: '5px 8px', background: '#2c2c2e', color: '#fff', border: 'none', borderRadius: 6, fontFamily: 'inherit' }}
+        >
+          <option value="all">All years</option>
+          {years.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
       </div>
 
       {/* Grid */}
       <div className="flex-1 overflow-auto">
         {loading ? (
           <div className="text-center py-8" style={{ color: '#8e8e93', fontSize: 15 }}>Loading...</div>
-        ) : photos.length === 0 ? (
-          <div className="text-center py-8" style={{ color: '#8e8e93', fontSize: 15 }}>No photos yet.</div>
+        ) : visible.length === 0 ? (
+          <div className="text-center py-8" style={{ color: '#8e8e93', fontSize: 15 }}>{photos.length === 0 ? 'No photos yet.' : 'No photos match the filter.'}</div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, padding: 2 }}>
-            {photos.map(photo => (
+            {visible.map(photo => (
               <div
                 key={photo.id}
                 onClick={() => setSelected(photo)}
