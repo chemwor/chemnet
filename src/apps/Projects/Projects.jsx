@@ -48,7 +48,7 @@ You paid for your home. You should be able to defend it.`,
     id: 'mgn',
     name: 'My Guardian Neighbor',
     icon: '🛡️',
-    status: 'active',
+    status: 'on-hold',
     type: 'tech',
     tagline: 'Neighbors helping neighbors. Built for Metro Atlanta.',
     description: `My Guardian Neighbor (MGN) is a free, community-powered platform connecting Metro Atlanta families navigating hardship with local volunteers ready to show up. Groceries when the month runs long. A ride to a medical appointment. Help rewriting a resume after a layoff. A check-in on an aging parent whose kids live out of state.
@@ -70,7 +70,7 @@ Free, forever. Hyperlocal by design. Infrastructure, not charity. Built to last.
       'Hyperlocal density is the chicken-and-egg problem. Launching neighborhood by neighborhood is better than going city-wide and being thin everywhere.',
       'Trust and moderation have to be built in from day one, not bolted on later.',
     ],
-    notes: 'Verified volunteer matching, request/fulfillment pipeline, AI-assisted moderation, career tools (resume review, cover letter generator, skills-matching quiz). Designed for Metro Atlanta communities first. Every feature tuned for local, not generic national.',
+    notes: 'On hold until DMHOA ads are profitable. Verified volunteer matching, request/fulfillment pipeline, AI-assisted moderation, career tools (resume review, cover letter generator, skills-matching quiz). Designed for Metro Atlanta communities first. Every feature tuned for local, not generic national.',
   },
   {
     id: 'chemnet',
@@ -187,6 +187,7 @@ const STATUS_STYLES = {
   planning: { color: '#FBBF24', label: 'PLANNING', bg: '#3a2a1a' },
   planned: { color: '#60A5FA', label: 'PLANNED', bg: '#1a1a3a' },
   concept: { color: '#A78BFA', label: 'CONCEPT', bg: '#2a1a3a' },
+  'on-hold': { color: '#F97316', label: 'ON HOLD', bg: '#3a2418' },
   completed: { color: '#888', label: 'DONE', bg: '#2a2a2a' },
 }
 
@@ -231,13 +232,13 @@ function DesktopProjects() {
           })}
         </div>
       ) : (
-        <div className="flex-1 overflow-auto" style={{ minHeight: 0 }}>
-          {/* Back button */}
-          <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+        <div className="flex-1 flex flex-col" style={{ minHeight: 0 }}>
+          {/* Back button — sticky header */}
+          <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a', background: '#0f0f14' }}>
             <button onClick={() => setSelectedId(null)} className="text-xs border-none bg-transparent cursor-pointer" style={{ color: '#FF6B35', fontFamily: 'inherit' }}>← Back to Projects</button>
           </div>
 
-          <div className="p-4" style={{ maxWidth: 640 }}>
+          <div className="flex-1 overflow-auto p-4" style={{ maxWidth: 640 }}>
             {/* Header */}
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">{selected.icon}</span>

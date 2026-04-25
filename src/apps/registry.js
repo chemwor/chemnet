@@ -11,6 +11,7 @@ export const APP_REGISTRY = [
     pinned: true,
     auth: false,
     category: null, // top-level
+    hideFromDesktop: true, // opens on boot; no need for a desktop icon
   },
   {
     id: 'aboutme',
@@ -175,6 +176,18 @@ export const APP_REGISTRY = [
     component: () => import('./Digest/Digest.jsx'),
     defaultSize: { width: 520, height: 480 },
     defaultPosition: { x: 130, y: 50 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+    category: null,
+  },
+  {
+    id: 'manifestations',
+    label: 'Manifestations',
+    icon: 'cookie',
+    component: () => import('./Manifestations/Manifestations.jsx'),
+    defaultSize: { width: 520, height: 420 },
+    defaultPosition: { x: 150, y: 70 },
     openOnBoot: false,
     pinned: false,
     auth: false,

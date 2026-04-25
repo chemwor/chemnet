@@ -51,6 +51,18 @@ const TRIPS = [
     photos: [],
     notes: 'Architecture + food + beach. The whole package. Would love to catch a Barça game if timing works.',
   },
+  { id: 6,  destination: 'Portugal',              status: 'planned', dates: 'TBD', icon: '🇵🇹', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 7,  destination: 'Switzerland',           status: 'planned', dates: 'TBD', icon: '🇨🇭', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 8,  destination: 'Amsterdam, Netherlands', status: 'planned', dates: 'TBD', icon: '🇳🇱', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 9,  destination: 'France',                status: 'planned', dates: 'TBD', icon: '🇫🇷', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 10, destination: 'Rome, Italy',           status: 'planned', dates: 'TBD', icon: '🇮🇹', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 11, destination: 'Thailand',              status: 'planned', dates: 'TBD', icon: '🇹🇭', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 12, destination: 'Mexico',                status: 'planned', dates: 'TBD', icon: '🇲🇽', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 13, destination: 'Hong Kong',             status: 'planned', dates: 'TBD', icon: '🇭🇰', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 14, destination: 'Ghana',                 status: 'planned', dates: 'TBD', icon: '🇬🇭', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 15, destination: 'India',                 status: 'planned', dates: 'TBD', icon: '🇮🇳', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 16, destination: 'China',                 status: 'planned', dates: 'TBD', icon: '🇨🇳', summary: '', highlights: [], photos: [], notes: '' },
+  { id: 17, destination: 'Brazil',                status: 'planned', dates: 'TBD', icon: '🇧🇷', summary: '', highlights: [], photos: [], notes: '' },
 ]
 
 const STATUS_STYLES = {

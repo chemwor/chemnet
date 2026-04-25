@@ -112,6 +112,9 @@ export const ICONS = {
 
   // Robot — rock'em sock'em
   robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="4" y="3" width="8" height="6" rx="1" fill="#c00" stroke="#000" stroke-width=".5"/><rect x="5" y="4" width="2" height="2" fill="#ff0"/><rect x="9" y="4" width="2" height="2" fill="#ff0"/><rect x="6" y="7" width="4" height="1" fill="#666"/><rect x="5" y="9" width="6" height="4" fill="#c00" stroke="#000" stroke-width=".5"/><rect x="2" y="5" width="2" height="4" fill="#c00"/><rect x="12" y="5" width="2" height="4" fill="#c00"/><rect x="7" y="1" width="2" height="2" fill="#888"/></svg>`,
+
+  // Cookie — manifestations / fortune cookie
+  cookie: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 12c0-4 2-7 5-7s5 3 5 7c-2 1-3 1.5-5 1.5S5 13 3 12z" fill="#d99a4f" stroke="#7a4a1a" stroke-width=".5"/><path d="M4 11l2-2 2 1 2-1.5 2 2" fill="none" stroke="#7a4a1a" stroke-width=".5" stroke-linecap="round"/><rect x="6.5" y="11.5" width="3" height="2.5" fill="#fff" stroke="#aaa" stroke-width=".3"/><circle cx="6" cy="8" r=".4" fill="#7a4a1a"/><circle cx="9" cy="7" r=".4" fill="#7a4a1a"/><circle cx="10" cy="9" r=".4" fill="#7a4a1a"/><circle cx="5" cy="10" r=".4" fill="#7a4a1a"/></svg>`,
 }
 
 // Convert SVG string to data URI for use in <img> tags

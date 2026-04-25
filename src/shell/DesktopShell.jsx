@@ -127,7 +127,7 @@ export function DesktopShell({ windowManager }) {
           className="absolute top-4 left-4 flex flex-col flex-wrap gap-2 content-start"
           style={{ zIndex: 2, maxHeight: 'calc(100% - 16px)' }}
         >
-          {APP_REGISTRY.filter(a => !a.category).map((app, i) => (
+          {APP_REGISTRY.filter(a => !a.category && !a.hideFromDesktop).map((app, i) => (
             <DesktopIcon key={app.id} app={app} onOpen={openApp} index={i} />
           ))}
         </div>

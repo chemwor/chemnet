@@ -16,7 +16,7 @@ const PHASES = [
     id: 'repairs',
     label: '🔧 Catch-Up Repairs',
     mods: [
-      { name: 'Spark Plugs (V6 LGX)', status: 'in-progress', cost: '$40–200', priority: 'HIGH', notes: 'Currently getting replaced.', link: 'https://www.youtube.com/watch?v=SErRFQspaZ4' },
+      { name: 'Spark Plugs (V6 LGX)', status: 'done', cost: '$40–200', priority: 'HIGH', notes: 'Done.', link: 'https://www.youtube.com/watch?v=SErRFQspaZ4' },
       { name: 'Wheel Alignment', status: 'planned', cost: '$80–130', priority: 'MEDIUM', notes: 'Last done at 26k mi — 80k miles ago. New wheels/tires deserve a fresh one.' },
       { name: 'BG GDI Air Induction Service', status: 'researching', cost: 'TBD', priority: 'MEDIUM', notes: 'Carbon buildup cleaning for direct injection engine.' },
     ],
@@ -47,7 +47,7 @@ const PHASES = [
     label: '🎨 Phase 3 — 6–12 Months',
     mods: [
       { name: 'Wheels Upgrade (20")', status: 'planned', cost: '$800–1,500', priority: '#5', notes: 'Biggest visual jump — save up for this one.' },
-      { name: 'Bilstein B6 Shocks/Struts', status: 'in-progress', cost: '$400–600', priority: 'MID', notes: 'Currently getting replaced.' },
+      { name: 'Bilstein B6 Shocks/Struts', status: 'done', cost: '$400–600', priority: 'MID', notes: 'Done.' },
       { name: 'ECU Tune', status: 'planned', cost: '$300–500', priority: 'MID', notes: 'After intake + exhaust — gets full benefit. HP Tuners.' },
       { name: 'Sway Bar Upgrade', status: 'planned', cost: '$150–300', priority: 'MID', notes: 'Reduces body roll, tighter cornering. Whiteline or Eibach.' },
     ],
