@@ -292,6 +292,5 @@ function MobileDigest() {
 }
 
 export default function Digest() {
-  const isMobile = useMediaQuery('(max-width: 768px)')
-  return isMobile ? <MobileDigest /> : <DesktopDigest />
+  return <DesktopDigest />
 }
