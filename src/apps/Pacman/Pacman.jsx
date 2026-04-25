@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 // ── Map: 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house ──
 const MAP_TEMPLATE = [
@@ -466,43 +467,31 @@ export default function Pacman() {
       <div className="relative" style={{ width: W, height: H }}>
         <canvas ref={canvasRef} style={{ width: W, height: H }} />
 
-        {(screen === 'start' || screen === 'gameover') && (
+        {screen === 'start' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2, background: 'rgba(0,0,0,0.75)' }}>
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
-              {screen === 'gameover' ? (
-                <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#FF0000' }}>
-                    GAME OVER
-                  </div>
-                  <div className="text-sm mb-1" style={{ color: '#FFD700' }}>
-                    Score: {hud.score}
-                  </div>
-                  <div className="text-xs mb-4" style={{ color: '#888' }}>
-                    Hi-Score: {getGameScore('pacman').highScore || 0}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="text-2xl font-bold mb-1" style={{ color: '#FFD700' }}>
-                    PAC-MAN
-                  </div>
-                  <div className="text-xs mb-1" style={{ color: '#888' }}>
-                    Arrow keys or WASD to move
-                  </div>
-                  <div className="text-xs mb-4" style={{ color: '#666' }}>
-                    Hi-Score: {getGameScore('pacman').highScore || 0}
-                  </div>
-                </>
-              )}
+              <div className="text-2xl font-bold mb-1" style={{ color: '#FFD700' }}>
+                PAC-MAN
+              </div>
+              <div className="text-xs mb-1" style={{ color: '#888' }}>
+                Arrow keys or WASD to move
+              </div>
+              <div className="text-xs mb-4" style={{ color: '#666' }}>
+                Hi-Score: {getGameScore('pacman').highScore || 0}
+              </div>
               <button
                 onClick={startGame}
                 className="px-4 py-1.5 text-sm font-bold cursor-pointer border-none"
                 style={{ background: '#FFD700', color: '#000', fontFamily: 'monospace' }}
               >
-                {screen === 'gameover' ? 'Play Again' : 'Start'}
+                Start
               </button>
             </div>
           </div>
+        )}
+
+        {screen === 'gameover' && (
+          <GameOver gameId="pacman" score={hud.score} onRestart={startGame} />
         )}
       </div>
     </div>

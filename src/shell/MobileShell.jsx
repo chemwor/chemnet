@@ -48,7 +48,7 @@ function StatusBar() {
 
 // ── iOS icon glyph map — clean white symbols like original iPhone ──
 const IOS_GLYPHS = {
-  about: '📋', terminal: '>_', projects: '📂', blog: '✏️',
+  about: '📋', aboutme: '🖥️', terminal: '>_', projects: '📂', blog: '✏️',
   pictures: '🌅', videos: '▶', messageboard: '💬', guestbook: '📖',
   music: '♫', reviews: '📺', restaurants: '🍴', email: '✉️',
   carmods: '🏎️', wishlist: '🛒', trips: '✈️',
@@ -128,6 +128,7 @@ function getIconBg(id) {
   // Bold, saturated gradients like original iPhone icons
   const colors = {
     about: 'linear-gradient(180deg, #4a4a4a, #1a1a1a)',
+    aboutme: 'linear-gradient(180deg, #007AFF, #0055CC)',
     projects: 'linear-gradient(180deg, #FFD60A, #C8A200)',
     blog: 'linear-gradient(180deg, #FFCC00, #FF9500)',
     pictures: 'linear-gradient(180deg, #FF6B35, #D44500)',
@@ -318,6 +319,15 @@ export function MobileShell({ windowManager }) {
       setTimeout(() => setShowNotification(false), 6000)
     }, 5000)
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const handler = (e) => {
+      const appId = e.detail
+      if (APP_REGISTRY.find(a => a.id === appId)) handleOpen(appId)
+    }
+    window.addEventListener('ericOS:openApp', handler)
+    return () => window.removeEventListener('ericOS:openApp', handler)
   }, [])
 
   const activeApp = activeAppId ? APP_REGISTRY.find(a => a.id === activeAppId) : null

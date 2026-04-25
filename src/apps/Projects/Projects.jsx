@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
+function getYouTubeId(url) {
+  if (!url) return null
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&]+)/)
+  return m ? m[1] : null
+}
+
 const PROJECTS = [
   {
     id: 'dmhoa',
@@ -33,6 +39,10 @@ You paid for your home. You should be able to defend it.`,
       'Tone matters as much as content. Letters that are firm but measured get taken seriously. Angry midnight emails get ignored.',
     ],
     notes: 'Platform informed by how management companies actually respond to disputes and what kinds of letters they take seriously versus ignore. Private by default. Violation details, property info, and letter content stay with the user. No data selling.',
+    roadmap: [
+      { item: 'Find a winning ad', done: false },
+      { item: 'Make content pipeline automated', done: false },
+    ],
   },
   {
     id: 'mgn',
@@ -94,7 +104,11 @@ The site itself is the project. It will always be a work in progress.`,
       { item: 'PWA support so it can be installed on phone home screen', done: false },
       { item: 'Shared high scores leaderboard (Supabase backed)', done: false },
       { item: 'More mobile-native app views (Guestbook, Trips, etc.)', done: false },
-      { item: 'Music player that actually plays audio', done: false },
+      { item: 'Fix games that are broken', done: false },
+      { item: 'Add more games', done: false },
+      { item: 'Thought board / Twitter equivalence', done: false },
+      { item: 'Music player', done: false },
+      { item: 'Connect Spotify', done: false },
       { item: 'Dark mode toggle for mobile', done: false },
       { item: 'Visitor analytics (privacy-respecting)', done: false },
     ],
@@ -106,21 +120,20 @@ The site itself is the project. It will always be a work in progress.`,
     status: 'planning',
     type: 'hybrid',
     tagline: 'Personal AI assistant. Software + hardware.',
-    description: `BMO is a personal AI assistant project. The idea is to build something that actually knows me. Not a generic chatbot but an assistant trained on my preferences, schedule, habits, and goals.
+    description: `BMO is a personal AI assistant project. Named after BMO from Adventure Time because that's the energy. The idea is to replicate what this guy did and build my own version of it as a house assistant.
 
-A digital companion that can help with task management, research, and decision making in a way that fits how I think and work. Named after BMO from Adventure Time because that's the energy.
+The main use case is a home companion. Ask it for recipes, have it help with meal planning, general house stuff. Not a generic chatbot. Something that sits in the kitchen or on the desk and is actually useful day to day.
 
-Software side is an AI agent with memory, context, and personality. Hardware side is a physical device. Small screen with a speaker that sits on the desk. Something you can talk to and that talks back.
-
-Still in the planning phase. Figuring out what the right architecture looks like.`,
+Software side is an AI agent with memory and personality. Hardware side is a physical device with a small screen, speaker, and mic. Still in the planning phase. Figuring out what the right architecture looks like and what parts I need.`,
     stack: ['Python', 'LangChain', 'OpenAI', 'Raspberry Pi', 'Speaker/Mic', 'Small Display'],
+    video: 'https://youtu.be/l5ggH-YhuAw?si=UnZ62DCUy6jggU_d',
     links: [],
     learnings: [
       'The gap between a chatbot and a useful assistant is context. It needs to remember things across conversations.',
       'Hardware adds a whole layer of complexity. Audio processing, wake words, display rendering. Might need to be software first, hardware second.',
       'The personality part is the hardest to get right. It needs to feel like talking to someone, not querying a database.',
     ],
-    notes: 'Investigating RAG (Retrieval Augmented Generation) for personal knowledge base. Considering OpenAI, Anthropic, or a local model. The hardware enclosure could be 3D printed with a Raspberry Pi and small touchscreen.',
+    notes: 'Planning phase. Replicating the BMO build from the inspiration video as a starting point. Want it to handle recipes, kitchen help, and general house assistant tasks. Investigating RAG for personal knowledge base. Hardware enclosure could be 3D printed with a Raspberry Pi and small touchscreen.',
   },
   {
     id: 'bathroom',
@@ -191,9 +204,8 @@ function DesktopProjects() {
         <div className="text-xs" style={{ color: '#666' }}>{PROJECTS.length} projects · {PROJECTS.filter(p => p.status === 'active').length} active</div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-        {/* Project list */}
-        <div className="flex-1 overflow-auto">
+      {!selected ? (
+        <div className="flex-1 overflow-auto" style={{ minHeight: 0 }}>
           {PROJECTS.map(p => {
             const st = STATUS_STYLES[p.status]
             return (
@@ -201,7 +213,9 @@ function DesktopProjects() {
                 key={p.id}
                 onClick={() => setSelectedId(p.id)}
                 className="flex items-start gap-3 px-3 py-2.5 cursor-pointer"
-                style={{ background: selectedId === p.id ? '#1a1a2a' : 'transparent', borderBottom: '1px solid #1a1a1a' }}
+                style={{ borderBottom: '1px solid #1a1a1a' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#1a1a2a'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 <span className="text-2xl shrink-0">{p.icon}</span>
                 <div className="flex-1 min-w-0">
@@ -216,74 +230,107 @@ function DesktopProjects() {
             )
           })}
         </div>
+      ) : (
+        <div className="flex-1 overflow-auto" style={{ minHeight: 0 }}>
+          {/* Back button */}
+          <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+            <button onClick={() => setSelectedId(null)} className="text-xs border-none bg-transparent cursor-pointer" style={{ color: '#FF6B35', fontFamily: 'inherit' }}>← Back to Projects</button>
+          </div>
 
-        {/* Detail panel */}
-        {selected && (
-          <div className="shrink-0 overflow-auto p-3" style={{ width: 280, background: '#12121a', borderLeft: '1px solid #2a2a3a' }}>
-            <div className="text-center text-3xl mb-2">{selected.icon}</div>
-            <div className="font-bold text-sm text-center mb-1">{selected.name}</div>
-            <div className="text-center mb-3">
-              <span className="text-xs px-2 py-0.5" style={{ background: STATUS_STYLES[selected.status].bg, color: STATUS_STYLES[selected.status].color }}>{STATUS_STYLES[selected.status].label}</span>
+          <div className="p-4" style={{ maxWidth: 640 }}>
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-4xl">{selected.icon}</span>
+              <div>
+                <div className="font-bold text-lg">{selected.name}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs px-2 py-0.5" style={{ background: STATUS_STYLES[selected.status].bg, color: STATUS_STYLES[selected.status].color }}>{STATUS_STYLES[selected.status].label}</span>
+                  <span className="text-xs" style={{ color: '#555' }}>{TYPE_LABELS[selected.type]}</span>
+                </div>
+              </div>
             </div>
 
-            <div className="text-xs leading-relaxed mb-3" style={{ color: '#aaa' }}>
+            {/* Description */}
+            <div className="text-sm leading-relaxed mb-4" style={{ color: '#bbb' }}>
               {selected.description.split('\n\n').map((para, i) => (
-                <p key={i} style={{ margin: '0 0 8px' }}>{para}</p>
+                <p key={i} style={{ margin: '0 0 10px' }}>{para}</p>
               ))}
             </div>
 
+            {/* Video */}
+            {selected.video && getYouTubeId(selected.video) && (
+              <div className="mb-4">
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>VIDEO</div>
+                <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 3, border: '1px solid #333' }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(selected.video)}`}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Project video"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Stack */}
             {selected.stack.length > 0 && (
-              <div className="mb-3">
-                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>Stack</div>
-                <div className="flex flex-wrap gap-1">
+              <div className="mb-4">
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>STACK</div>
+                <div className="flex flex-wrap gap-1.5">
                   {selected.stack.map(s => (
-                    <span key={s} className="text-xs px-1.5 py-0.5" style={{ background: '#1a1a2a', color: '#888' }}>{s}</span>
+                    <span key={s} className="text-xs px-2 py-1" style={{ background: '#1a1a2a', color: '#999', borderRadius: 2 }}>{s}</span>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* Learnings */}
             {selected.learnings?.length > 0 && (
-              <div className="mb-3">
-                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>What I've Learned</div>
+              <div className="mb-4">
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>WHAT I'VE LEARNED</div>
                 {selected.learnings.map((l, i) => (
-                  <div key={i} className="text-xs mb-1.5 pl-2" style={{ color: '#888', lineHeight: 1.4, borderLeft: '2px solid #2a2a3a' }}>{l}</div>
+                  <div key={i} className="text-xs mb-2 pl-3" style={{ color: '#999', lineHeight: 1.5, borderLeft: '2px solid #2a2a3a' }}>{l}</div>
                 ))}
               </div>
             )}
 
+            {/* Notes */}
             {selected.notes && (
-              <div className="mb-3">
-                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>Notes</div>
-                <div className="text-xs" style={{ color: '#888', lineHeight: 1.4 }}>{selected.notes}</div>
+              <div className="mb-4">
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>NOTES</div>
+                <div className="text-xs" style={{ color: '#999', lineHeight: 1.5 }}>{selected.notes}</div>
               </div>
             )}
 
+            {/* Roadmap */}
             {selected.roadmap?.length > 0 && (
-              <div className="mb-3">
-                <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>Roadmap</div>
+              <div className="mb-4">
+                <div className="text-xs font-bold mb-2" style={{ color: '#FF6B35' }}>ROADMAP ({selected.roadmap.filter(r => r.done).length}/{selected.roadmap.length})</div>
                 {selected.roadmap.map((r, i) => (
-                  <div key={i} className="text-xs mb-1 flex items-start gap-1" style={{ color: r.done ? '#4ADE80' : '#666' }}>
+                  <div key={i} className="text-xs mb-1.5 flex items-start gap-2" style={{ color: r.done ? '#4ADE80' : '#777' }}>
                     <span>{r.done ? '✓' : '○'}</span>
                     <span style={{ textDecoration: r.done ? 'line-through' : 'none', opacity: r.done ? 0.6 : 1 }}>{r.item}</span>
                   </div>
                 ))}
-                <div className="text-xs mt-1" style={{ color: '#444' }}>
-                  {selected.roadmap.filter(r => r.done).length}/{selected.roadmap.length} done
-                </div>
               </div>
             )}
 
+            {/* Links */}
             {selected.links?.length > 0 && (
-              <div>
+              <div className="mb-4">
                 {selected.links.map((l, i) => (
-                  <a key={i} href={l.url} target={l.url.startsWith('#') ? undefined : '_blank'} rel="noopener noreferrer" className="text-xs block mb-1" style={{ color: '#4A90D9' }}>🔗 {l.label}</a>
+                  l.url.startsWith('#') ? (
+                    <button key={i} onClick={() => window.dispatchEvent(new CustomEvent('ericOS:openApp', { detail: l.url.slice(1) }))} className="text-xs block mb-1 border-none bg-transparent cursor-pointer p-0" style={{ color: '#4A90D9', fontFamily: 'inherit' }}>🔗 {l.label}</button>
+                  ) : (
+                    <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="text-xs block mb-1" style={{ color: '#4A90D9' }}>🔗 {l.label}</a>
+                  )
                 ))}
               </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -354,12 +401,33 @@ function MobileProjects() {
               </div>
             )}
 
+            {selected.video && getYouTubeId(selected.video) && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#8e8e93', marginBottom: 6, textTransform: 'uppercase' }}>Video</div>
+                <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 10 }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(selected.video)}`}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Project video"
+                  />
+                </div>
+              </div>
+            )}
+
             {selected.links?.length > 0 && (
               <div style={{ marginTop: 16 }}>
                 {selected.links.map((l, i) => (
-                  <a key={i} href={l.url} target={l.url.startsWith('#') ? undefined : '_blank'} rel="noopener noreferrer" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#007AFF', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none', marginBottom: 8 }}>
-                    {l.label}
-                  </a>
+                  l.url.startsWith('#') ? (
+                    <button key={i} onClick={() => window.dispatchEvent(new CustomEvent('ericOS:openApp', { detail: l.url.slice(1) }))} style={{ display: 'block', width: '100%', textAlign: 'center', padding: '12px', background: '#007AFF', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, border: 'none', cursor: 'pointer', marginBottom: 8, fontFamily: 'inherit' }}>
+                      {l.label}
+                    </button>
+                  ) : (
+                    <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#007AFF', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none', marginBottom: 8 }}>
+                      {l.label}
+                    </a>
+                  )
                 ))}
               </div>
             )}

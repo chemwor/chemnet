@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const GRAVITY = 0.4
 const FLAP = -6.5
@@ -231,32 +232,26 @@ export default function FlappyBird() {
     >
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
 
-      {(screen === 'start' || screen === 'gameover') && (
+      {screen === 'start' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="text-center" style={{ fontFamily: '-apple-system, Arial, sans-serif' }}>
-            {screen === 'gameover' ? (
-              <>
-                <div className="text-2xl font-bold mb-2" style={{ color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Game Over</div>
-                <div className="text-lg mb-1" style={{ color: '#F5C842' }}>{finalScore}</div>
-                <div className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>Best: {getGameScore('flappybird').highScore || 0}</div>
-              </>
-            ) : (
-              <>
-                <div className="text-3xl font-bold mb-2" style={{ color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Flappy Bird</div>
-                <div className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.8)' }}>Tap to flap</div>
-                <div className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>Best: {getGameScore('flappybird').highScore || 0}</div>
-              </>
-            )}
+            <div className="text-3xl font-bold mb-2" style={{ color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Flappy Bird</div>
+            <div className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.8)' }}>Tap to flap</div>
+            <div className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>Best: {getGameScore('flappybird').highScore || 0}</div>
             <button
               onClick={(e) => { e.stopPropagation(); startGame() }}
               onTouchStart={(e) => { e.stopPropagation() }}
               className="px-5 py-2 text-sm font-bold cursor-pointer border-none rounded-full"
               style={{ background: '#F5C842', color: '#5A4008', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
             >
-              {screen === 'gameover' ? 'Play Again' : 'Start'}
+              Start
             </button>
           </div>
         </div>
+      )}
+
+      {screen === 'gameover' && (
+        <GameOver gameId="flappybird" score={finalScore} onRestart={startGame} />
       )}
     </div>
   )

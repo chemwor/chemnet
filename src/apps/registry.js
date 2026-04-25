@@ -13,6 +13,18 @@ export const APP_REGISTRY = [
     category: null, // top-level
   },
   {
+    id: 'aboutme',
+    label: 'About',
+    icon: 'computer',
+    component: () => import('./AboutMe/AboutMe.jsx'),
+    defaultSize: { width: 560, height: 480 },
+    defaultPosition: { x: 140, y: 60 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+    category: null,
+  },
+  {
     id: 'projects',
     label: 'Projects',
     icon: 'folder',

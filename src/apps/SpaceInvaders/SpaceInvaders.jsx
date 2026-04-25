@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const PLAYER_W = 30
 const PLAYER_H = 16
@@ -579,47 +580,35 @@ export default function SpaceInvaders() {
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-        {(screen === 'start' || screen === 'gameover') && (
+        {screen === 'start' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2 }}>
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
-              {screen === 'gameover' ? (
-                <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#FF0000' }}>
-                    GAME OVER
-                  </div>
-                  <div className="text-sm mb-1" style={{ color: '#4ADE80' }}>
-                    Score: {hud.score}
-                  </div>
-                  <div className="text-xs mb-4" style={{ color: '#666' }}>
-                    Hi-Score: {getGameScore('spaceinvaders').highScore || 0}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#F0EBE1' }}>
-                    SPACE INVADERS
-                  </div>
-                  <div className="text-xs mb-1" style={{ color: '#FF6B35' }}>
-                    ← → move &middot; SPACE shoot
-                  </div>
-                  <div className="text-xs mb-1" style={{ color: '#666' }}>
-                    Hi-Score: {getGameScore('spaceinvaders').highScore || 0}
-                  </div>
-                  <div className="flex flex-col gap-1 items-center my-3 text-xs" style={{ color: '#888' }}>
-                    <span><span style={{ color: '#FF6B35' }}>■</span> = 30 pts &nbsp; <span style={{ color: '#F0EBE1' }}>■</span> = 20 pts &nbsp; <span style={{ color: '#A09AB0' }}>■</span> = 10 pts</span>
-                    <span><span style={{ color: '#FF0000' }}>●</span> = ??? pts</span>
-                  </div>
-                </>
-              )}
+              <div className="text-xl font-bold mb-1" style={{ color: '#F0EBE1' }}>
+                SPACE INVADERS
+              </div>
+              <div className="text-xs mb-1" style={{ color: '#FF6B35' }}>
+                ← → move &middot; SPACE shoot
+              </div>
+              <div className="text-xs mb-1" style={{ color: '#666' }}>
+                Hi-Score: {getGameScore('spaceinvaders').highScore || 0}
+              </div>
+              <div className="flex flex-col gap-1 items-center my-3 text-xs" style={{ color: '#888' }}>
+                <span><span style={{ color: '#FF6B35' }}>■</span> = 30 pts &nbsp; <span style={{ color: '#F0EBE1' }}>■</span> = 20 pts &nbsp; <span style={{ color: '#A09AB0' }}>■</span> = 10 pts</span>
+                <span><span style={{ color: '#FF0000' }}>●</span> = ??? pts</span>
+              </div>
               <button
                 onClick={startGame}
                 className="px-4 py-1.5 text-sm font-bold cursor-pointer border-none"
                 style={{ background: '#4ADE80', color: '#000', fontFamily: 'monospace' }}
               >
-                {screen === 'gameover' ? 'Play Again' : 'Start'}
+                Start
               </button>
             </div>
           </div>
+        )}
+
+        {screen === 'gameover' && (
+          <GameOver gameId="spaceinvaders" score={hud.score} onRestart={startGame} />
         )}
       </div>
     </div>

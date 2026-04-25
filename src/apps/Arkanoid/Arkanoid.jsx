@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const PADDLE_W = 64
 const PADDLE_H = 10
@@ -453,39 +454,32 @@ export default function Arkanoid() {
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-        {(screen === 'start' || screen === 'gameover') && (
+        {screen === 'start' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2, background: 'rgba(0,0,0,0.85)' }}>
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
-              {screen === 'gameover' ? (
-                <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#FF4444' }}>GAME OVER</div>
-                  <div className="text-sm mb-1" style={{ color: '#888' }}>Score: {hudRef.current.score}</div>
-                  <div className="text-xs mb-1" style={{ color: '#555' }}>Level {hudRef.current.level}</div>
-                  <div className="text-xs mb-4" style={{ color: '#555' }}>Hi-Score: {getGameScore('arkanoid').highScore || 0}</div>
-                </>
-              ) : (
-                <>
-                  <div className="text-2xl font-bold mb-2" style={{ color: '#fff' }}>ARKANOID</div>
-                  <div className="text-xs mb-1" style={{ color: '#888' }}>← → or A/D to move</div>
-                  <div className="text-xs mb-1" style={{ color: '#888' }}>SPACE to launch ball</div>
-                  <div className="text-xs mb-3" style={{ color: '#555' }}>Hi-Score: {getGameScore('arkanoid').highScore || 0}</div>
-                  <div className="flex gap-3 justify-center mb-4 text-xs" style={{ color: '#666' }}>
-                    <span><span style={{ color: '#00CCFF' }}>W</span>ide</span>
-                    <span><span style={{ color: '#FF00FF' }}>M</span>ulti</span>
-                    <span><span style={{ color: '#00FF88' }}>S</span>low</span>
-                    <span><span style={{ color: '#FF4444' }}>♥</span> Life</span>
-                  </div>
-                </>
-              )}
+              <div className="text-2xl font-bold mb-2" style={{ color: '#fff' }}>ARKANOID</div>
+              <div className="text-xs mb-1" style={{ color: '#888' }}>← → or A/D to move</div>
+              <div className="text-xs mb-1" style={{ color: '#888' }}>SPACE to launch ball</div>
+              <div className="text-xs mb-3" style={{ color: '#555' }}>Hi-Score: {getGameScore('arkanoid').highScore || 0}</div>
+              <div className="flex gap-3 justify-center mb-4 text-xs" style={{ color: '#666' }}>
+                <span><span style={{ color: '#00CCFF' }}>W</span>ide</span>
+                <span><span style={{ color: '#FF00FF' }}>M</span>ulti</span>
+                <span><span style={{ color: '#00FF88' }}>S</span>low</span>
+                <span><span style={{ color: '#FF4444' }}>♥</span> Life</span>
+              </div>
               <button
                 onClick={startGame}
                 className="px-5 py-2 text-sm font-bold cursor-pointer border-none rounded"
                 style={{ background: '#4444CC', color: '#fff', fontFamily: 'monospace' }}
               >
-                {screen === 'gameover' ? 'Play Again' : 'Start'}
+                Start
               </button>
             </div>
           </div>
+        )}
+
+        {screen === 'gameover' && (
+          <GameOver gameId="arkanoid" score={hudRef.current.score} onRestart={startGame} />
         )}
       </div>
     </div>

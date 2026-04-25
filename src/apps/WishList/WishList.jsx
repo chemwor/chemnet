@@ -76,6 +76,15 @@ function DesktopWishList() {
         {/* Sidebar — category filter + sort */}
         <div style={{ width: 160, background: '#fff', borderRight: '1px solid #ddd', overflow: 'auto', padding: 8, shrink: 0 }}>
           <div style={{ fontWeight: 'bold', fontSize: 11, color: '#c45500', borderBottom: '1px solid #eee', paddingBottom: 4, marginBottom: 6 }}>
+            My Sizes
+          </div>
+          <div style={{ fontSize: 10, color: '#555', marginBottom: 12 }}>
+            Shirt: M<br />
+            Pants: 30<br />
+            Shoes: 10
+          </div>
+
+          <div style={{ fontWeight: 'bold', fontSize: 11, color: '#c45500', borderBottom: '1px solid #eee', paddingBottom: 4, marginBottom: 6 }}>
             Sort By
           </div>
           {SORT_OPTIONS.map(s => (
@@ -252,12 +261,13 @@ function MobileWishList() {
         ))}
       </div>
 
-      {/* Sort */}
-      <div style={{ padding: '4px 12px', background: '#fff', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: 4 }}>
+      {/* Sort + Sizes */}
+      <div style={{ padding: '4px 12px', background: '#fff', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 10, color: '#555' }}>Sort:</span>
         <select value={sort} onChange={e => setSort(e.target.value)} style={{ fontSize: 10, border: '1px solid #ccc', borderRadius: 3, padding: '2px 4px', fontFamily: 'inherit' }}>
           {SORT_OPTIONS.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
+        <span style={{ marginLeft: 'auto', fontSize: 9, color: '#888' }}>Shirt: M · Pants: 30 · Shoes: 10</span>
       </div>
 
       {/* Product grid — 2 col on mobile */}

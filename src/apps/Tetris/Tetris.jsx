@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const COLS = 10
 const ROWS = 20
@@ -269,32 +270,26 @@ export default function Tetris() {
     >
       <canvas ref={canvasRef} style={{ display: 'block' }} />
 
-      {(screen === 'start' || screen === 'gameover') && (
+      {screen === 'start' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,0.85)' }}>
           <div className="text-center" style={{ fontFamily: 'monospace' }}>
-            {screen === 'gameover' ? (
-              <>
-                <div className="text-xl font-bold mb-1" style={{ color: '#FF4444' }}>GAME OVER</div>
-                <div className="text-sm mb-1" style={{ color: '#ccc' }}>Score: {hud.score} · Level {hud.level}</div>
-                <div className="text-xs mb-3" style={{ color: '#666' }}>Hi-Score: {getGameScore('tetris').highScore || 0}</div>
-              </>
-            ) : (
-              <>
-                <div className="text-2xl font-bold mb-2" style={{ color: '#00F0F0' }}>TETRIS</div>
-                <div className="text-xs mb-1" style={{ color: '#888' }}>Swipe ← → to move · Tap to rotate</div>
-                <div className="text-xs mb-1" style={{ color: '#888' }}>Swipe ↓ soft drop · Double-tap hard drop</div>
-                <div className="text-xs mb-3" style={{ color: '#555' }}>Hi-Score: {getGameScore('tetris').highScore || 0}</div>
-              </>
-            )}
+            <div className="text-2xl font-bold mb-2" style={{ color: '#00F0F0' }}>TETRIS</div>
+            <div className="text-xs mb-1" style={{ color: '#888' }}>Swipe ← → to move · Tap to rotate</div>
+            <div className="text-xs mb-1" style={{ color: '#888' }}>Swipe ↓ soft drop · Double-tap hard drop</div>
+            <div className="text-xs mb-3" style={{ color: '#555' }}>Hi-Score: {getGameScore('tetris').highScore || 0}</div>
             <button
               onClick={startGame}
               className="px-4 py-1.5 text-sm font-bold cursor-pointer border-none"
               style={{ background: '#00F0F0', color: '#000', fontFamily: 'monospace' }}
             >
-              {screen === 'gameover' ? 'Play Again' : 'Start'}
+              Start
             </button>
           </div>
         </div>
+      )}
+
+      {screen === 'gameover' && (
+        <GameOver gameId="tetris" score={hud.score} onRestart={startGame} />
       )}
     </div>
   )

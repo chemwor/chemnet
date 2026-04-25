@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const FRUITS = [
   { emoji: '🍎', color: '#FF3333', points: 1 },
@@ -275,32 +276,26 @@ export default function FruitNinja() {
     <div style={{ position: 'absolute', inset: 0, background: '#2C1810' }}>
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block', touchAction: 'none' }} />
 
-      {(screen === 'start' || screen === 'gameover') && (
+      {screen === 'start' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(44,24,16,0.9)' }}>
           <div className="text-center" style={{ fontFamily: '-apple-system, Arial, sans-serif' }}>
-            {screen === 'gameover' ? (
-              <>
-                <div className="text-xl font-bold mb-1" style={{ color: '#FF4444' }}>Game Over</div>
-                <div className="text-2xl mb-1" style={{ color: '#FFD700' }}>{finalScore}</div>
-                <div className="text-xs mb-3" style={{ color: '#888' }}>Best: {getGameScore('fruitninja').highScore || 0}</div>
-              </>
-            ) : (
-              <>
-                <div className="text-3xl mb-1">🍉🔪</div>
-                <div className="text-xl font-bold mb-1" style={{ color: '#fff' }}>Fruit Ninja</div>
-                <div className="text-xs mb-1" style={{ color: '#aaa' }}>Swipe to slice · Avoid bombs</div>
-                <div className="text-xs mb-3" style={{ color: '#666' }}>Best: {getGameScore('fruitninja').highScore || 0}</div>
-              </>
-            )}
+            <div className="text-3xl mb-1">🍉🔪</div>
+            <div className="text-xl font-bold mb-1" style={{ color: '#fff' }}>Fruit Ninja</div>
+            <div className="text-xs mb-1" style={{ color: '#aaa' }}>Swipe to slice · Avoid bombs</div>
+            <div className="text-xs mb-3" style={{ color: '#666' }}>Best: {getGameScore('fruitninja').highScore || 0}</div>
             <button
               onClick={startGame}
               className="px-5 py-2 text-sm font-bold cursor-pointer border-none rounded"
               style={{ background: '#FF6B35', color: '#fff' }}
             >
-              {screen === 'gameover' ? 'Play Again' : 'Start'}
+              Start
             </button>
           </div>
         </div>
+      )}
+
+      {screen === 'gameover' && (
+        <GameOver gameId="fruitninja" score={finalScore} onRestart={startGame} />
       )}
     </div>
   )

@@ -104,6 +104,9 @@ export const ICONS = {
   // Brick — arkanoid
   brick: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="2" width="6" height="3" fill="#f00" stroke="#800" stroke-width=".3"/><rect x="8" y="2" width="7" height="3" fill="#f80" stroke="#840" stroke-width=".3"/><rect x="1" y="6" width="7" height="3" fill="#ff0" stroke="#880" stroke-width=".3"/><rect x="9" y="6" width="6" height="3" fill="#0c0" stroke="#080" stroke-width=".3"/><rect x="1" y="10" width="6" height="3" fill="#08f" stroke="#048" stroke-width=".3"/><circle cx="12" cy="12" r="2" fill="#fff" stroke="#888" stroke-width=".3"/></svg>`,
 
+  // Computer — about/system properties
+  computer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="9" rx=".5" fill="#c0c0c0" stroke="#000" stroke-width=".6"/><rect x="3" y="2" width="10" height="7" fill="#008080"/><text x="8" y="7" fill="#fff" font-size="4" font-family="monospace" text-anchor="middle">EC</text><rect x="6" y="10" width="4" height="2" fill="#c0c0c0" stroke="#000" stroke-width=".3"/><rect x="4" y="12" width="8" height="1.5" rx=".3" fill="#c0c0c0" stroke="#000" stroke-width=".3"/></svg>`,
+
   // Robot — rock'em sock'em
   robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="4" y="3" width="8" height="6" rx="1" fill="#c00" stroke="#000" stroke-width=".5"/><rect x="5" y="4" width="2" height="2" fill="#ff0"/><rect x="9" y="4" width="2" height="2" fill="#ff0"/><rect x="6" y="7" width="4" height="1" fill="#666"/><rect x="5" y="9" width="6" height="4" fill="#c00" stroke="#000" stroke-width=".5"/><rect x="2" y="5" width="2" height="4" fill="#c00"/><rect x="12" y="5" width="2" height="4" fill="#c00"/><rect x="7" y="1" width="2" height="2" fill="#888"/></svg>`,
 }

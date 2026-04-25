@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const CELL = 16
 const COLS = 20
@@ -189,31 +190,25 @@ export default function Snake() {
       <div className="relative">
         <canvas ref={canvasRef} style={{ display: 'block' }} />
 
-        {(screen === 'start' || screen === 'gameover') && (
+        {screen === 'start' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}>
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
-              {screen === 'gameover' ? (
-                <>
-                  <div className="text-lg font-bold mb-1" style={{ color: '#FF4444' }}>GAME OVER</div>
-                  <div className="text-sm mb-1" style={{ color: '#44FF44' }}>Score: {score}</div>
-                  <div className="text-xs mb-3" style={{ color: '#1a5a1a' }}>Hi-Score: {getGameScore('snake').highScore || 0}</div>
-                </>
-              ) : (
-                <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#44FF44' }}>SNAKE</div>
-                  <div className="text-xs mb-1" style={{ color: '#22aa22' }}>Swipe or arrow keys to move</div>
-                  <div className="text-xs mb-3" style={{ color: '#1a5a1a' }}>Hi-Score: {getGameScore('snake').highScore || 0}</div>
-                </>
-              )}
+              <div className="text-xl font-bold mb-1" style={{ color: '#44FF44' }}>SNAKE</div>
+              <div className="text-xs mb-1" style={{ color: '#22aa22' }}>Swipe or arrow keys to move</div>
+              <div className="text-xs mb-3" style={{ color: '#1a5a1a' }}>Hi-Score: {getGameScore('snake').highScore || 0}</div>
               <button
                 onClick={startGame}
                 className="px-4 py-1.5 text-sm font-bold cursor-pointer border-none"
                 style={{ background: '#44FF44', color: '#0a2a0a', fontFamily: 'monospace' }}
               >
-                {screen === 'gameover' ? 'Play Again' : 'Start'}
+                Start
               </button>
             </div>
           </div>
+        )}
+
+        {screen === 'gameover' && (
+          <GameOver gameId="snake" score={score} onRestart={startGame} />
         )}
       </div>
     </div>

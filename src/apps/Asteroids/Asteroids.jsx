@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const SHIP_SIZE = 14
 const TURN_SPEED = 0.07
@@ -387,43 +388,31 @@ export default function Asteroids() {
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-        {(screen === 'start' || screen === 'gameover') && (
+        {screen === 'start' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2 }}>
             <div className="text-center" style={{ fontFamily: 'monospace' }}>
-              {screen === 'gameover' ? (
-                <>
-                  <div className="text-xl font-bold mb-1" style={{ color: '#FF6B35' }}>
-                    GAME OVER
-                  </div>
-                  <div className="text-sm mb-1" style={{ color: '#666' }}>
-                    Score: {hud.score}
-                  </div>
-                  <div className="text-xs mb-4" style={{ color: '#555' }}>
-                    Hi-Score: {getGameScore('asteroids').highScore || 0}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="text-2xl font-bold mb-1" style={{ color: '#F0EBE1' }}>
-                    ASTEROIDS
-                  </div>
-                  <div className="text-xs mb-1" style={{ color: '#666' }}>
-                    ← → rotate &middot; ↑ thrust &middot; SPACE shoot
-                  </div>
-                  <div className="text-xs mb-4" style={{ color: '#555' }}>
-                    Hi-Score: {getGameScore('asteroids').highScore || 0}
-                  </div>
-                </>
-              )}
+              <div className="text-2xl font-bold mb-1" style={{ color: '#F0EBE1' }}>
+                ASTEROIDS
+              </div>
+              <div className="text-xs mb-1" style={{ color: '#666' }}>
+                ← → rotate &middot; ↑ thrust &middot; SPACE shoot
+              </div>
+              <div className="text-xs mb-4" style={{ color: '#555' }}>
+                Hi-Score: {getGameScore('asteroids').highScore || 0}
+              </div>
               <button
                 onClick={startGame}
                 className="px-4 py-1.5 text-sm font-bold cursor-pointer border-none"
                 style={{ background: '#FF6B35', color: '#000', fontFamily: 'monospace' }}
               >
-                {screen === 'gameover' ? 'Play Again' : 'Start'}
+                Start
               </button>
             </div>
           </div>
+        )}
+
+        {screen === 'gameover' && (
+          <GameOver gameId="asteroids" score={hud.score} onRestart={startGame} />
         )}
       </div>
     </div>

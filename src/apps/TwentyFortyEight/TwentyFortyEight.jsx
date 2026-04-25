@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const SIZE = 4
 
@@ -270,19 +271,7 @@ export default function TwentyFortyEight() {
 
         {/* Game over overlay */}
         {gameOver && (
-          <div className="absolute inset-0 flex items-center justify-center rounded" style={{ background: 'rgba(238,228,218,0.73)' }}>
-            <div className="text-center">
-              <div style={{ fontSize: 24, fontWeight: 'bold', color: '#776e65', marginBottom: 8 }}>Game Over!</div>
-              <div style={{ fontSize: 14, color: '#776e65', marginBottom: 12 }}>Score: {score}</div>
-              <button
-                onClick={newGame}
-                className="px-4 py-2 text-sm font-bold border-none cursor-pointer rounded"
-                style={{ background: '#8f7a66', color: '#f9f6f2' }}
-              >
-                Try Again
-              </button>
-            </div>
-          </div>
+          <GameOver gameId="2048" score={score} onRestart={newGame} />
         )}
 
         {/* Win overlay */}

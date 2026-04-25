@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { submitScore, getGameScore } from '../../lib/highscores'
+import GameOver from '../../lib/GameOver'
 
 const PLAT_W = 60
 const PLAT_H = 12
@@ -246,31 +247,25 @@ export default function DoodleJump() {
     <div style={{ position: 'absolute', inset: 0, background: '#F5F0E0' }}>
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
 
-      {(screen === 'start' || screen === 'gameover') && (
+      {screen === 'start' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(245,240,224,0.9)' }}>
           <div className="text-center" style={{ fontFamily: '-apple-system, Arial, sans-serif' }}>
-            {screen === 'gameover' ? (
-              <>
-                <div className="text-xl font-bold mb-1" style={{ color: '#D9534F' }}>Game Over</div>
-                <div className="text-lg mb-1" style={{ color: '#333' }}>{finalScore}</div>
-                <div className="text-xs mb-3" style={{ color: '#999' }}>Best: {getGameScore('doodlejump').highScore || 0}</div>
-              </>
-            ) : (
-              <>
-                <div className="text-2xl font-bold mb-1" style={{ color: '#3A3' }}>Doodle Jump</div>
-                <div className="text-xs mb-1" style={{ color: '#888' }}>Tilt phone or ← → to move</div>
-                <div className="text-xs mb-3" style={{ color: '#aaa' }}>Best: {getGameScore('doodlejump').highScore || 0}</div>
-              </>
-            )}
+            <div className="text-2xl font-bold mb-1" style={{ color: '#3A3' }}>Doodle Jump</div>
+            <div className="text-xs mb-1" style={{ color: '#888' }}>Tilt phone or ← → to move</div>
+            <div className="text-xs mb-3" style={{ color: '#aaa' }}>Best: {getGameScore('doodlejump').highScore || 0}</div>
             <button
               onClick={startGame}
               className="px-5 py-2 text-sm font-bold cursor-pointer border-none rounded"
               style={{ background: '#5CB85C', color: '#fff' }}
             >
-              {screen === 'gameover' ? 'Play Again' : 'Start'}
+              Start
             </button>
           </div>
         </div>
+      )}
+
+      {screen === 'gameover' && (
+        <GameOver gameId="doodlejump" score={finalScore} onRestart={startGame} />
       )}
     </div>
   )

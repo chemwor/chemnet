@@ -16,7 +16,7 @@ const PHASES = [
     id: 'repairs',
     label: '🔧 Catch-Up Repairs',
     mods: [
-      { name: 'Spark Plugs (V6 LGX)', status: 'planned', cost: '$40–200', priority: 'HIGH', notes: '108k on likely original plugs — past spec interval for this engine.', link: 'https://www.youtube.com/watch?v=SErRFQspaZ4' },
+      { name: 'Spark Plugs (V6 LGX)', status: 'in-progress', cost: '$40–200', priority: 'HIGH', notes: 'Currently getting replaced.', link: 'https://www.youtube.com/watch?v=SErRFQspaZ4' },
       { name: 'Wheel Alignment', status: 'planned', cost: '$80–130', priority: 'MEDIUM', notes: 'Last done at 26k mi — 80k miles ago. New wheels/tires deserve a fresh one.' },
       { name: 'BG GDI Air Induction Service', status: 'researching', cost: 'TBD', priority: 'MEDIUM', notes: 'Carbon buildup cleaning for direct injection engine.' },
     ],
@@ -26,7 +26,7 @@ const PHASES = [
     label: '⚡ Phase 1 — Do Now',
     mods: [
       { name: 'Cat-Back Exhaust', status: 'planned', cost: '$400–900', priority: '#1', notes: 'Biggest immediate transformation — sound + feel. Looking at Borla, Corsa, or Axle-back.' },
-      { name: 'Hawk HPS Brake Pads', status: 'planned', cost: '$80–150', priority: '#2', notes: 'Doing brake job anyway — upgrade while in there.' },
+      { name: 'Brakes Replaced', status: 'done', cost: '$80–150', priority: '#2', notes: 'Done. Brakes replaced recently.' },
       { name: 'Slotted/Drilled Rotors', status: 'planned', cost: '$150–300', priority: '#2', notes: 'Pair with pads — same job. PowerStop or EBC.' },
       { name: 'Window Tint', status: 'planned', cost: '$150–250', priority: 'EASY WIN', notes: 'Easy visual win, immediate premium look. 35% or 20%.' },
       { name: 'Black Badge Delete', status: 'planned', cost: '$20–50', priority: 'EASY WIN', notes: 'Cheapest visual upgrade possible. 3M wrap or OEM badges.' },
@@ -47,7 +47,7 @@ const PHASES = [
     label: '🎨 Phase 3 — 6–12 Months',
     mods: [
       { name: 'Wheels Upgrade (20")', status: 'planned', cost: '$800–1,500', priority: '#5', notes: 'Biggest visual jump — save up for this one.' },
-      { name: 'Bilstein B6 Shocks/Struts', status: 'planned', cost: '$400–600', priority: 'MID', notes: 'Pair with lowering springs for full suspension upgrade.' },
+      { name: 'Bilstein B6 Shocks/Struts', status: 'in-progress', cost: '$400–600', priority: 'MID', notes: 'Currently getting replaced.' },
       { name: 'ECU Tune', status: 'planned', cost: '$300–500', priority: 'MID', notes: 'After intake + exhaust — gets full benefit. HP Tuners.' },
       { name: 'Sway Bar Upgrade', status: 'planned', cost: '$150–300', priority: 'MID', notes: 'Reduces body roll, tighter cornering. Whiteline or Eibach.' },
     ],
@@ -58,7 +58,7 @@ const PHASES = [
     mods: [
       { name: 'Custom Leather Seat Covers', status: 'planned', cost: '$469–850', priority: 'HIGH IMPACT', notes: 'Precision fit for 2016+ Camaro Coupe. Compatible with seat heaters and airbags. Multiple color options.', link: 'https://kustominterior.com/collections/chevrolet-camaro-interior-parts-accessories/products/2016-chevrolet-camaro-coupe-seat-covers' },
       { name: 'Leather Knee Pads Cover Kit (4pc)', status: 'planned', cost: '$129.99', priority: 'HIGH IMPACT', notes: 'Premium leather over factory area. Center console + door knee pads. OEM-style fitment.', link: 'https://kustominterior.com/collections/chevrolet-camaro-interior-parts-accessories/products/6th-gen-camaro-leather-knee-pads-cover-kit-interior-trim' },
-      { name: 'Witamats Diamond Line Galaxy Floor Mats', status: 'planned', cost: '$199.95', priority: 'PRACTICAL', notes: 'Custom-fit microfiber leather. Waterproof, extended coverage wraps up the sides. Dual-layer cushion.', link: 'https://witamats.com/products/witamats-diamond-line-galaxy/' },
+      { name: 'Witamats Diamond Line Galaxy Floor Mats', status: 'ordered', cost: '$199.95', priority: 'PRACTICAL', notes: 'Ordered. Custom-fit microfiber leather. Waterproof, extended coverage wraps up the sides. Dual-layer cushion.', link: 'https://witamats.com/products/witamats-diamond-line-galaxy/' },
       { name: 'Husky WeatherBeater Trunk Liner', status: 'planned', cost: '$107.99', priority: 'PRACTICAL', notes: 'Protect that trunk.', link: 'https://www.americanmuscle.com/husky-camaro-weatherbeater-trunk-liner-black-42091.html' },
       { name: 'BloomCar LED Door Sill Pro', status: 'planned', cost: '$69.99', priority: 'NICE', notes: 'LED light-up door sills. Custom fit for Camaro.', link: 'https://thebloomcar.com/products/bloomcar-led-light-pedal' },
       { name: 'CF Gear Shifter Console Trim', status: 'planned', cost: '$84.99', priority: 'HIGH IMPACT', notes: 'Carbon fiber. NextGenSpeed.', link: 'https://nextgenspeed.com/shop/chevy/chevycamaro/2019-camaro/interior-parts-2019/genuine-carbon-fiber/carbon-fiber-gear-shifter-trim-cover-2016-2020-camaro/' },
@@ -272,6 +272,7 @@ const STATUS_COLORS = {
   planned: { bg: '#1a1a3a', color: '#60A5FA', label: 'PLANNED' },
   researching: { bg: '#3a2a1a', color: '#FBBF24', label: 'RESEARCH' },
   'in-progress': { bg: '#3a1a1a', color: '#FF6B35', label: 'IN PROGRESS' },
+  ordered: { bg: '#2a1a3a', color: '#A78BFA', label: 'ORDERED' },
 }
 
 // ── Desktop View ──
@@ -384,8 +385,8 @@ function MobileCarMods() {
               {mod.priority && <div style={{ fontSize: 11, color: '#FF9500', marginTop: 2 }}>{mod.priority}</div>}
               {mod.notes && <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 4, lineHeight: 1.4 }}>{mod.notes}</div>}
               <div className="flex items-center gap-3" style={{ marginTop: 4 }}>
-                <span style={{ fontSize: 11, color: mod.status === 'done' ? '#34C759' : mod.status === 'researching' ? '#FF9500' : '#007AFF' }}>
-                  {mod.status === 'done' ? '✓ Done' : mod.status === 'researching' ? '🔍 Researching' : '○ Planned'}
+                <span style={{ fontSize: 11, color: mod.status === 'done' ? '#34C759' : mod.status === 'in-progress' ? '#FF6B35' : mod.status === 'ordered' ? '#A78BFA' : mod.status === 'researching' ? '#FF9500' : '#007AFF' }}>
+                  {mod.status === 'done' ? '✓ Done' : mod.status === 'in-progress' ? '⚡ In Progress' : mod.status === 'ordered' ? '📦 Ordered' : mod.status === 'researching' ? '🔍 Researching' : '○ Planned'}
                 </span>
                 {mod.link && <a href={mod.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#007AFF' }}>View Part →</a>}
               </div>

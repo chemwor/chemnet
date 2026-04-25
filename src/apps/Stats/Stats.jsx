@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getTopScores, getMostActive, getGameStats, getLeaderboard, getPlayerName, setPlayerName } from '../../lib/highscores'
+import { supabase } from '../../lib/supabase'
 
 const GAME_NAMES = {
   asteroids: 'Asteroids',
@@ -83,7 +84,45 @@ function NamePrompt({ currentName, onSave }) {
 
 function LeaderboardView({ period }) {
   const [selectedGame, setSelectedGame] = useState('asteroids')
-  const scores = getTopScores(selectedGame, period, 15)
+  const [scores, setScores] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true)
+      try {
+        let query = supabase
+          .from('high_scores')
+          .select('*')
+          .eq('game_id', selectedGame)
+          .eq('type', 'score')
+          .order('score', { ascending: false })
+          .limit(15)
+
+        if (period) {
+          const cutoff = new Date()
+          if (period === 'day') cutoff.setDate(cutoff.getDate() - 1)
+          else if (period === 'month') cutoff.setMonth(cutoff.getMonth() - 1)
+          else if (period === 'year') cutoff.setFullYear(cutoff.getFullYear() - 1)
+          query = query.gte('created_at', cutoff.toISOString())
+        }
+
+        const { data } = await query
+        if (data && data.length > 0) {
+          setScores(data.map(s => ({ name: s.player_name, value: s.score, date: s.created_at })))
+        } else {
+          // Fall back to localStorage
+          const local = getTopScores(selectedGame, period, 15)
+          setScores(local)
+        }
+      } catch {
+        const local = getTopScores(selectedGame, period, 15)
+        setScores(local)
+      }
+      setLoading(false)
+    }
+    load()
+  }, [selectedGame, period])
 
   return (
     <div className="flex-1 overflow-auto">
@@ -111,7 +150,9 @@ function LeaderboardView({ period }) {
           🏆 {GAME_NAMES[selectedGame]} — Top Scores
         </div>
 
-        {scores.length === 0 ? (
+        {loading ? (
+          <div className="text-xs py-4 text-center" style={{ color: '#888', fontFamily: 'Tahoma, Arial, sans-serif' }}>Loading...</div>
+        ) : scores.length === 0 ? (
           <div className="text-xs py-4 text-center" style={{ color: '#888', fontFamily: 'Tahoma, Arial, sans-serif' }}>
             No scores yet. Go play some games!
           </div>
@@ -145,8 +186,44 @@ function LeaderboardView({ period }) {
 }
 
 function GamesOverview({ period }) {
-  const stats = getGameStats(period)
+  const [stats, setStats] = useState({})
+  const [loading, setLoading] = useState(true)
   const allGames = [...SCORE_GAMES, ...RECORD_GAMES]
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true)
+      try {
+        let query = supabase.from('high_scores').select('*')
+        if (period) {
+          const cutoff = new Date()
+          if (period === 'day') cutoff.setDate(cutoff.getDate() - 1)
+          else if (period === 'month') cutoff.setMonth(cutoff.getMonth() - 1)
+          else if (period === 'year') cutoff.setFullYear(cutoff.getFullYear() - 1)
+          query = query.gte('created_at', cutoff.toISOString())
+        }
+        const { data } = await query
+        if (data && data.length > 0) {
+          const s = {}
+          for (const e of data) {
+            if (!s[e.game_id]) s[e.game_id] = { plays: 0, topScore: 0, topPlayer: '' }
+            s[e.game_id].plays++
+            if (e.type === 'score' && e.score > s[e.game_id].topScore) {
+              s[e.game_id].topScore = e.score
+              s[e.game_id].topPlayer = e.player_name
+            }
+          }
+          setStats(s)
+        } else {
+          setStats(getGameStats(period))
+        }
+      } catch {
+        setStats(getGameStats(period))
+      }
+      setLoading(false)
+    }
+    load()
+  }, [period])
 
   return (
     <div className="flex-1 overflow-auto px-3 py-2">
@@ -154,33 +231,37 @@ function GamesOverview({ period }) {
         📊 All Games Overview
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Tahoma, Arial, sans-serif', fontSize: 11 }}>
-        <thead>
-          <tr style={{ background: '#d4d0c8', borderBottom: '1px solid #808080' }}>
-            <th style={{ textAlign: 'left', padding: '2px 6px' }}>Game</th>
-            <th style={{ textAlign: 'right', padding: '2px 6px', width: 50 }}>Plays</th>
-            <th style={{ textAlign: 'right', padding: '2px 6px', width: 70 }}>Top Score</th>
-            <th style={{ textAlign: 'left', padding: '2px 6px', width: 90 }}>Top Player</th>
-          </tr>
-        </thead>
-        <tbody>
-          {allGames.map(id => {
-            const s = stats[id] || { plays: 0, topScore: 0, topPlayer: '—' }
-            return (
-              <tr key={id} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                <td style={{ padding: '3px 6px' }}>{GAME_NAMES[id]}</td>
-                <td style={{ padding: '3px 6px', textAlign: 'right' }}>{s.plays}</td>
-                <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 'bold', color: s.topScore > 0 ? '#000080' : '#ccc' }}>
-                  {s.topScore > 0 ? s.topScore.toLocaleString() : '—'}
-                </td>
-                <td style={{ padding: '3px 6px', color: s.topPlayer ? '#333' : '#ccc' }}>
-                  {s.topPlayer || '—'}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      {loading ? (
+        <div className="text-xs py-4 text-center" style={{ color: '#888' }}>Loading...</div>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Tahoma, Arial, sans-serif', fontSize: 11 }}>
+          <thead>
+            <tr style={{ background: '#d4d0c8', borderBottom: '1px solid #808080' }}>
+              <th style={{ textAlign: 'left', padding: '2px 6px' }}>Game</th>
+              <th style={{ textAlign: 'right', padding: '2px 6px', width: 50 }}>Plays</th>
+              <th style={{ textAlign: 'right', padding: '2px 6px', width: 70 }}>Top Score</th>
+              <th style={{ textAlign: 'left', padding: '2px 6px', width: 90 }}>Top Player</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allGames.map(id => {
+              const s = stats[id] || { plays: 0, topScore: 0, topPlayer: '' }
+              return (
+                <tr key={id} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                  <td style={{ padding: '3px 6px' }}>{GAME_NAMES[id]}</td>
+                  <td style={{ padding: '3px 6px', textAlign: 'right' }}>{s.plays}</td>
+                  <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 'bold', color: s.topScore > 0 ? '#000080' : '#ccc' }}>
+                    {s.topScore > 0 ? s.topScore.toLocaleString() : '—'}
+                  </td>
+                  <td style={{ padding: '3px 6px', color: s.topPlayer ? '#333' : '#ccc' }}>
+                    {s.topPlayer || '—'}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )}
     </div>
   )
 }
@@ -278,7 +359,7 @@ function RecentActivity({ period }) {
 }
 
 export default function Stats() {
-  const [tab, setTab] = useState('leaderboard')
+  const [tab, setTab] = useState('games')
   const [period, setPeriod] = useState(null)
   const [playerName, setName] = useState(getPlayerName())
 
@@ -329,8 +410,8 @@ export default function Stats() {
 
       {/* Tabs */}
       <div className="flex px-2 pt-1 shrink-0" style={{ background: '#d4d0c8' }}>
-        <Tab label="🏆 Leaderboard" active={tab === 'leaderboard'} onClick={() => setTab('leaderboard')} />
         <Tab label="📊 Games" active={tab === 'games'} onClick={() => setTab('games')} />
+        <Tab label="🏆 Leaderboard" active={tab === 'leaderboard'} onClick={() => setTab('leaderboard')} />
         <Tab label="👾 Players" active={tab === 'players'} onClick={() => setTab('players')} />
         <Tab label="📋 Activity" active={tab === 'activity'} onClick={() => setTab('activity')} />
       </div>
@@ -345,7 +426,7 @@ export default function Stats() {
 
       {/* Status */}
       <div className="px-2 py-0.5 text-xs shrink-0" style={{ background: '#d4d0c8', borderTop: '1px solid #808080', color: '#666' }}>
-        All scores stored locally in your browser
+        Scores saved to ChemNet leaderboard
       </div>
     </div>
   )
