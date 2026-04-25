@@ -138,7 +138,7 @@ export default function Manifestations() {
                 fontFamily: 'Georgia, serif',
               }}
             >
-              — {m.attribution}
+              from {m.attribution}
             </div>
           )}
         </div>

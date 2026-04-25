@@ -47,37 +47,39 @@ function DesktopPictures() {
         {/* Image + caption */}
         <div className="flex-1 overflow-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 16 }}>
           <div style={{ maxWidth: 600, width: '100%' }}>
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative', background: '#0a0a18', border: '2px inset #4A4555', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
               <img
                 src={allSlides[slideIdx] || selected.url}
                 alt={selected.title}
-                style={{ width: '100%', maxHeight: 500, objectFit: 'contain', display: 'block', border: '2px inset #4A4555', background: '#0a0a18' }}
+                style={{ maxWidth: '100%', maxHeight: 500, objectFit: 'contain', display: 'block' }}
               />
               {hasSlides && (
                 <>
                   <button
                     onClick={() => setSlideIdx(i => (i - 1 + allSlides.length) % allSlides.length)}
-                    style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, border: 'none', background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 18, cursor: 'pointer', borderRadius: 0 }}
+                    style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', width: 30, height: 30, border: 'none', background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 18, cursor: 'pointer', borderRadius: 0, lineHeight: 1 }}
                     aria-label="Previous"
                   >‹</button>
                   <button
                     onClick={() => setSlideIdx(i => (i + 1) % allSlides.length)}
-                    style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, border: 'none', background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 18, cursor: 'pointer', borderRadius: 0 }}
+                    style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 30, height: 30, border: 'none', background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 18, cursor: 'pointer', borderRadius: 0, lineHeight: 1 }}
                     aria-label="Next"
                   >›</button>
-                  <div style={{ position: 'absolute', bottom: 8, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 6 }}>
-                    {allSlides.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSlideIdx(i)}
-                        style={{ width: 8, height: 8, padding: 0, border: '1px solid rgba(0,0,0,0.6)', background: i === slideIdx ? '#FF6B35' : 'rgba(255,255,255,0.6)', cursor: 'pointer', borderRadius: 0 }}
-                        aria-label={`Slide ${i + 1}`}
-                      />
-                    ))}
-                  </div>
                 </>
               )}
             </div>
+            {hasSlides && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '8px 0', background: '#12121a' }}>
+                {allSlides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSlideIdx(i)}
+                    style={{ width: 8, height: 8, padding: 0, border: '1px solid #2a2840', background: i === slideIdx ? '#FF6B35' : '#3a3a4a', cursor: 'pointer', borderRadius: 0 }}
+                    aria-label={`Slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
             <div style={{ marginTop: 12, padding: 12, background: '#12121a', border: '1px solid #2a2840' }}>
               <div style={{ fontSize: 14, fontWeight: 'bold', color: '#F0EBE1', marginBottom: 6 }}>
                 {selected.title}
@@ -218,33 +220,35 @@ function MobilePictures() {
 
         {/* Full image */}
         <div className="flex-1 overflow-auto" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', minHeight: 200 }}>
-            <img src={allSlides[slideIdx] || selected.url} alt={selected.title} style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }} />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', minHeight: 200 }}>
+            <img src={allSlides[slideIdx] || selected.url} alt={selected.title} style={{ maxWidth: '100%', maxHeight: '55vh', objectFit: 'contain' }} />
             {hasSlides && (
               <>
                 <button
                   onClick={() => setSlideIdx(i => (i - 1 + allSlides.length) % allSlides.length)}
-                  style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, border: 'none', background: 'rgba(0,0,0,0.45)', color: '#fff', fontSize: 22, cursor: 'pointer', borderRadius: 22 }}
+                  style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, border: 'none', background: 'rgba(0,0,0,0.5)', color: '#fff', fontSize: 22, cursor: 'pointer', borderRadius: 20, lineHeight: 1 }}
                   aria-label="Previous"
                 >‹</button>
                 <button
                   onClick={() => setSlideIdx(i => (i + 1) % allSlides.length)}
-                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, border: 'none', background: 'rgba(0,0,0,0.45)', color: '#fff', fontSize: 22, cursor: 'pointer', borderRadius: 22 }}
+                  style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, border: 'none', background: 'rgba(0,0,0,0.5)', color: '#fff', fontSize: 22, cursor: 'pointer', borderRadius: 20, lineHeight: 1 }}
                   aria-label="Next"
                 >›</button>
-                <div style={{ position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 6 }}>
-                  {allSlides.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setSlideIdx(i)}
-                      style={{ width: 7, height: 7, padding: 0, border: 'none', background: i === slideIdx ? '#fff' : 'rgba(255,255,255,0.4)', cursor: 'pointer', borderRadius: '50%' }}
-                      aria-label={`Slide ${i + 1}`}
-                    />
-                  ))}
-                </div>
               </>
             )}
           </div>
+          {hasSlides && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '10px 0', background: '#0a0a0a', borderTop: '0.5px solid #1c1c1e' }}>
+              {allSlides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSlideIdx(i)}
+                  style={{ width: 7, height: 7, padding: 0, border: 'none', background: i === slideIdx ? '#fff' : 'rgba(255,255,255,0.35)', cursor: 'pointer', borderRadius: '50%' }}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Caption area */}
           <div style={{ padding: 16, background: '#1c1c1e' }}>

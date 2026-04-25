@@ -142,19 +142,19 @@ Software side is an AI agent with memory and personality. Hardware side is a phy
     status: 'planned',
     type: 'physical',
     tagline: 'First real home renovation. Moody, warm, full gut.',
-    description: `Full master bath — gut and redo. Tile, vanity, fixtures, lighting, layout where it makes sense. The current setup is dated and feels like a rental.
+    description: `Full master bath. Gut and redo. Tile, vanity, fixtures, lighting, layout where it makes sense. The current setup is dated and feels like a rental.
 
-The direction is moody and warm. Deep green herringbone tile in the shower with brass fixtures, and a pebble mosaic accent to break up the geometry with something organic. Sahara Carrara polished hexagon marble is the alternative if the green ends up feeling like too much. The whole palette pulls toward burnt orange, warm wood, and brass — a long way from the cold beige standard.
+The direction is moody and warm. Deep green herringbone tile in the shower with brass fixtures, and a pebble mosaic accent to break up the geometry with something organic. Sahara Carrara polished hexagon marble is the alternative if the green ends up feeling like too much. The whole palette pulls toward burnt orange, warm wood, and brass. A long way from the cold beige standard.
 
 Plan to do as much hands-on as possible. Watching way too many YouTube videos on waterproofing, Schluter, and cutting tile around fixtures. Quotes still pending for the parts I won't do myself (plumbing rough-in, electrical).
 
 Budget and timeline TBD.`,
     stack: [],
     photos: [
-      { src: '/projects/bathroom/green-herringbone-shower.jpg', caption: 'Green herringbone shower walls + floor with pebble accent — Floor & Decor' },
-      { src: '/projects/bathroom/pebble-mosaic-accent.jpg', caption: 'Pebble mosaic — accent wall option, organic texture against the herringbone' },
-      { src: '/projects/bathroom/sahara-carrara-hexagon.jpg', caption: 'Sahara Carrara Polished hex marble — alt floor candidate ($14.99/sqft)' },
-      { src: '/projects/bathroom/burnt-orange-mood.webp', caption: 'Color & material mood — burnt orange, brass, warm earth tones' },
+      { src: '/projects/bathroom/green-herringbone-shower.jpg', caption: 'Green herringbone shower walls and floor with pebble accent. Floor & Decor.' },
+      { src: '/projects/bathroom/pebble-mosaic-accent.jpg', caption: 'Pebble mosaic. Accent wall option, organic texture against the herringbone.' },
+      { src: '/projects/bathroom/sahara-carrara-hexagon.jpg', caption: 'Sahara Carrara Polished hex marble. Alt floor candidate ($14.99/sqft).' },
+      { src: '/projects/bathroom/burnt-orange-mood.webp', caption: 'Color and material mood. Burnt orange, brass, warm earth tones.' },
     ],
     roadmap: [
       { item: 'Finalize tile selection (green herringbone vs Carrara hex)', done: false },
@@ -174,19 +174,19 @@ Budget and timeline TBD.`,
     icon: '🐚',
     status: 'planned',
     type: 'physical',
-    tagline: 'Beach theme — sand floors, blue shower.',
-    description: `Second bathroom. Beach-themed direction — bright and washed out, the opposite end of the spectrum from the master's moody warm palette.
+    tagline: 'Beach theme. Sand floors, blue shower.',
+    description: `Second bathroom. Beach-themed direction. Bright and washed out, the opposite end of the spectrum from the master's moody warm palette.
 
-Floor leaning toward Floor & Decor's Napoli Sands — 24"×48" Italian matte porcelain with a soft travertine veining (~$4.49). Shower tile in dusty blue, still deciding between a scallop / fish-scale pattern and an elongated picket, both in the same seafoam family. A white + seafoam pebble mosaic is in the running for either the shower floor or a thin accent strip.
+Floor leaning toward Floor & Decor's Napoli Sands. 24"×48" Italian matte porcelain with a soft travertine veining (~$4.49). Shower tile in dusty blue, still deciding between a scallop / fish-scale pattern and an elongated picket, both in the same seafoam family. A white and seafoam pebble mosaic is in the running for either the shower floor or a thin accent strip.
 
-Paint color is undecided. Probably soft and washed out — pale blue, off-white, or a warm sand to tie back to the floor.
+Paint color is undecided. Probably soft and washed out. Pale blue, off-white, or a warm sand to tie back to the floor.
 
 Plan is less developed than the master. Tile and palette first, fixtures and the rest after.`,
     stack: [],
     photos: [
-      { src: '/projects/bathroom2/blue-tile-options.jpg', caption: 'Shower tile contenders — scallop and elongated picket in dusty blue (Floor & Decor)' },
-      { src: '/projects/bathroom2/napoli-sands-floor.jpg', caption: 'Napoli Sands 24"×48" matte porcelain — sand-colored floor (Made in Italy, ~$4.49, Floor & Decor)' },
-      { src: '/projects/bathroom2/seafoam-pebble.jpg', caption: 'White + seafoam pebble mosaic — option for shower floor or accent strip' },
+      { src: '/projects/bathroom2/blue-tile-options.jpg', caption: 'Shower tile contenders. Scallop and elongated picket in dusty blue (Floor & Decor).' },
+      { src: '/projects/bathroom2/napoli-sands-floor.jpg', caption: 'Napoli Sands 24"×48" matte porcelain. Sand-colored floor (Made in Italy, ~$4.49, Floor & Decor).' },
+      { src: '/projects/bathroom2/seafoam-pebble.jpg', caption: 'White and seafoam pebble mosaic. Option for shower floor or accent strip.' },
     ],
     roadmap: [
       { item: 'Pick shower tile (scallop vs picket)', done: false },
@@ -212,21 +212,21 @@ The full mod list, prices, and links are tracked in the Car Mods app on this sit
     stack: [],
     photosLabel: 'Build Log',
     photos: [
-      { src: '/projects/carmods/turn-signal-amber-before.jpg', caption: 'LED side markers — before, OEM amber on the rear quarter' },
-      { src: '/projects/carmods/turn-signal-removed.jpg', caption: 'LED side markers — mid-install, old amber lens unscrewed' },
-      { src: '/projects/carmods/turn-signal-led-front.jpg', caption: 'LED side markers — front, clear LED in flush' },
-      { src: '/projects/carmods/turn-signal-led-rear.jpg', caption: 'LED side markers — rear, clear LED in (had to pull the wheel)' },
-      { src: '/projects/carmods/caliper-stock-before.jpg', caption: 'Caliper covers — before, the stock caliper rusty and tired' },
-      { src: '/projects/carmods/caliper-cover-mid-install.jpg', caption: 'Caliper covers — new red covers laid out next to the brake' },
-      { src: '/projects/carmods/caliper-cover-installed.jpg', caption: 'Caliper covers — installed on the rotor, before the wheel goes back on' },
-      { src: '/projects/carmods/caliper-cover-wheel-on.jpg', caption: 'Caliper covers — wheel back on, Brembo sticker added for the design element' },
-      { src: '/projects/carmods/brakes-rotors-fresh-wheel.jpg', caption: 'Brakes + rotors — fresh discs and pads, done by R&E Motors' },
-      { src: '/projects/carmods/brakes-rotors-driveway.jpg', caption: 'Brakes + rotors — back on the driveway, the new setup paired with the red covers' },
-      { src: '/projects/carmods/serpentine-bay-overview.jpg', caption: 'Serpentine belt — engine bay, mid-job after pulling the old belt' },
-      { src: '/projects/carmods/serpentine-belt-routed.jpg', caption: 'Serpentine belt — new belt routed around the crank, tensioner, and idler pulleys' },
-      { src: '/projects/carmods/serpentine-tensioner-wrench.jpg', caption: 'Serpentine belt — tensioner saved for last. The trick to landing the belt' },
-      { src: '/projects/carmods/camaro-night-leds.jpg', caption: 'Night shot — fresh white LEDs glowing front and back' },
-      { src: '/projects/carmods/camaro-side-day.jpg', caption: 'Daytime profile — LEDs in, red calipers showing through the spokes' },
+      { src: '/projects/carmods/turn-signal-amber-before.jpg', caption: 'LED side markers, before. OEM amber on the rear quarter.' },
+      { src: '/projects/carmods/turn-signal-removed.jpg', caption: 'LED side markers, mid-install. Old amber lens unscrewed.' },
+      { src: '/projects/carmods/turn-signal-led-front.jpg', caption: 'LED side markers, front. Clear LED in flush.' },
+      { src: '/projects/carmods/turn-signal-led-rear.jpg', caption: 'LED side markers, rear. Clear LED in (had to pull the wheel).' },
+      { src: '/projects/carmods/caliper-stock-before.jpg', caption: 'Caliper covers, before. The stock caliper rusty and tired.' },
+      { src: '/projects/carmods/caliper-cover-mid-install.jpg', caption: 'Caliper covers. New red covers laid out next to the brake.' },
+      { src: '/projects/carmods/caliper-cover-installed.jpg', caption: 'Caliper covers. Installed on the rotor, before the wheel goes back on.' },
+      { src: '/projects/carmods/caliper-cover-wheel-on.jpg', caption: 'Caliper covers. Wheel back on, Brembo sticker added for the design element.' },
+      { src: '/projects/carmods/brakes-rotors-fresh-wheel.jpg', caption: 'Brakes and rotors. Fresh discs and pads, done by R&E Motors.' },
+      { src: '/projects/carmods/brakes-rotors-driveway.jpg', caption: 'Brakes and rotors. Back on the driveway, the new setup paired with the red covers.' },
+      { src: '/projects/carmods/serpentine-bay-overview.jpg', caption: 'Serpentine belt. Engine bay, mid-job after pulling the old belt.' },
+      { src: '/projects/carmods/serpentine-belt-routed.jpg', caption: 'Serpentine belt. New belt routed around the crank, tensioner, and idler pulleys.' },
+      { src: '/projects/carmods/serpentine-tensioner-wrench.jpg', caption: 'Serpentine belt. Tensioner saved for last. The trick to landing the belt.' },
+      { src: '/projects/carmods/camaro-night-leds.jpg', caption: 'Night shot. Fresh white LEDs glowing front and back.' },
+      { src: '/projects/carmods/camaro-side-day.jpg', caption: 'Daytime profile. LEDs in, red calipers showing through the spokes.' },
     ],
     links: [{ label: 'Open Car Mods', url: '#carmods' }],
   },
@@ -239,22 +239,22 @@ The full mod list, prices, and links are tracked in the Car Mods app on this sit
     tagline: 'LED-powered dice board game.',
     description: `An idea for a custom board game that uses LED-lit dice and an interactive board. Tabletop game where the dice results trigger different light patterns on the board, creating a visual experience on top of the gameplay.
 
-Started with a SOLDR "I Can Solder" beginner kit — a small electronic dice PCB with seven LEDs and a press-to-roll button — to get hands-on with the iron before designing my own. Soldering is done. First time with a soldering iron and it's not bad. One of those things I feel like I'd get better at with reps.
+Started with a SOLDR "I Can Solder" beginner kit (a small electronic dice PCB with seven LEDs and a press-to-roll button) to get hands-on with the iron before designing my own. Soldering is done. First time with a soldering iron and it's not bad. One of those things I feel like I'd get better at with reps.
 
-Currently debugging why the assembled board isn't turning on. Some current is being pulled when USB is plugged in, so it's not completely dead — that's a start. Multimeter is out, working through the joints.
+Currently debugging why the assembled board isn't turning on. Some current is being pulled when USB is plugged in, so it's not completely dead. That's a start. Multimeter is out, working through the joints.
 
 Once this works end-to-end, the long-term plan is the bigger version: custom PCB with more LEDs, an interactive board around the dice. Probably Arduino or Raspberry Pi with a custom board.`,
     stack: ['Arduino/RPi', 'LED Strips', 'Custom PCB', 'Game Design'],
     photosLabel: 'Build Log',
     photos: [
-      { src: '/projects/lightdice/workbench-and-kit.jpg', caption: 'Workbench setup — multimeter, soldering iron, components, blank SOLDR PCB' },
-      { src: '/projects/lightdice/blank-pcb-front.jpg', caption: 'Blank SOLDR board — NE555 + CD4017 layout, 7-LED dice pattern, press button' },
-      { src: '/projects/lightdice/soldered-front.jpg', caption: 'Fully soldered top — yellow LEDs in dice pattern, USB-C, button, capacitors' },
-      { src: '/projects/lightdice/soldered-back.jpg', caption: 'Backside — "I CAN SOLDER!" message visible through the joints' },
+      { src: '/projects/lightdice/workbench-and-kit.jpg', caption: 'Workbench setup. Multimeter, soldering iron, components, blank SOLDR PCB.' },
+      { src: '/projects/lightdice/blank-pcb-front.jpg', caption: 'Blank SOLDR board. NE555 and CD4017 layout, 7-LED dice pattern, press button.' },
+      { src: '/projects/lightdice/soldered-front.jpg', caption: 'Fully soldered top. Yellow LEDs in dice pattern, USB-C, button, capacitors.' },
+      { src: '/projects/lightdice/soldered-back.jpg', caption: 'Backside. "I CAN SOLDER!" message visible through the joints.' },
     ],
     roadmap: [
       { item: 'Solder SOLDR beginner kit', done: true },
-      { item: 'Debug power — get the kit booting from USB', done: false },
+      { item: 'Debug power. Get the kit booting from USB', done: false },
       { item: 'Verify dice + button logic end-to-end', done: false },
       { item: 'Sketch custom PCB design', done: false },
       { item: 'Order custom PCB', done: false },
@@ -315,7 +315,7 @@ function DesktopProjects() {
         </div>
       ) : (
         <div className="flex-1 flex flex-col" style={{ minHeight: 0 }}>
-          {/* Back button — sticky header */}
+          {/* Back button, sticky header */}
           <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a', background: '#0f0f14' }}>
             <button onClick={() => setSelectedId(null)} className="text-xs border-none bg-transparent cursor-pointer" style={{ color: '#FF6B35', fontFamily: 'inherit' }}>← Back to Projects</button>
           </div>

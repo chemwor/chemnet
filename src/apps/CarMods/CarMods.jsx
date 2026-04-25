@@ -17,7 +17,7 @@ const PHASES = [
     label: '🔧 Catch-Up Repairs',
     mods: [
       { name: 'Spark Plugs (V6 LGX)', status: 'done', cost: '$40–200', priority: 'HIGH', notes: 'Done.', link: 'https://www.youtube.com/watch?v=SErRFQspaZ4' },
-      { name: 'Serpentine Belt Replaced', status: 'done', cost: '$30–80', priority: 'MEDIUM', notes: 'Done. Ordered the parts and did it myself. Intimidating going in but not too bad once the initial fear went away. Getting the belt back on was the hardest part — leaving the tensioner pulley for last is the trick to landing it.' },
+      { name: 'Serpentine Belt Replaced', status: 'done', cost: '$30–80', priority: 'MEDIUM', notes: 'Done. Ordered the parts and did it myself. Intimidating going in but not too bad once the initial fear went away. Getting the belt back on was the hardest part. Leaving the tensioner pulley for last is the trick to landing it.' },
       { name: 'Wheel Alignment', status: 'planned', cost: '$80–130', priority: 'MEDIUM', notes: 'Last done at 26k mi — 80k miles ago. New wheels/tires deserve a fresh one.' },
       { name: 'BG GDI Air Induction Service', status: 'researching', cost: 'TBD', priority: 'MEDIUM', notes: 'Carbon buildup cleaning for direct injection engine.' },
     ],
@@ -27,12 +27,12 @@ const PHASES = [
     label: '⚡ Phase 1 — Do Now',
     mods: [
       { name: 'Cat-Back Exhaust', status: 'planned', cost: '$400–900', priority: '#1', notes: 'Biggest immediate transformation — sound + feel. Looking at Borla, Corsa, or Axle-back.' },
-      { name: 'Brakes + Rotors Replaced', status: 'done', cost: '$80–150', priority: '#2', notes: 'Done at R&E Motors. Pads and rotors swapped together for a clean reset before any of the performance mods. Pairs with the red caliper covers — fresh rotors look right behind them.' },
+      { name: 'Brakes + Rotors Replaced', status: 'done', cost: '$80–150', priority: '#2', notes: 'Done at R&E Motors. Pads and rotors swapped together for a clean reset before any of the performance mods. Pairs with the red caliper covers. Fresh rotors look right behind them.' },
       { name: 'Slotted/Drilled Rotors', status: 'planned', cost: '$150–300', priority: '#2', notes: 'Pair with pads — same job. PowerStop or EBC.' },
       { name: 'Window Tint', status: 'planned', cost: '$150–250', priority: 'EASY WIN', notes: 'Easy visual win, immediate premium look. 35% or 20%.' },
       { name: 'Black Badge Delete', status: 'planned', cost: '$20–50', priority: 'EASY WIN', notes: 'Cheapest visual upgrade possible. 3M wrap or OEM badges.' },
-      { name: 'LED Side Markers / Turn Signals', status: 'done', cost: '$60–120', priority: 'EASY WIN', notes: 'Done. White LEDs replacing the OEM amber. Install was simple and basic — fronts went in fast. Rears were a fight without removing the wheels; eventually pulled them for clean access.' },
-      { name: 'Brake Caliper Covers (Red)', status: 'done', cost: '$60–150', priority: 'EASY WIN', notes: 'Done. Bright red covers over the stock calipers. The kit came bare, so added a Brembo-style sticker to give it more of a design element. Install wasn\'t too difficult — just needed the car jacked and the wheels off.' },
+      { name: 'LED Side Markers / Turn Signals', status: 'done', cost: '$60–120', priority: 'EASY WIN', notes: 'Done. White LEDs replacing the OEM amber. Install was simple and basic. Fronts went in fast. Rears were a fight without removing the wheels; eventually pulled them for clean access.' },
+      { name: 'Brake Caliper Covers (Red)', status: 'done', cost: '$60–150', priority: 'EASY WIN', notes: 'Done. Bright red covers over the stock calipers. The kit came bare, so added a Brembo-style sticker to give it more of a design element. Install wasn\'t too difficult. Just needed the car jacked and the wheels off.' },
     ],
   },
   {
