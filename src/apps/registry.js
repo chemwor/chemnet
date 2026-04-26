@@ -63,7 +63,7 @@ export const APP_REGISTRY = [
   },
   {
     id: 'videos',
-    label: 'Videos',
+    label: 'ChemTube',
     icon: 'videos',
     component: () => import('./Videos/Videos.jsx'),
     defaultSize: { width: 520, height: 420 },

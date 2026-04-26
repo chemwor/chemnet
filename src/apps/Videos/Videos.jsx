@@ -262,9 +262,9 @@ function MobileVideos() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f1f1f1', fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-      {/* Top bar — old YouTube red */}
+      {/* Top bar — old YouTube red, ChemTube wordmark */}
       <div style={{ display: 'flex', alignItems: 'center', height: 48, padding: '0 14px', background: '#cc0000', color: '#fff', flexShrink: 0, gap: 6 }}>
-        <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: -0.5 }}>You</span>
+        <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: -0.5 }}>Chem</span>
         <span style={{ fontSize: 16, fontWeight: 700, padding: '2px 6px', background: '#fff', color: '#cc0000', borderRadius: 3, letterSpacing: -0.5 }}>Tube</span>
       </div>
 
