@@ -4,30 +4,20 @@ const FOLDERS = {
   root: {
     path: 'C:\\Media\\Videos',
     items: [
-      { id: 'my-videos', name: 'My Videos', type: 'folder', icon: '📁', description: 'Videos I\'ve made' },
-      { id: 'watching', name: 'Watching', type: 'folder', icon: '📁', description: 'Videos I\'m sharing' },
+      { id: 'my-videos', name: 'My Videos', type: 'folder', icon: '📁', description: 'Videos from my YouTube channel.' },
+      { id: 'watching', name: 'Interested In', type: 'folder', icon: '📁', description: 'Videos I want to share.' },
     ],
   },
   'my-videos': {
     path: 'C:\\Media\\Videos\\My Videos',
     items: [
-      { name: 'ChemNet Site Build Timelapse.mp4', type: 'video', size: '48 MB', date: '2026-03-20', description: 'Building this site from scratch — 12 hours compressed into 3 minutes.' },
-      { name: 'Kilimanjaro Summit Night.mp4', type: 'video', size: '120 MB', date: '2025-12-18', description: 'The midnight summit push. Headlamps, freezing cold, and the most beautiful sunrise of my life.' },
-      { name: 'First BJJ Competition.mp4', type: 'video', size: '85 MB', date: '2025-10-05', description: 'My first tournament. Won one, lost two. Learned everything.' },
-      { name: 'Guitar Cover - Neon (John Mayer).mp4', type: 'video', size: '35 MB', date: '2025-09-12', description: 'Attempted Neon by John Mayer. My thumb will never be the same.' },
-      { name: 'Nairobi Street Food Tour.mp4', type: 'video', size: '95 MB', date: '2025-08-30', description: 'Exploring Nairobi\'s best street food spots. Nyama choma, mutura, and mandazi.' },
+      { name: 'SkyJump Las Vegas.mp4', type: 'youtube', url: 'https://youtu.be/6S7bkah5O0U', size: 'YT', date: '', description: '' },
+      { name: 'Spectrum Piano Cover.mp4', type: 'youtube', url: 'https://youtube.com/shorts/WSJFbDv7Aw8', size: 'YT', date: '', description: '' },
     ],
   },
   watching: {
-    path: 'C:\\Media\\Videos\\Watching',
-    items: [
-      { name: 'How To Build A 20-Person Startup.mp4', type: 'link', size: '—', date: '2026-04-01', description: 'Great breakdown on scaling a small team without losing your mind.' },
-      { name: 'The Art of Code (Dylan Beattie).mp4', type: 'link', size: '—', date: '2026-03-15', description: 'The best conference talk ever made. Code as art, music, and absurdity.' },
-      { name: 'Jiro Dreams of Sushi.mp4', type: 'link', size: '—', date: '2026-02-20', description: 'Obsession, craft, and the pursuit of perfection. Applies to everything.' },
-      { name: 'How The Economic Machine Works.mp4', type: 'link', size: '—', date: '2026-01-10', description: 'Ray Dalio\'s 30-minute masterclass on how economies actually function.' },
-      { name: 'The Power of Vulnerability (Brene Brown).mp4', type: 'link', size: '—', date: '2025-12-05', description: 'Still hits different every time. Courage starts with showing up.' },
-      { name: 'Abstract - Tinker Hatfield.mp4', type: 'link', size: '—', date: '2025-11-18', description: 'The man who designed the Air Jordan. Design thinking at its best.' },
-    ],
+    path: 'C:\\Media\\Videos\\Interested In',
+    items: [],
   },
 }
 
@@ -35,6 +25,13 @@ const ICON_MAP = {
   folder: '📁',
   video: '🎬',
   link: '🔗',
+  youtube: '▶️',
+}
+
+function getYouTubeId(url) {
+  if (!url) return null
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&]+)/)
+  return m ? m[1] : null
 }
 
 function FileRow({ item, isSelected, onClick, onDoubleClick }) {
@@ -62,6 +59,7 @@ export default function Videos() {
   const [currentFolder, setCurrentFolder] = useState('root')
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const [preview, setPreview] = useState(null)
+  const [playing, setPlaying] = useState(null)
 
   const folder = FOLDERS[currentFolder]
   const items = folder.items
@@ -71,6 +69,9 @@ export default function Videos() {
       setCurrentFolder(item.id)
       setSelectedIdx(-1)
       setPreview(null)
+      setPlaying(null)
+    } else if (item.type === 'youtube') {
+      setPlaying(item)
     } else {
       setPreview(item)
     }
@@ -82,7 +83,7 @@ export default function Videos() {
       <div className="flex items-center gap-2 px-2 py-1 shrink-0" style={{ background: 'var(--color-surface)', borderBottom: '1px solid var(--color-bevel-dark)' }}>
         {currentFolder !== 'root' && (
           <button
-            onClick={() => { setCurrentFolder('root'); setSelectedIdx(-1); setPreview(null) }}
+            onClick={() => { setCurrentFolder('root'); setSelectedIdx(-1); setPreview(null); setPlaying(null) }}
             className="text-xs border-none bg-transparent cursor-pointer underline"
             style={{ color: 'var(--color-accent)' }}
           >
@@ -108,44 +109,85 @@ export default function Videos() {
       <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
         {/* File list */}
         <div className="flex-1 overflow-auto" style={{ background: '#fff' }}>
-          {items.map((item, i) => (
-            <FileRow
-              key={item.name}
-              item={item}
-              isSelected={selectedIdx === i}
-              onClick={() => { setSelectedIdx(i); setPreview(null) }}
-              onDoubleClick={() => handleDoubleClick(item)}
-            />
-          ))}
+          {playing ? (
+            <div className="flex flex-col h-full" style={{ background: '#000' }}>
+              <div className="flex items-center gap-2 px-2 py-1 shrink-0" style={{ background: 'var(--color-surface)', borderBottom: '1px solid var(--color-bevel-dark)' }}>
+                <button
+                  onClick={() => setPlaying(null)}
+                  className="text-xs border-none bg-transparent cursor-pointer underline"
+                  style={{ color: 'var(--color-accent)', fontFamily: 'monospace' }}
+                >
+                  ← Back to {folder.path.split('\\').pop()}
+                </button>
+                <span className="text-xs flex-1 truncate" style={{ color: 'var(--color-text-secondary)', fontFamily: 'monospace' }}>{playing.name}</span>
+                <a
+                  href={playing.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs underline"
+                  style={{ color: 'var(--color-text-secondary)', fontFamily: 'monospace' }}
+                >Open on YouTube ↗</a>
+              </div>
+              <div className="flex-1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', padding: 8 }}>
+                {(() => {
+                  const id = getYouTubeId(playing.url)
+                  if (!id) return <div style={{ color: '#888', fontFamily: 'monospace', fontSize: 12 }}>Invalid URL</div>
+                  return (
+                    <div style={{ position: 'relative', width: '100%', maxWidth: 900, aspectRatio: '16 / 9', background: '#000' }}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+                        title={playing.name}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  )
+                })()}
+              </div>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex items-center justify-center h-full" style={{ color: '#888', fontFamily: 'monospace', fontSize: 12 }}>
+              This folder is empty.
+            </div>
+          ) : (
+            items.map((item, i) => (
+              <FileRow
+                key={item.name}
+                item={item}
+                isSelected={selectedIdx === i}
+                onClick={() => { setSelectedIdx(i); setPreview(null) }}
+                onDoubleClick={() => handleDoubleClick(item)}
+              />
+            ))
+          )}
         </div>
 
         {/* Preview panel */}
         {(selectedIdx >= 0 || preview) && (
           <div className="shrink-0 overflow-auto p-3" style={{ width: 200, background: '#f5f5f5', borderLeft: '1px solid #ddd' }}>
-            {preview ? (
-              <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#333' }}>
-                <div className="text-center text-2xl mb-2">{ICON_MAP[preview.type]}</div>
-                <div className="font-bold mb-2" style={{ fontSize: 12 }}>{preview.name}</div>
-                <p style={{ color: '#555', lineHeight: 1.5 }}>{preview.description}</p>
-                {preview.type === 'link' && (
-                  <div className="mt-3 text-xs" style={{ color: '#888' }}>External video — link coming soon</div>
-                )}
-                {preview.type === 'video' && (
-                  <div className="mt-3 text-xs" style={{ color: '#888' }}>Video player coming soon</div>
-                )}
-              </div>
-            ) : selectedIdx >= 0 ? (
-              <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#333' }}>
-                <div className="text-center text-2xl mb-2">{ICON_MAP[items[selectedIdx].type]}</div>
-                <div className="font-bold mb-2" style={{ fontSize: 12 }}>{items[selectedIdx].name}</div>
-                {items[selectedIdx].description && (
-                  <p style={{ color: '#555', lineHeight: 1.5 }}>{items[selectedIdx].description}</p>
-                )}
-                {items[selectedIdx].type === 'folder' && (
-                  <div className="mt-2 text-xs" style={{ color: '#888' }}>Double-click to open</div>
-                )}
-              </div>
-            ) : null}
+            {(() => {
+              const sel = preview || (selectedIdx >= 0 ? items[selectedIdx] : null)
+              if (!sel) return null
+              const ytId = sel.type === 'youtube' ? getYouTubeId(sel.url) : null
+              return (
+                <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#333' }}>
+                  {ytId ? (
+                    <img src={`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`} alt={sel.name} style={{ width: '100%', display: 'block', marginBottom: 8, border: '1px solid #ccc' }} />
+                  ) : (
+                    <div className="text-center text-2xl mb-2">{ICON_MAP[sel.type]}</div>
+                  )}
+                  <div className="font-bold mb-2" style={{ fontSize: 12 }}>{sel.name}</div>
+                  {sel.description && <p style={{ color: '#555', lineHeight: 1.5 }}>{sel.description}</p>}
+                  {sel.type === 'folder' && (
+                    <div className="mt-2 text-xs" style={{ color: '#888' }}>Double-click to open</div>
+                  )}
+                  {sel.type === 'youtube' && (
+                    <div className="mt-2 text-xs" style={{ color: '#888' }}>Double-click to play</div>
+                  )}
+                </div>
+              )
+            })()}
           </div>
         )}
       </div>
