@@ -60,14 +60,16 @@ export function MobilePanel({ app, onClose }) {
         <div style={{ width: 50 }} />
       </div>
 
-      {/* App content — uses calc to guarantee height */}
-      <div style={{ height: 'calc(100% - 44px)', overflow: 'hidden' }}>
+      {/* App content — uses calc to guarantee height. position: relative so apps that
+          use `position: absolute; inset: 0` stay inside this box and don't cover the
+          back button in the header above. */}
+      <div style={{ height: 'calc(100% - 44px)', overflow: 'hidden', position: 'relative' }}>
         <Suspense fallback={
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)' }}>
             Loading...
           </div>
         }>
-          <div style={{ height: '100%' }}>
+          <div style={{ height: '100%', position: 'relative' }}>
             <AppComponent />
           </div>
         </Suspense>
