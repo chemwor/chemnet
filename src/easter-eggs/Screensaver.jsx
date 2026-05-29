@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-
-const SCREENSAVER_AUDIO = '/loose-cannon.m4a'
+import { getScreensaverAudio } from './screensaverAudio'
 
 const STORAGE_BASE = 'https://cxbfuzqjlqipjyinhzqv.supabase.co/storage/v1/object/public/screensavers'
 
@@ -51,20 +50,16 @@ function StarfieldFallback() {
 export function Screensaver({ onDismiss }) {
   const url = useMemo(getScreensaverUrl, [])
   const [loadFailed, setLoadFailed] = useState(false)
-  const audioRef = useRef(null)
 
   // Play the screensaver theme while active; stop on dismiss/unmount.
+  // Uses the shared element primed on first user gesture (see screensaverAudio).
   useEffect(() => {
-    const audio = new Audio(SCREENSAVER_AUDIO)
-    audio.loop = true
-    audio.volume = 0.6
-    audioRef.current = audio
-    // Autoplay may be blocked if the tab never received a gesture; ignore.
+    const audio = getScreensaverAudio()
+    audio.currentTime = 0
     audio.play().catch(() => {})
     return () => {
       audio.pause()
       audio.currentTime = 0
-      audioRef.current = null
     }
   }, [])
 
