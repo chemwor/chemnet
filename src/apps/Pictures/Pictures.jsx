@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { useRepo } from '../../lib/repo/useRepo'
+import { useProfile } from '../../context/ProfileContext'
+import { OwnerManager } from '../_shared/OwnerManager'
+import { UploadButton } from '../_shared/UploadButton'
 
 // Build the full slide list for a photo entry. Each slide is
 // { url, type: 'image'|'video', locked: bool }. Slide 0 is always
@@ -75,23 +78,12 @@ function LockedSlide({ hint, onUnlock, expected, dark = true }) {
 // DESKTOP — Win95 File Browser with thumbnail grid
 // ══════════════════════════════════════════
 
-function DesktopPictures() {
-  const [photos, setPhotos] = useState([])
-  const [loading, setLoading] = useState(true)
+function DesktopPictures({ photos, loading }) {
   const [selected, setSelected] = useState(null)
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
   const [yearFilter, setYearFilter] = useState('all')
   const [unlocked, unlock] = useUnlocked(selected?.id)
-
-  useEffect(() => {
-    async function load() {
-      const { data } = await supabase.from('photos').select('*').order('created_at', { ascending: false })
-      setPhotos(data || [])
-      setLoading(false)
-    }
-    load()
-  }, [])
 
   const years = [...new Set(photos.map(p => new Date(p.created_at).getFullYear()))].sort((a, b) => b - a)
   const visible = photos
@@ -257,23 +249,12 @@ function DesktopPictures() {
 // MOBILE — Old iPhone Photo Gallery
 // ══════════════════════════════════════════
 
-function MobilePictures() {
-  const [photos, setPhotos] = useState([])
-  const [loading, setLoading] = useState(true)
+function MobilePictures({ photos, loading }) {
   const [selected, setSelected] = useState(null)
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
   const [yearFilter, setYearFilter] = useState('all')
   const [unlocked, unlock] = useUnlocked(selected?.id)
-
-  useEffect(() => {
-    async function load() {
-      const { data } = await supabase.from('photos').select('*').order('created_at', { ascending: false })
-      setPhotos(data || [])
-      setLoading(false)
-    }
-    load()
-  }, [])
 
   const years = [...new Set(photos.map(p => new Date(p.created_at).getFullYear()))].sort((a, b) => b - a)
   const visible = photos
@@ -407,5 +388,34 @@ function MobilePictures() {
 
 export default function Pictures() {
   const isMobile = useMediaQuery('(max-width: 768px)')
-  return isMobile ? <MobilePictures /> : <DesktopPictures />
+  const repo = useRepo()
+  const { node, isOwner } = useProfile()
+  const canUpload = node.kind === 'member' && isOwner
+  const [photos, setPhotos] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    const data = await repo.photos.list()
+    setPhotos(data || [])
+    setLoading(false)
+  }, [repo])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  return (
+    <>
+      {isMobile ? <MobilePictures photos={photos} loading={loading} /> : <DesktopPictures photos={photos} loading={loading} />}
+      {canUpload && (
+        <div style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 50 }}>
+          <UploadButton
+            bucket="photos"
+            label="⬆ Upload photo"
+            onUploaded={async (url) => { await repo.photos.create({ title: 'Untitled', url }); load() }}
+          />
+        </div>
+      )}
+      <OwnerManager resource="photos" onChange={load} />
+    </>
+  )
 }

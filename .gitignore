@@ -27,3 +27,6 @@ dist-ssr
 *.mp4
 src/assets/wallpapers/*.gif
 public/screensavers/*.gif
+
+# Local Netlify folder
+.netlify

@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
+import { useRepo } from '../../lib/repo/useRepo'
 
 // Shared styles
 const inputStyle = { background: '#111', color: '#ccc', fontFamily: 'monospace' }
@@ -631,6 +632,82 @@ function ScoresManager() {
   )
 }
 
+// ── Section: Moderation queue (platform-wide; admin-only via RLS + RPC) ──
+const HIDEABLE = [
+  'posts', 'photos', 'reviews', 'food_items', 'digest_entries', 'board_threads', 'board_posts',
+  'wishlist_items', 'car_mods', 'travel_log', 'projects', 'music_tracks', 'guestbook_entries',
+]
+
+function ModerationManager() {
+  const repo = useRepo()
+  const [reports, setReports] = useState([])
+  const [filter, setFilter] = useState('open')
+  const [msg, setMsg] = useState('')
+
+  const load = useCallback(async () => {
+    setReports(await repo.social.moderation.listReports(filter))
+  }, [repo, filter])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  async function hideContent(r) {
+    if (!HIDEABLE.includes(r.target_type)) { setMsg('Error: that target is not hideable content'); return }
+    await repo.social.moderation.setHidden(r.target_type, Number(r.target_id), true, `report:${r.id}`)
+    await repo.social.moderation.resolveReport(r.id, 'actioned')
+    setMsg('Content hidden.'); load()
+  }
+  async function suspendUser(r) {
+    if (!confirm('Suspend this user? Their node is unpublished.')) return
+    await repo.social.moderation.setSuspended(r.target_id, true)
+    await repo.social.moderation.resolveReport(r.id, 'actioned')
+    setMsg('User suspended.'); load()
+  }
+  async function resolve(r, status) {
+    await repo.social.moderation.resolveReport(r.id, status)
+    load()
+  }
+
+  return (
+    <div className="p-3 overflow-auto h-full" style={{ fontSize: 12, fontFamily: 'monospace' }}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-bold" style={{ color: '#ccc' }}>Reports ({reports.length})</span>
+        <select value={filter} onChange={e => setFilter(e.target.value)} className="px-1 py-0.5 border-none text-xs" style={inputStyle}>
+          <option value="open">Open</option>
+          <option value="actioned">Actioned</option>
+          <option value="dismissed">Dismissed</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+      <StatusMsg msg={msg} />
+      {reports.map(r => (
+        <div key={r.id} className="px-2 py-1.5 mb-1" style={{ background: '#1a1a1a', borderLeft: `2px solid ${r.status === 'open' ? '#FF6B35' : '#555'}` }}>
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-1" style={{ background: '#2a2a4a', color: '#8888FF', fontSize: 9 }}>{r.target_type}</span>
+            <span className="truncate" style={{ color: '#ccc' }}>{r.target_id}</span>
+            <span className="ml-auto text-xs" style={{ color: '#555' }}>{r.status}</span>
+          </div>
+          {r.reason && <div className="text-xs mt-0.5" style={{ color: '#999' }}>“{r.reason}”</div>}
+          <div className="text-xs mt-0.5" style={{ color: '#555' }}>by @{r.reporter_handle || '—'} · {new Date(r.created_at).toLocaleDateString()}</div>
+          {r.status === 'open' && (
+            <div className="flex gap-3 mt-1">
+              {HIDEABLE.includes(r.target_type) && (
+                <button onClick={() => hideContent(r)} className="text-xs border-none bg-transparent cursor-pointer underline" style={btnDanger}>Hide content</button>
+              )}
+              {r.target_type === 'profile' && (
+                <button onClick={() => suspendUser(r)} className="text-xs border-none bg-transparent cursor-pointer underline" style={btnDanger}>Suspend user</button>
+              )}
+              <button onClick={() => resolve(r, 'dismissed')} className="text-xs border-none bg-transparent cursor-pointer underline" style={btnLink}>Dismiss</button>
+              <button onClick={() => resolve(r, 'actioned')} className="text-xs border-none bg-transparent cursor-pointer underline" style={{ color: '#888' }}>Mark done</button>
+            </div>
+          )}
+        </div>
+      ))}
+      {reports.length === 0 && <div className="text-xs py-4 text-center" style={{ color: '#555' }}>No reports in this view.</div>}
+    </div>
+  )
+}
+
 // ── Main Admin Panel ──
 const SECTIONS = [
   { id: 'blog', label: '📝 Blog', component: BlogManager },
@@ -640,6 +717,7 @@ const SECTIONS = [
   { id: 'photos', label: '📷 Photos', component: PhotosManager },
   { id: 'messages', label: '📧 Mail', component: MessagesView },
   { id: 'scores', label: '🏆 Scores', component: ScoresManager },
+  { id: 'moderation', label: '🛡 Moderation', component: ModerationManager },
 ]
 
 export default function Admin() {

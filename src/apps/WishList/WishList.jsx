@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import { WISHLIST_ITEMS } from './wishlist-data'
+import { useRepo } from '../../lib/repo/useRepo'
+import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
   { id: 'all', label: 'All Items' },
@@ -30,17 +31,17 @@ function sortItems(items, sort) {
 // DESKTOP — Early 2000s Shopping Site
 // ══════════════════════════════════════════
 
-function DesktopWishList() {
+function DesktopWishList({ items }) {
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('priority')
   const [selectedId, setSelectedId] = useState(null)
 
   const filtered = sortItems(
-    category === 'all' ? WISHLIST_ITEMS : WISHLIST_ITEMS.filter(i => i.category === category),
+    category === 'all' ? items : items.filter(i => i.category === category),
     sort
   )
-  const selected = WISHLIST_ITEMS.find(i => i.id === selectedId)
-  const totalValue = WISHLIST_ITEMS.reduce((s, i) => s + i.price, 0)
+  const selected = items.find(i => i.id === selectedId)
+  const totalValue = items.reduce((s, i) => s + i.price, 0)
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#f5f5f5', fontFamily: 'Verdana, Geneva, Tahoma, sans-serif', color: '#333', fontSize: 12 }}>
@@ -50,7 +51,7 @@ function DesktopWishList() {
           ✨ Eric's Wish List
         </div>
         <div style={{ color: '#ccc', fontSize: 10 }}>
-          {WISHLIST_ITEMS.length} items · ${totalValue.toLocaleString()} total
+          {items.length} items · ${totalValue.toLocaleString()} total
         </div>
       </div>
 
@@ -98,19 +99,19 @@ function DesktopWishList() {
             Price Range
           </div>
           <div style={{ fontSize: 10, color: '#555' }}>
-            Under $50: {WISHLIST_ITEMS.filter(i => i.price < 50).length}<br />
-            $50–$150: {WISHLIST_ITEMS.filter(i => i.price >= 50 && i.price < 150).length}<br />
-            $150–$300: {WISHLIST_ITEMS.filter(i => i.price >= 150 && i.price < 300).length}<br />
-            $300+: {WISHLIST_ITEMS.filter(i => i.price >= 300).length}
+            Under $50: {items.filter(i => i.price < 50).length}<br />
+            $50–$150: {items.filter(i => i.price >= 50 && i.price < 150).length}<br />
+            $150–$300: {items.filter(i => i.price >= 150 && i.price < 300).length}<br />
+            $300+: {items.filter(i => i.price >= 300).length}
           </div>
 
           <div style={{ fontWeight: 'bold', fontSize: 11, color: '#c45500', borderBottom: '1px solid #eee', paddingBottom: 4, marginTop: 12, marginBottom: 6 }}>
             Priority
           </div>
           <div style={{ fontSize: 10, color: '#555' }}>
-            🔥 Must Have: {WISHLIST_ITEMS.filter(i => i.priority === 'high').length}<br />
-            👍 Nice to Have: {WISHLIST_ITEMS.filter(i => i.priority === 'medium').length}<br />
-            💭 Someday: {WISHLIST_ITEMS.filter(i => i.priority === 'low').length}
+            🔥 Must Have: {items.filter(i => i.priority === 'high').length}<br />
+            👍 Nice to Have: {items.filter(i => i.priority === 'medium').length}<br />
+            💭 Someday: {items.filter(i => i.priority === 'low').length}
           </div>
         </div>
 
@@ -118,7 +119,7 @@ function DesktopWishList() {
         <div style={{ flex: 1, overflow: 'auto', padding: 8 }}>
           {/* Results header */}
           <div style={{ fontSize: 11, color: '#555', marginBottom: 8, borderBottom: '1px solid #eee', paddingBottom: 4 }}>
-            Showing {filtered.length} of {WISHLIST_ITEMS.length} results
+            Showing {filtered.length} of {items.length} results
           </div>
 
           {/* Grid */}
@@ -191,7 +192,7 @@ function DesktopWishList() {
 
       {/* Footer */}
       <div style={{ background: '#232f3e', padding: '4px 12px', textAlign: 'center', fontSize: 9, color: '#999' }}>
-        Eric's Wish List · {WISHLIST_ITEMS.length} items · Updated 2026
+        Eric's Wish List · {items.length} items · Updated 2026
       </div>
     </div>
   )
@@ -201,16 +202,16 @@ function DesktopWishList() {
 // MOBILE — Old eBay/shopping app style
 // ══════════════════════════════════════════
 
-function MobileWishList() {
+function MobileWishList({ items }) {
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('priority')
   const [selectedId, setSelectedId] = useState(null)
 
   const filtered = sortItems(
-    category === 'all' ? WISHLIST_ITEMS : WISHLIST_ITEMS.filter(i => i.category === category),
+    category === 'all' ? items : items.filter(i => i.category === category),
     sort
   )
-  const selected = WISHLIST_ITEMS.find(i => i.id === selectedId)
+  const selected = items.find(i => i.id === selectedId)
 
   if (selected) {
     return (
@@ -299,5 +300,21 @@ function MobileWishList() {
 
 export default function WishList() {
   const isMobile = useMediaQuery('(max-width: 768px)')
-  return isMobile ? <MobileWishList /> : <DesktopWishList />
+  const repo = useRepo()
+  const [items, setItems] = useState([])
+
+  const load = useCallback(async () => {
+    const data = await repo.wishlist.list()
+    setItems(data || [])
+  }, [repo])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  return (
+    <>
+      {isMobile ? <MobileWishList items={items} /> : <DesktopWishList items={items} />}
+      <OwnerManager resource="wishlist" onChange={load} />
+    </>
+  )
 }

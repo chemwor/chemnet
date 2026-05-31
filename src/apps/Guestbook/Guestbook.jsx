@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+import { useRepo } from '../../lib/repo/useRepo'
+import { useProfile } from '../../context/ProfileContext'
 
-function GuestEntry({ entry }) {
+function GuestEntry({ entry, onDelete }) {
   return (
     <div className="mb-3 pb-3" style={{ borderBottom: '1px dashed #446' }}>
       <div className="flex items-center gap-2 mb-1">
@@ -12,6 +13,9 @@ function GuestEntry({ entry }) {
         <span className="ml-auto" style={{ color: '#444', fontSize: 10 }}>
           {new Date(entry.created_at).toLocaleDateString()}
         </span>
+        {onDelete && (
+          <button onClick={() => onDelete(entry.id)} title="Delete" className="border-none bg-transparent cursor-pointer" style={{ color: '#FF5555', fontSize: 11 }}>✕</button>
+        )}
       </div>
       <div style={{ color: '#aab', lineHeight: 1.5, paddingLeft: 16 }}>{entry.message}</div>
     </div>
@@ -19,6 +23,9 @@ function GuestEntry({ entry }) {
 }
 
 export default function Guestbook() {
+  const repo = useRepo()
+  const { node, isOwner } = useProfile()
+  const canModerate = node.kind === 'member' && isOwner
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
@@ -29,38 +36,29 @@ export default function Guestbook() {
   const bottomRef = useRef(null)
 
   useEffect(() => {
+    let cancelled = false
+    async function loadEntries() {
+      const data = await repo.guestbook.list()
+      if (cancelled) return
+      setEntries(data)
+      setLoading(false)
+    }
     loadEntries()
-  }, [])
-
-  async function loadEntries() {
-    try {
-      const { data, error } = await supabase
-        .from('guestbook_entries')
-        .select('*')
-        .order('created_at', { ascending: true })
-      if (!error && data) setEntries(data)
-    } catch {}
-    setLoading(false)
-  }
+    return () => { cancelled = true }
+  }, [repo])
 
   const handleSign = async () => {
     if (!name.trim()) { setError('Name required — even a fake one'); return }
     if (!message.trim()) { setError('Say something! Anything.'); return }
     setError('')
 
-    const newEntry = {
+    const data = await repo.guestbook.sign({
       name: name.trim(),
       location: location.trim() || null,
       message: message.trim(),
-    }
+    })
 
-    const { data, error: insertErr } = await supabase
-      .from('guestbook_entries')
-      .insert(newEntry)
-      .select()
-      .single()
-
-    if (insertErr) {
+    if (!data) {
       setError('Failed to sign. Try again.')
       return
     }
@@ -93,7 +91,15 @@ export default function Guestbook() {
           <div className="text-center py-4" style={{ color: '#555' }}>No signatures yet. Be the first!</div>
         ) : (
           entries.map(entry => (
-            <GuestEntry key={entry.id} entry={entry} />
+            <GuestEntry
+              key={entry.id}
+              entry={entry}
+              onDelete={canModerate ? async (id) => {
+                if (!confirm('Delete this entry?')) return
+                const ok = await repo.guestbook.remove(id)
+                if (ok) setEntries(prev => prev.filter(e => e.id !== id))
+              } : null}
+            />
           ))
         )}
 

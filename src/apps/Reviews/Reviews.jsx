@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import { supabase } from '../../lib/supabase'
+import { useRepo } from '../../lib/repo/useRepo'
+import { useProfile } from '../../context/ProfileContext'
+import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
   { id: 'movies', label: 'Movies' },
@@ -364,31 +366,12 @@ function filterByCategory(items, cat) {
   return items.filter(r => r.category === cat)
 }
 
-export default function Reviews() {
+function ReviewsView({ data, loading }) {
   const isMobile = useMediaQuery('(max-width: 768px)')
-  const [data, setData] = useState(REVIEWS)
-  const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('movies')
   const [filter, setFilter] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
   const [openId, setOpenId] = useState(null)
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const controller = new AbortController()
-        setTimeout(() => controller.abort(), 3000)
-        const { data: rows, error } = await supabase
-          .from('reviews')
-          .select('*')
-          .order('title')
-          .abortSignal(controller.signal)
-        if (!error && rows && rows.length > 0) setData(rows)
-      } catch {}
-      setLoading(false)
-    }
-    load()
-  }, [])
 
   if (loading) {
     return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f1a', color: '#555', fontFamily: 'monospace' }}>Loading...</div>
@@ -523,5 +506,30 @@ export default function Reviews() {
         {selected ? `${selected.title} — double-click for full review` : 'Click a title for details · Double-click for full review'}
       </div>
     </div>
+  )
+}
+
+export default function Reviews() {
+  const repo = useRepo()
+  const { node } = useProfile()
+  // Eric's hub falls back to the hand-written sample reviews when the DB is
+  // empty; a member node shows only that member's rows (no fallback).
+  const [data, setData] = useState(node.kind === 'flagship' ? REVIEWS : [])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    const rows = await repo.reviews.list()
+    if (rows && rows.length > 0) setData(rows)
+    setLoading(false)
+  }, [repo])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  return (
+    <>
+      <ReviewsView data={data} loading={loading} />
+      <OwnerManager resource="reviews" onChange={load} />
+    </>
   )
 }

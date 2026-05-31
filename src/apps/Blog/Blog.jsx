@@ -1,20 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../../lib/supabase'
-import { iconUrl } from '../../shell/icons'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-
-// Fallback to hardcoded if DB is empty/fails
-import { AI_PAPER } from './ai-paper'
-const FALLBACK_POSTS = [
-  {
-    id: 'fallback-1',
-    title: 'Break Down of Artificial Intelligence and Its Impact on Human Life',
-    filename: 'Artificial Intelligence in The Workforce.doc',
-    content: AI_PAPER, raw: null,
-    note: 'Research paper written at John McEachern High School, Fall/Spring 2015-2016.',
-    created_at: '2016-05-18T12:00:00Z', views: 0, category: 'tech',
-  },
-]
+import { useRepo } from '../../lib/repo/useRepo'
+import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
   { id: 'all', label: 'All' },
@@ -175,13 +162,12 @@ function FileDirectory({ posts, onOpen, sort, setSort, category, setCategory }) 
 // ── Document viewer ──
 function DocumentViewer({ post, onBack }) {
   const [showRaw, setShowRaw] = useState(false)
+  const repo = useRepo()
 
   // Track view
   useEffect(() => {
-    if (post.id && !String(post.id).startsWith('fallback')) {
-      try { supabase.rpc('increment_blog_views', { post_id: post.id }) } catch {}
-    }
-  }, [post.id])
+    repo.posts.incrementViews(post.id)
+  }, [post.id, repo])
 
   const bodyText = showRaw && post.raw ? post.raw : post.content
   const pages = paginateContent(bodyText, true)
@@ -313,12 +299,11 @@ function MobileNotesList({ posts, onOpen }) {
 function MobileNoteView({ post, onBack }) {
   const [showRaw, setShowRaw] = useState(false)
   const bodyText = showRaw && post.raw ? post.raw : post.content
+  const repo = useRepo()
 
   useEffect(() => {
-    if (post.id && !String(post.id).startsWith('fallback')) {
-      try { supabase.rpc('increment_blog_views', { post_id: post.id }) } catch {}
-    }
-  }, [post.id])
+    repo.posts.incrementViews(post.id)
+  }, [post.id, repo])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
@@ -369,54 +354,36 @@ function MobileNoteView({ post, onBack }) {
 // ── Main ──
 export default function Blog() {
   const isMobile = useMediaQuery('(max-width: 768px)')
+  const repo = useRepo()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [openPostId, setOpenPostId] = useState(null)
   const [sort, setSort] = useState('recent')
   const [category, setCategory] = useState('all')
 
-  useEffect(() => {
-    async function load() {
-      try {
-        // Timeout after 3 seconds — fall back to hardcoded if slow/offline
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 3000)
+  const loadPosts = useCallback(async () => {
+    const data = await repo.posts.list()
+    setPosts(data)
+    setLoading(false)
+  }, [repo])
 
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .eq('published', true)
-          .order('created_at', { ascending: false })
-          .abortSignal(controller.signal)
-
-        clearTimeout(timeout)
-
-        if (error || !data || data.length === 0) {
-          setPosts(FALLBACK_POSTS)
-        } else {
-          setPosts(data)
-        }
-      } catch {
-        setPosts(FALLBACK_POSTS)
-      }
-      setLoading(false)
-    }
-    load()
-  }, [])
-
-  if (loading) {
-    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#fff', color: '#888', fontFamily: 'monospace' }}>Loading...</div>
-  }
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { loadPosts() }, [loadPosts])
 
   const openPost = posts.find(p => p.id === openPostId)
 
-  // Mobile — Notes style
-  if (isMobile) {
-    if (openPost) return <MobileNoteView post={openPost} onBack={() => setOpenPostId(null)} />
-    return <MobileNotesList posts={posts} onOpen={setOpenPostId} />
+  let content
+  if (loading) {
+    content = <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#fff', color: '#888', fontFamily: 'monospace' }}>Loading...</div>
+  } else if (isMobile) {
+    content = openPost
+      ? <MobileNoteView post={openPost} onBack={() => setOpenPostId(null)} />
+      : <MobileNotesList posts={posts} onOpen={setOpenPostId} />
+  } else if (openPost) {
+    content = <DocumentViewer post={openPost} onBack={() => setOpenPostId(null)} />
+  } else {
+    content = <FileDirectory posts={posts} onOpen={setOpenPostId} sort={sort} setSort={setSort} category={category} setCategory={setCategory} />
   }
 
-  // Desktop — Word style
-  if (openPost) return <DocumentViewer post={openPost} onBack={() => setOpenPostId(null)} />
-  return <FileDirectory posts={posts} onOpen={setOpenPostId} sort={sort} setSort={setSort} category={category} setCategory={setCategory} />
+  return <>{content}<OwnerManager resource="posts" onChange={loadPosts} /></>
 }

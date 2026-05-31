@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { useState, useEffect, useCallback } from 'react'
+import { useRepo } from '../../lib/repo/useRepo'
+import { OwnerManager } from '../_shared/OwnerManager'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -28,22 +28,19 @@ function getDomain(url) {
 // ══════════════════════════════════════════
 
 function DesktopDigest() {
+  const repo = useRepo()
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState(null)
 
-  useEffect(() => {
-    async function load() {
-      const { data } = await supabase
-        .from('digest_entries')
-        .select('*')
-        .order('published_date', { ascending: false })
-        .order('created_at', { ascending: false })
-      setEntries(data || [])
-      setLoading(false)
-    }
-    load()
-  }, [])
+  const load = useCallback(async () => {
+    const data = await repo.digest.list()
+    setEntries(data || [])
+    setLoading(false)
+  }, [repo])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
 
   // Group by date
   const grouped = {}
@@ -153,6 +150,8 @@ function DesktopDigest() {
       <div style={{ padding: '4px 16px', background: '#1a1a1a', textAlign: 'center', fontSize: 9, color: '#666', fontFamily: 'monospace' }}>
         The Daily Digest — Curated by Eric
       </div>
+
+      <OwnerManager resource="digest" onChange={load} />
     </div>
   )
 }
@@ -162,22 +161,22 @@ function DesktopDigest() {
 // ══════════════════════════════════════════
 
 function MobileDigest() {
+  const repo = useRepo()
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedEntry, setSelectedEntry] = useState(null)
 
   useEffect(() => {
+    let cancelled = false
     async function load() {
-      const { data } = await supabase
-        .from('digest_entries')
-        .select('*')
-        .order('published_date', { ascending: false })
-        .order('created_at', { ascending: false })
+      const data = await repo.digest.list()
+      if (cancelled) return
       setEntries(data || [])
       setLoading(false)
     }
     load()
-  }, [])
+    return () => { cancelled = true }
+  }, [repo])
 
   // Group by date
   const grouped = {}

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { APP_REGISTRY, MENU_CATEGORIES } from '../apps/registry'
 import { MobilePanel } from '../windows/MobilePanel'
 import { AppIcon } from './AppIcon'
+import { useNodeView } from './useNodeView'
 import daytime from '../assets/wallpapers/daytime.jpg'
 import nighttime from '../assets/wallpapers/nighttime.jpg'
 
@@ -56,7 +57,8 @@ const IOS_GLYPHS = {
   pong: '🏓', asteroids: '☄️', pacman: '👾', spaceinvaders: '👽',
   arkanoid: '🧱', fighter: '🤖', snake: '🐍', '2048': '🔢',
   flappybird: '🐤', tetris: '▦', sudoku: '9', doodlejump: '↑',
-  fruitninja: '🔪', admin: '⚙️',
+  fruitninja: '🔪', admin: '⚙️', signup: '✨', customize: '⚙️',
+  profile: '👤', notifications: '🔔', chemfeed: '📡', directory: '🗂️',
 }
 
 // ── App Icon (iOS 1 glossy rounded square) ──
@@ -162,6 +164,12 @@ function getIconBg(id) {
     wishlist: 'linear-gradient(180deg, #FFD60A, #CC9900)',
     trips: 'linear-gradient(180deg, #5AC8FA, #007AFF)',
     admin: 'linear-gradient(180deg, #8E8E93, #4A4A4E)',
+    signup: 'linear-gradient(180deg, #FF6B35, #B23A12)',
+    customize: 'linear-gradient(180deg, #5856D6, #3634A3)',
+    profile: 'linear-gradient(180deg, #34C759, #1B8C3A)',
+    notifications: 'linear-gradient(180deg, #FF3B30, #CC2222)',
+    chemfeed: 'linear-gradient(180deg, #FF9500, #CC7700)',
+    directory: 'linear-gradient(180deg, #5AC8FA, #007AFF)',
   }
   return colors[id] || 'linear-gradient(180deg, #636366, #3A3A3C)'
 }
@@ -236,8 +244,8 @@ function PageDots({ total, current }) {
 }
 
 // ── Dock ──
-function Dock({ onTap }) {
-  const dockApps = APP_REGISTRY.filter(a => a.pinned)
+function Dock({ onTap, apps, labelFor }) {
+  const dockApps = apps.filter(a => a.pinned)
   return (
     <div
       className="flex items-center justify-center gap-4 px-3 py-2 shrink-0"
@@ -248,7 +256,7 @@ function Dock({ onTap }) {
       }}
     >
       {dockApps.map(app => (
-        <MobileAppIcon key={app.id} app={app} onTap={onTap} />
+        <MobileAppIcon key={app.id} app={{ ...app, label: labelFor(app) }} onTap={onTap} />
       ))}
     </div>
   )
@@ -303,6 +311,7 @@ function NotificationBanner({ onTap }) {
 // ── Main Shell ──
 export function MobileShell({ windowManager }) {
   const { openApp, closeApp } = windowManager
+  const { node, isOwner, apps, labelFor, themeVars, wallpaper } = useNodeView()
   const [activeAppId, setActiveAppId] = useState(null)
   const [page, setPage] = useState(0)
   const [gamesOpen, setGamesOpen] = useState(false)
@@ -331,10 +340,18 @@ export function MobileShell({ windowManager }) {
     return () => window.removeEventListener('ericOS:openApp', handler)
   }, [])
 
-  const activeApp = activeAppId ? APP_REGISTRY.find(a => a.id === activeAppId) : null
+  // Land in edit mode: /u/:handle?edit=1 auto-opens Customize for the owner.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('edit') === '1' && node.kind === 'member' && isOwner) handleOpen('customize')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, isOwner])
 
-  const topLevelApps = APP_REGISTRY.filter(a => !a.category && !a.pinned)
-  const gameApps = APP_REGISTRY.filter(a => a.category === 'games' && a.mobile !== false)
+  const activeAppBase = activeAppId ? APP_REGISTRY.find(a => a.id === activeAppId) : null
+  const activeApp = activeAppBase ? { ...activeAppBase, label: labelFor(activeAppBase) } : null
+
+  const topLevelApps = apps.filter(a => !a.category && !a.pinned)
+  const gameApps = apps.filter(a => a.category === 'games' && a.mobile !== false)
 
   // Split into pages of 16 (4x4 grid) — include games folder on first page
   const pageSize = 16
@@ -366,17 +383,22 @@ export function MobileShell({ windowManager }) {
   }
 
   const bg = isDaytime() ? daytime : nighttime
+  const isMember = node.kind === 'member'
 
   return (
-    <div className="flex flex-col w-full h-full" style={{ background: '#000' }}>
-      {/* Wallpaper */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `url(${bg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        filter: 'brightness(0.6)',
-      }} />
+    <div className="flex flex-col w-full h-full" style={{ background: '#000', ...themeVars }}>
+      {/* Wallpaper — member nodes use their chosen preset */}
+      {isMember ? (
+        <div style={{ position: 'absolute', inset: 0, background: wallpaper }} />
+      ) : (
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${bg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'brightness(0.6)',
+        }} />
+      )}
 
       {/* Content layer */}
       <div className="flex flex-col w-full h-full relative" style={{ zIndex: 1 }}>
@@ -407,7 +429,7 @@ export function MobileShell({ windowManager }) {
             >
               <div className="grid grid-cols-4 gap-y-5 gap-x-2 justify-items-center">
                 {allHomeItems.slice(page * pageSize, (page + 1) * pageSize).map(app => (
-                  <MobileAppIcon key={app.id} app={app} onTap={handleOpen} />
+                  <MobileAppIcon key={app.id} app={{ ...app, label: labelFor(app) }} onTap={handleOpen} />
                 ))}
                 {/* Games folder on first page */}
                 {page === 0 && <GamesFolderIcon onTap={() => setGamesOpen(true)} />}
@@ -446,7 +468,7 @@ export function MobileShell({ windowManager }) {
               >
                 <div className="grid grid-cols-4 gap-y-4 gap-x-2 justify-items-center">
                   {gameApps.map(app => (
-                    <MobileAppIcon key={app.id} app={app} onTap={handleOpen} />
+                    <MobileAppIcon key={app.id} app={{ ...app, label: labelFor(app) }} onTap={handleOpen} />
                   ))}
                 </div>
               </div>
@@ -458,7 +480,7 @@ export function MobileShell({ windowManager }) {
         {!gamesOpen && <PageDots total={totalPages} current={page} />}
 
         {/* Dock */}
-        <Dock onTap={handleOpen} />
+        <Dock onTap={handleOpen} apps={apps} labelFor={labelFor} />
       </div>
 
       {/* App panel */}

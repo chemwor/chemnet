@@ -40,11 +40,10 @@ function Separator() {
   )
 }
 
-export function StartMenu({ onOpenApp, onClose }) {
+export function StartMenu({ onOpenApp, onClose, apps = APP_REGISTRY, labelFor = (a) => a.label }) {
   const [activeSubmenu, setActiveSubmenu] = useState(null)
 
-  const topLevelApps = APP_REGISTRY.filter(a => !a.category)
-  const gameApps = APP_REGISTRY.filter(a => a.category === 'games')
+  const topLevelApps = apps.filter(a => !a.category && !a.hideFromDesktop)
 
   const handleOpen = (appId) => {
     onOpenApp(appId)
@@ -108,7 +107,7 @@ export function StartMenu({ onOpenApp, onClose }) {
             <MenuItem
               key={app.id}
               icon={app.icon}
-              label={app.label}
+              label={labelFor(app)}
               onClick={() => handleOpen(app.id)}
               onMouseEnter={() => setActiveSubmenu(null)}
             />
@@ -149,11 +148,11 @@ export function StartMenu({ onOpenApp, onClose }) {
                     transition={{ duration: 0.1 }}
                   >
                     <div className="py-1">
-                      {APP_REGISTRY.filter(a => a.category === cat.id).map(app => (
+                      {apps.filter(a => a.category === cat.id).map(app => (
                         <MenuItem
                           key={app.id}
                           icon={app.icon}
-                          label={app.label}
+                          label={labelFor(app)}
                           onClick={() => handleOpen(app.id)}
                         />
                       ))}

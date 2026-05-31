@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useRepo } from '../../lib/repo/useRepo'
+import { useProfile } from '../../context/ProfileContext'
+import { OwnerManager } from '../_shared/OwnerManager'
 
 const TRIPS = [
   {
@@ -107,11 +110,29 @@ function TripDetail({ trip }) {
 }
 
 export default function Trips() {
+  const repo = useRepo()
+  const { node } = useProfile()
   const [filter, setFilter] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
+  // Flagship renders Eric's inline trips; a member node reads members.travel_log.
+  const [trips, setTrips] = useState(node.kind === 'flagship' ? TRIPS : [])
 
-  const filtered = TRIPS.filter(t => filter === 'all' || t.status === filter)
-  const selected = TRIPS.find(t => t.id === selectedId)
+  const load = useCallback(async () => {
+    if (node.kind === 'flagship') return
+    const rows = await repo.travelLog.list()
+    // members.travel_log keeps highlights/photos in a `data` jsonb (Phase 1 gap)
+    setTrips((rows || []).map(r => ({
+      ...r,
+      highlights: r.highlights || r.data?.highlights || [],
+      photos: r.photos || r.data?.photos || [],
+    })))
+  }, [repo, node])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  const filtered = trips.filter(t => filter === 'all' || t.status === filter)
+  const selected = trips.find(t => t.id === selectedId)
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#0f0f1a', fontFamily: 'monospace', color: '#F0EBE1' }}>
@@ -121,7 +142,7 @@ export default function Trips() {
           <span>✈️</span>
           <span className="font-bold text-sm">Travel Log</span>
         </div>
-        <span className="text-xs" style={{ color: '#555' }}>{TRIPS.length} trips</span>
+        <span className="text-xs" style={{ color: '#555' }}>{trips.length} trips</span>
       </div>
 
       {/* Filter */}
@@ -168,6 +189,8 @@ export default function Trips() {
       <div className="px-3 py-0.5 text-xs shrink-0" style={{ background: '#1a1a30', borderTop: '1px solid #2a2a4a', color: '#444' }}>
         {selected ? selected.destination : 'Click a trip for details'}
       </div>
+
+      <OwnerManager resource="travelLog" onChange={load} />
     </div>
   )
 }

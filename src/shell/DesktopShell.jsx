@@ -17,6 +17,7 @@ import { recordDiscovery } from '../lib/layers'
 import { useIdleTimer } from '../hooks/useIdleTimer'
 import { useKonamiCode } from '../hooks/useKonamiCode'
 import { useSecretCode } from '../hooks/useSecretCode'
+import { useNodeView } from './useNodeView'
 
 // Cache lazy components so they don't remount on every render
 const lazyCache = new Map()
@@ -47,6 +48,7 @@ function BusyCursor() {
 
 export function DesktopShell({ windowManager }) {
   const { windows, openApp, closeApp, minimizeApp, maximizeApp, focusApp } = windowManager
+  const { node, isOwner, apps, labelFor, themeVars, wallpaper } = useNodeView()
   const bootedRef = useRef(false)
 
   // Open boot apps on first mount, but only on the user's first ever visit
@@ -59,6 +61,12 @@ export function DesktopShell({ windowManager }) {
       try { localStorage.setItem('ericOS_visited', '1') } catch {}
     }
   }, [openApp])
+
+  // Land in edit mode: /u/:handle?edit=1 auto-opens Customize for the owner.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('edit') === '1' && node.kind === 'member' && isOwner) openApp('customize')
+  }, [node, isOwner, openApp])
 
   // Easter egg hooks
   const { idle, resetIdle } = useIdleTimer(60000)
@@ -110,7 +118,7 @@ export function DesktopShell({ windowManager }) {
   )
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full" style={themeVars}>
       <div
         className="relative flex-1 overflow-hidden"
         onClick={(e) => {
@@ -120,8 +128,10 @@ export function DesktopShell({ windowManager }) {
         }}
         onContextMenu={handleContextMenu}
       >
-        {/* Layer 0 — Animated gradient mesh */}
-        <Wallpaper />
+        {/* Layer 0 — Wallpaper (member nodes use their chosen preset) */}
+        {node.kind === 'member'
+          ? <div className="absolute inset-0" style={{ zIndex: 0, background: wallpaper }} />
+          : <Wallpaper />}
 
         {/* Layer 1 — CRT scanlines + noise + vignette */}
         <CRTOverlay />
@@ -131,8 +141,8 @@ export function DesktopShell({ windowManager }) {
           className="absolute top-4 left-4 flex flex-col flex-wrap gap-2 content-start"
           style={{ zIndex: 2, maxHeight: 'calc(100% - 16px)' }}
         >
-          {APP_REGISTRY.filter(a => !a.category && !a.hideFromDesktop).map((app, i) => (
-            <DesktopIcon key={app.id} app={app} onOpen={openApp} index={i} />
+          {apps.filter(a => !a.category && !a.hideFromDesktop).map((app, i) => (
+            <DesktopIcon key={app.id} app={{ ...app, label: labelFor(app) }} onOpen={openApp} index={i} />
           ))}
         </div>
 
@@ -145,7 +155,7 @@ export function DesktopShell({ windowManager }) {
               <WindowFrame
                 key={w.id}
                 windowState={w}
-                app={w.app}
+                app={{ ...w.app, label: labelFor(w.app) }}
                 onClose={() => closeApp(w.id)}
                 onMinimize={() => minimizeApp(w.id)}
                 onMaximize={() => maximizeApp(w.id)}
@@ -183,11 +193,13 @@ export function DesktopShell({ windowManager }) {
       <Taskbar
         windows={windowsWithMeta.map(w => ({
           id: w.id,
-          label: w.app?.label ?? w.id,
+          label: w.app ? labelFor(w.app) : w.id,
           minimized: w.minimized,
         }))}
         onFocusApp={focusApp}
         onOpenApp={openApp}
+        apps={apps}
+        labelFor={labelFor}
       />
 
       {/* Easter egg overlays */}

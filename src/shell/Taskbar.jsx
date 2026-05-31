@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { StartMenu } from './StartMenu'
+import { NotificationBell } from './NotificationBell'
 
 function Clock() {
   const [time, setTime] = useState(new Date())
@@ -23,7 +24,7 @@ function Clock() {
   )
 }
 
-export function Taskbar({ windows, onFocusApp, onOpenApp }) {
+export function Taskbar({ windows, onFocusApp, onOpenApp, apps, labelFor }) {
   const [startOpen, setStartOpen] = useState(false)
 
   return (
@@ -45,6 +46,8 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
           <StartMenu
             onOpenApp={onOpenApp}
             onClose={() => setStartOpen(false)}
+            apps={apps}
+            labelFor={labelFor}
           />
         )}
       </AnimatePresence>
@@ -107,6 +110,8 @@ export function Taskbar({ windows, onFocusApp, onOpenApp }) {
         borderLeft: '1px solid var(--color-bevel-dark)',
         borderRight: '1px solid var(--color-bevel-light)',
       }} />
+
+      <NotificationBell onOpen={() => onOpenApp('notifications')} />
 
       <Clock />
     </motion.div>

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import { supabase } from '../../lib/supabase'
+import { useRepo } from '../../lib/repo/useRepo'
+import { useProfile } from '../../context/ProfileContext'
+import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
   { id: 'been', label: 'Been To', icon: '✅' },
@@ -253,29 +255,10 @@ function MobileRestaurants({ data }) {
   )
 }
 
-export default function Restaurants() {
+function RestaurantsView({ data, loading }) {
   const isMobile = useMediaQuery('(max-width: 768px)')
-  const [data, setData] = useState(RESTAURANTS) // fallback to hardcoded
-  const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('been')
   const [selectedId, setSelectedId] = useState(null)
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const controller = new AbortController()
-        setTimeout(() => controller.abort(), 3000)
-        const { data: rows, error } = await supabase
-          .from('restaurants')
-          .select('*')
-          .order('name')
-          .abortSignal(controller.signal)
-        if (!error && rows && rows.length > 0) setData(rows)
-      } catch {}
-      setLoading(false)
-    }
-    load()
-  }, [])
 
   if (loading) {
     return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#12100c', color: '#666', fontFamily: 'monospace' }}>Loading...</div>
@@ -378,5 +361,30 @@ export default function Restaurants() {
         {selected ? `${selected.name} — ${selected.location}` : 'Click a restaurant for details'}
       </div>
     </div>
+  )
+}
+
+export default function Restaurants() {
+  const repo = useRepo()
+  const { node } = useProfile()
+  // Flagship falls back to the hand-written sample list; a member node shows
+  // only that member's rows (no fallback).
+  const [data, setData] = useState(node.kind === 'flagship' ? RESTAURANTS : [])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    const rows = await repo.foodItems.list()
+    if (rows && rows.length > 0) setData(rows)
+    setLoading(false)
+  }, [repo])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  return (
+    <>
+      <RestaurantsView data={data} loading={loading} />
+      <OwnerManager resource="foodItems" onChange={load} />
+    </>
   )
 }
