@@ -87,10 +87,12 @@ function MemberNode() {
 
 // `/me` — redirect to the signed-in user's node, else the hub.
 function MeRedirect() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, isAdmin } = useAuth()
 
   if (loading) return <NodeLoading />
   if (!user) return <Navigate to="/" replace />
+  // The hub admin (Eric) owns the flagship — never force a handle claim.
+  if (isAdmin) return <Navigate to="/" replace />
   if (profile?.handle) return <Navigate to={`/u/${profile.handle}`} replace />
   // Signed in but no node yet → claim a handle (the Signup app's claim screen).
   return <Signup />

@@ -28,7 +28,7 @@ const ERR_TEXT = {
 }
 
 export default function Signup() {
-  const { user, profile, needsHandle, loading, loginWithMagicLink, loginWithGoogle, claimHandle } = useAuth()
+  const { user, profile, needsHandle, isAdmin, loading, loginWithMagicLink, loginWithGoogle, claimHandle } = useAuth()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [handle, setHandle] = useState('')
@@ -37,6 +37,22 @@ export default function Signup() {
 
   if (loading) {
     return <div style={{ ...panel, color: 'var(--color-text-secondary)' }}>Loading…</div>
+  }
+
+  // Hub admin (Eric) — the flagship IS their node; never prompt a handle claim.
+  if (user && isAdmin) {
+    return (
+      <div style={panel}>
+        <div style={{ ...card, textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>🛰️</div>
+          <div style={{ fontWeight: 'bold', marginBottom: 6 }}>You're the ChemNet hub.</div>
+          <div style={{ color: 'var(--color-text-secondary)', fontSize: 13, marginBottom: 14 }}>
+            Your desktop is the flagship at <code style={{ color: 'var(--color-accent)' }}>/</code>.
+          </div>
+          <a href="/" style={{ ...button, display: 'block', textDecoration: 'none', textAlign: 'center' }}>Go to my desktop →</a>
+        </div>
+      </div>
+    )
   }
 
   // Step 3 — already has a node

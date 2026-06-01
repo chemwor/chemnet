@@ -10,7 +10,9 @@ function describe(n) {
   switch (n.kind) {
     case 'follow': return { icon: '👤', text: `${who} started following you`, href: n.actor_handle ? `/u/${n.actor_handle}` : null }
     case 'guestbook_sign': return { icon: '📖', text: `${who} signed your guestbook`, open: 'guestbook' }
-    case 'chemmail': return { icon: '✉️', text: `${who} sent you ChemMail${n.payload?.subject ? `: ${n.payload.subject}` : ''}`, open: 'email' }
+    case 'chemmail': return { icon: '✉️', text: `${who} sent you a message${n.payload?.subject ? `: ${n.payload.subject}` : ''}`, open: 'messageboard' }
+    case 'friend_request': return { icon: '👋', text: `${who} sent you a friend request`, open: 'directory' }
+    case 'friend_accept': return { icon: '🤝', text: `${who} accepted your friend request`, href: n.actor_handle ? `/u/${n.actor_handle}` : null }
     default: return { icon: '🔔', text: `${who} — ${n.kind}`, href: null }
   }
 }

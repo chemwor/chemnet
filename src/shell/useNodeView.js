@@ -33,7 +33,7 @@ function visibilityOk(app, { isOwner, isAuthed, hasNode }) {
 
 // Comms/identity apps that should always be present regardless of a member's
 // saved `enabled_apps` (which only ever curated the content apps).
-const ALWAYS_ON = new Set(['about', 'terminal', 'guestbook', 'email', 'messageboard', 'profile'])
+const ALWAYS_ON = new Set(['about', 'terminal', 'guestbook', 'email', 'messageboard', 'profile', 'directory'])
 
 // The node-scoped app list: node-kind + visibility filtered, then (on member
 // nodes with a saved desktop_config) the *content* apps are restricted to
@@ -59,7 +59,7 @@ function resolveApps(node, ctx, config) {
 // One hook the shells use instead of importing APP_REGISTRY directly. Gives
 // the node-scoped apps, per-node relabeling, and the theme/wallpaper to apply.
 export function useNodeView() {
-  const { node, isOwner, isAuthed, hasNode } = useProfile()
+  const { node, isOwner, isAuthed, hasNode, currentUser } = useProfile()
   const { config } = useDesktopConfig()
 
   const ctx = { isOwner, isAuthed, hasNode }
@@ -76,5 +76,5 @@ export function useNodeView() {
   const themeVars = isMember ? themeStyle(config?.theme) : {}
   const wallpaper = isMember ? wallpaperCss(config?.wallpaper || 'warm-slate') : null
 
-  return { node, isOwner, config, apps, labelFor, themeVars, wallpaper }
+  return { node, isOwner, currentUser, config, apps, labelFor, themeVars, wallpaper }
 }

@@ -50,6 +50,17 @@ export interface SocialApi {
   report(input: { targetType: string; targetId: string; reason?: string }): Promise<{ error?: string }>
   // Mail contact form → send_mail Edge Function (owner email resolved server-side).
   sendMail(input: { handle?: string; fromEmail: string; fromName?: string; subject?: string; body: string }): Promise<{ ok?: boolean; error?: string }>
+  // Mutual, accepted friendship graph (distinct from one-directional follows).
+  friends: {
+    relationships(): Promise<{ accepted: string[]; incoming: string[]; outgoing: string[] }>
+    list(): Promise<Row[]>
+    incoming(): Promise<Row[]>
+    request(userId: string): Promise<{ error?: string }>
+    accept(requesterId: string): Promise<{ error?: string }>
+    unfriend(userId: string): Promise<{ error?: string }>
+    myCode(): Promise<string | null>
+    redeem(code: string): Promise<{ ownerId?: string; error?: string }>
+  }
   chat: {
     conversations(): Promise<Row[]>
     thread(otherId: string): Promise<Row[]>
@@ -202,6 +213,93 @@ export const socialApi: SocialApi = {
     if (data?.error) return { error: data.error }
     return { ok: true }
   },
+
+  friends: (() => {
+    let _hubId: string | null | undefined
+    async function hubId() {
+      if (_hubId === undefined) {
+        const { data } = await platform().rpc('flagship_owner_id')
+        _hubId = data || null
+      }
+      return _hubId
+    }
+    async function myRows(): Promise<Row[]> {
+      const me = await uid()
+      if (!me) return []
+      const { data } = await platform().from('friendships').select('*')
+        .or(`requester_id.eq.${me},addressee_id.eq.${me}`)
+      return data || []
+    }
+    return {
+      async relationships() {
+        const me = await uid()
+        const out = { accepted: [] as string[], incoming: [] as string[], outgoing: [] as string[] }
+        if (!me) return out
+        for (const r of await myRows()) {
+          const other = r.requester_id === me ? r.addressee_id : r.requester_id
+          if (r.status === 'accepted') out.accepted.push(other)
+          else if (r.addressee_id === me) out.incoming.push(r.requester_id)
+          else out.outgoing.push(r.addressee_id)
+        }
+        return out
+      },
+      async list() {
+        const me = await uid()
+        if (!me) return []
+        const accepted = (await myRows()).filter(r => r.status === 'accepted')
+          .map(r => (r.requester_id === me ? r.addressee_id : r.requester_id))
+        const hub = await hubId()
+        const profs = await profilesByIds(accepted.filter(id => id !== hub))
+        const pmap = new Map(profs.map(p => [p.id, p]))
+        const out: Row[] = []
+        for (const id of accepted) {
+          if (id === hub) out.push({ id, handle: '', display_name: 'ChemNet Hub', isHub: true })
+          else if (pmap.has(id)) out.push(pmap.get(id))
+        }
+        return out
+      },
+      async incoming() {
+        const me = await uid()
+        if (!me) return []
+        const ids = (await myRows()).filter(r => r.status === 'pending' && r.addressee_id === me).map(r => r.requester_id)
+        return profilesByIds(ids)
+      },
+      async request(userId) {
+        const me = await uid()
+        if (!me) return { error: 'auth' }
+        const { error } = await platform().from('friendships')
+          .insert({ requester_id: me, addressee_id: userId, status: 'pending' })
+        return { error: error?.message }
+      },
+      async accept(requesterId) {
+        const me = await uid()
+        if (!me) return { error: 'auth' }
+        const { error } = await platform().from('friendships')
+          .update({ status: 'accepted' }).eq('requester_id', requesterId).eq('addressee_id', me)
+        return { error: error?.message }
+      },
+      async unfriend(userId) {
+        const me = await uid()
+        if (!me) return { error: 'auth' }
+        const { error } = await platform().from('friendships').delete()
+          .or(`and(requester_id.eq.${me},addressee_id.eq.${userId}),and(requester_id.eq.${userId},addressee_id.eq.${me})`)
+        return { error: error?.message }
+      },
+      async myCode() {
+        const { data } = await platform().rpc('my_invite_code')
+        return data || null
+      },
+      async redeem(code) {
+        const { data, error } = await platform().rpc('redeem_invite', { p_code: String(code || '').trim() })
+        if (error) {
+          const m = error.message || ''
+          const known = ['invalid_code', 'self', 'blocked', 'auth'].find(k => m.includes(k))
+          return { error: known || 'redeem_failed' }
+        }
+        return { ownerId: data }
+      },
+    }
+  })(),
 
   chat: {
     // Buddy-list: group my messages by the other participant, newest first.

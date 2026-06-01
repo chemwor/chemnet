@@ -279,18 +279,19 @@ export const APP_REGISTRY = [
     visibility: 'owner',
   },
   {
-    // Member directory — discover nodes from Eric's hub. Flagship only.
+    // Member directory + friends — discover people, manage friends/invites.
+    // Available on every node (the Members list is global; Friends/Requests/
+    // Invite are the viewer's own).
     id: 'directory',
-    label: 'Directory',
+    label: 'Members',
     icon: 'folder',
     component: () => import('./Directory/Directory.jsx'),
-    defaultSize: { width: 480, height: 500 },
+    defaultSize: { width: 480, height: 520 },
     defaultPosition: { x: 140, y: 60 },
     openOnBoot: false,
     pinned: false,
     auth: false,
     category: null,
-    flagshipOnly: true,
     visibility: 'public',
   },
   {

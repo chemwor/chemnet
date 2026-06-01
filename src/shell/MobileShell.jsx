@@ -4,6 +4,7 @@ import { APP_REGISTRY, MENU_CATEGORIES } from '../apps/registry'
 import { MobilePanel } from '../windows/MobilePanel'
 import { AppIcon } from './AppIcon'
 import { useNodeView } from './useNodeView'
+import { usePresence } from '../hooks/usePresence'
 import daytime from '../assets/wallpapers/daytime.jpg'
 import nighttime from '../assets/wallpapers/nighttime.jpg'
 
@@ -311,7 +312,8 @@ function NotificationBanner({ onTap }) {
 // ── Main Shell ──
 export function MobileShell({ windowManager }) {
   const { openApp, closeApp } = windowManager
-  const { node, isOwner, apps, labelFor, themeVars, wallpaper } = useNodeView()
+  const { node, isOwner, currentUser, apps, labelFor, themeVars, wallpaper } = useNodeView()
+  usePresence({ track: currentUser?.id })
   const [activeAppId, setActiveAppId] = useState(null)
   const [page, setPage] = useState(0)
   const [gamesOpen, setGamesOpen] = useState(false)

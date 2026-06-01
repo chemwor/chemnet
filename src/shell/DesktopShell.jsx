@@ -18,6 +18,7 @@ import { useIdleTimer } from '../hooks/useIdleTimer'
 import { useKonamiCode } from '../hooks/useKonamiCode'
 import { useSecretCode } from '../hooks/useSecretCode'
 import { useNodeView } from './useNodeView'
+import { usePresence } from '../hooks/usePresence'
 
 // Cache lazy components so they don't remount on every render
 const lazyCache = new Map()
@@ -48,7 +49,8 @@ function BusyCursor() {
 
 export function DesktopShell({ windowManager }) {
   const { windows, openApp, closeApp, minimizeApp, maximizeApp, focusApp } = windowManager
-  const { node, isOwner, apps, labelFor, themeVars, wallpaper } = useNodeView()
+  const { node, isOwner, currentUser, apps, labelFor, themeVars, wallpaper } = useNodeView()
+  usePresence({ track: currentUser?.id })
   const bootedRef = useRef(false)
 
   // Open boot apps on first mount, but only on the user's first ever visit
