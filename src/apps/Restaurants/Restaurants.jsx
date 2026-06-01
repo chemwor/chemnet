@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { useInitialItem } from '../../hooks/useInitialItem'
 import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
@@ -264,6 +265,17 @@ function RestaurantsView({ data, loading }) {
   const isMobile = useMediaQuery('(max-width: 768px)')
   const [tab, setTab] = useState('been')
   const [selectedId, setSelectedId] = useState(null)
+
+  // Deep-link: select a specific item (and switch to its tab) from ChemFeed.
+  const initialItem = useInitialItem('restaurants')
+  useEffect(() => {
+    if (!initialItem || !data?.length) return
+    const it = data.find(r => String(r.id) === String(initialItem))
+    if (!it) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedId(it.id)
+    if (it.status) setTab(it.status)
+  }, [initialItem, data])
 
   if (loading) {
     return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#12100c', color: '#666', fontFamily: 'monospace' }}>Loading...</div>

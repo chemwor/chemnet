@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { useInitialItem } from '../../hooks/useInitialItem'
 import { OwnerManager } from '../_shared/OwnerManager'
 
 const TRIPS = [
@@ -130,6 +131,15 @@ export default function Trips() {
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
+
+  // Deep-link: select a specific trip when arriving from ChemFeed.
+  const initialItem = useInitialItem('trips')
+  useEffect(() => {
+    if (!initialItem || !trips.length) return
+    const t = trips.find(x => String(x.id) === String(initialItem))
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (t) setSelectedId(t.id)
+  }, [initialItem, trips])
 
   const filtered = trips.filter(t => filter === 'all' || t.status === filter)
   const selected = trips.find(t => t.id === selectedId)

@@ -36,7 +36,16 @@ export interface SocialApi {
     markRead(id: string | number): Promise<void>
     markAllRead(): Promise<void>
   }
-  feed: { list(limit?: number): Promise<Row[]> }
+  feed: {
+    list(limit?: number): Promise<Row[]>
+    activity(limit?: number): Promise<Row[]>
+    subscribe(onChange: () => void): () => void
+  }
+  reactions: {
+    summary(targetType: string, ids: Array<string | number>): Promise<Record<string, { count: number; liked: boolean }>>
+    like(targetType: string, targetId: string | number): Promise<void>
+    unlike(targetType: string, targetId: string | number): Promise<void>
+  }
   directory: {
     list(opts?: { search?: string }): Promise<Row[]>
     resolveHandle(handle: string): Promise<Row | null>
@@ -142,6 +151,51 @@ export const socialApi: SocialApi = {
       const { data } = await platform().from('feed_posts')
         .select('*').order('created_at', { ascending: false }).limit(limit)
       return data || []
+    },
+    // ChemFeed v2: chronological activity from people you follow (RLS enforces
+    // public + not-blocked; the view adds the followee filter + actor profile).
+    async activity(limit = 80) {
+      const { data } = await platform().from('activity_feed')
+        .select('*').order('created_at', { ascending: false }).limit(limit)
+      return data || []
+    },
+    subscribe(onChange) {
+      const ch = supabase
+        .channel('activity-feed')
+        .on('postgres_changes', { event: 'INSERT', schema: 'platform', table: 'activity' }, () => onChange())
+        .subscribe()
+      return () => { supabase.removeChannel(ch) }
+    },
+  },
+
+  reactions: {
+    // Like counts + whether I liked, for a batch of targets (computed client-side
+    // from the rows; fine for a feed page).
+    async summary(targetType, ids) {
+      const out: Record<string, { count: number; liked: boolean }> = {}
+      for (const id of ids) out[String(id)] = { count: 0, liked: false }
+      if (!ids.length) return out
+      const me = await uid()
+      const { data } = await platform().from('reactions')
+        .select('target_id, user_id').eq('target_type', targetType).in('target_id', ids.map(String))
+      for (const r of data || []) {
+        const k = String(r.target_id)
+        if (!out[k]) out[k] = { count: 0, liked: false }
+        out[k].count++
+        if (me && r.user_id === me) out[k].liked = true
+      }
+      return out
+    },
+    async like(targetType, targetId) {
+      const me = await uid()
+      if (!me) return
+      await platform().from('reactions').insert({ user_id: me, target_type: targetType, target_id: String(targetId) })
+    },
+    async unlike(targetType, targetId) {
+      const me = await uid()
+      if (!me) return
+      await platform().from('reactions').delete()
+        .eq('user_id', me).eq('target_type', targetType).eq('target_id', String(targetId))
     },
   },
 

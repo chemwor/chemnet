@@ -19,6 +19,7 @@ import { useKonamiCode } from '../hooks/useKonamiCode'
 import { useSecretCode } from '../hooks/useSecretCode'
 import { useNodeView } from './useNodeView'
 import { usePresence } from '../hooks/usePresence'
+import { setInitialItem } from '../hooks/useInitialItem'
 
 // Cache lazy components so they don't remount on every render
 const lazyCache = new Map()
@@ -75,14 +76,27 @@ export function DesktopShell({ windowManager }) {
   const konamiActive = useKonamiCode()
   const { triggered: bsodActive, dismiss: dismissBsod } = useSecretCode('IDDQD')
 
-  // Terminal open app command
+  // Open-app channel. detail is either an app id string, or { app, itemId }
+  // to deep-link into a specific item (ChemFeed "open on node").
   useEffect(() => {
     const handler = (e) => {
-      const appId = e.detail
+      const d = e.detail
+      const appId = typeof d === 'string' ? d : d?.app
+      if (d && typeof d === 'object' && d.itemId) setInitialItem(d.app, d.itemId)
       if (APP_REGISTRY.find(a => a.id === appId)) openApp(appId)
     }
     window.addEventListener('ericOS:openApp', handler)
     return () => window.removeEventListener('ericOS:openApp', handler)
+  }, [openApp])
+
+  // Deep-link on load: /u/:handle?app=<id>&item=<id> opens that app on the item.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    const app = p.get('app'), item = p.get('item')
+    if (app && APP_REGISTRY.find(a => a.id === app)) {
+      if (item) setInitialItem(app, item)
+      openApp(app)
+    }
   }, [openApp])
 
   // Meltdown state

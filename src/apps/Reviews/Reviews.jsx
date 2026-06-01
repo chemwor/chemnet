@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { useInitialItem } from '../../hooks/useInitialItem'
 import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
@@ -372,6 +373,15 @@ function ReviewsView({ data, loading }) {
   const [filter, setFilter] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
   const [openId, setOpenId] = useState(null)
+
+  // Deep-link: open a specific review when arriving from ChemFeed.
+  const initialItem = useInitialItem('reviews')
+  useEffect(() => {
+    if (!initialItem || !data?.length) return
+    const it = data.find(r => String(r.id) === String(initialItem))
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (it) setOpenId(it.id)
+  }, [initialItem, data])
 
   if (loading) {
     return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f1a', color: '#555', fontFamily: 'monospace' }}>Loading...</div>

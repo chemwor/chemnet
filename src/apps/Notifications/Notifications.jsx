@@ -13,7 +13,8 @@ function describe(n) {
     case 'chemmail': return { icon: '✉️', text: `${who} sent you a message${n.payload?.subject ? `: ${n.payload.subject}` : ''}`, open: 'messageboard' }
     case 'friend_request': return { icon: '👋', text: `${who} sent you a friend request`, open: 'directory' }
     case 'friend_accept': return { icon: '🤝', text: `${who} accepted your friend request`, href: n.actor_handle ? `/u/${n.actor_handle}` : null }
-    default: return { icon: '🔔', text: `${who} — ${n.kind}`, href: null }
+    case 'like': return { icon: '♥', text: `${who} liked your activity`, open: 'chemfeed' }
+    default: return { icon: '🔔', text: `${who}: ${n.kind}`, href: null }
   }
 }
 

@@ -5,6 +5,7 @@ import { MobilePanel } from '../windows/MobilePanel'
 import { AppIcon } from './AppIcon'
 import { useNodeView } from './useNodeView'
 import { usePresence } from '../hooks/usePresence'
+import { setInitialItem } from '../hooks/useInitialItem'
 import daytime from '../assets/wallpapers/daytime.jpg'
 import nighttime from '../assets/wallpapers/nighttime.jpg'
 
@@ -335,11 +336,25 @@ export function MobileShell({ windowManager }) {
 
   useEffect(() => {
     const handler = (e) => {
-      const appId = e.detail
+      const d = e.detail
+      const appId = typeof d === 'string' ? d : d?.app
+      if (d && typeof d === 'object' && d.itemId) setInitialItem(d.app, d.itemId)
       if (APP_REGISTRY.find(a => a.id === appId)) handleOpen(appId)
     }
     window.addEventListener('ericOS:openApp', handler)
     return () => window.removeEventListener('ericOS:openApp', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Deep-link on load: /u/:handle?app=<id>&item=<id> opens that app on the item.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    const app = p.get('app'), item = p.get('item')
+    if (app && APP_REGISTRY.find(a => a.id === app)) {
+      if (item) setInitialItem(app, item)
+      handleOpen(app)
+    }
   }, [])
 
   // Land in edit mode: /u/:handle?edit=1 auto-opens Customize for the owner.

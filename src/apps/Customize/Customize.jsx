@@ -28,6 +28,8 @@ export default function Customize() {
   const [wallpaper, setWallpaper] = useState('warm-slate')
   const [enabled, setEnabled] = useState([])      // ordered list of app ids
   const [labels, setLabels] = useState({})
+  const [scUrl, setScUrl] = useState('')
+  const [spUrl, setSpUrl] = useState('')
   const [msg, setMsg] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -40,9 +42,14 @@ export default function Customize() {
       const order = c?.app_order?.length ? c.app_order : (c?.enabled_apps || [])
       setEnabled(order.filter(id => MANAGEABLE.some(a => a.id === id)))
       setLabels(c?.app_labels || {})
+      setScUrl(c?.soundcloud_url || '')
+      setSpUrl(c?.spotify_url || '')
       setLoading(false)
     })
   }, [repo])
+
+  const scValid = !scUrl.trim() || /soundcloud\.com\//.test(scUrl)
+  const spValid = !spUrl.trim() || /open\.spotify\.com\/playlist\//.test(spUrl)
 
   const isEnabled = (id) => enabled.includes(id)
   const toggle = (id) => setEnabled(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -60,6 +67,8 @@ export default function Customize() {
       enabled_apps: enabled,
       app_order: enabled,
       app_labels: labels,
+      soundcloud_url: scUrl.trim() || null,
+      spotify_url: spUrl.trim() || null,
     }
     const res = await repo.desktopConfig.upsert(config)
     if (!res) { setMsg('Error saving — are you the owner of this node?'); return }
@@ -79,6 +88,7 @@ export default function Customize() {
         <button style={tabBtn(tab === 'theme')} onClick={() => setTab('theme')}>🎨 Theme</button>
         <button style={tabBtn(tab === 'wallpaper')} onClick={() => setTab('wallpaper')}>🖼 Wallpaper</button>
         <button style={tabBtn(tab === 'apps')} onClick={() => setTab('apps')}>📱 Apps</button>
+        <button style={tabBtn(tab === 'music')} onClick={() => setTab('music')}>🎵 Music</button>
         <button onClick={save} style={{ ...tabBtn(false), marginLeft: 'auto', background: '#4ADE80', color: '#000', fontWeight: 'bold' }}>Save</button>
       </div>
 
@@ -167,6 +177,30 @@ export default function Customize() {
                 <span style={{ flex: 1, fontSize: 12 }}>{app.label}</span>
               </div>
             ))}
+          </div>
+        )}
+
+        {tab === 'music' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ ...label }}>
+              Paste your playlist links. They auto-sync: edit the playlist on SoundCloud or Spotify and your node updates with no changes here. Use a playlist link, not a single track.
+            </div>
+            <label style={label}>SoundCloud playlist URL <span style={{ color: 'var(--color-text-disabled)' }}>(My Music)</span>
+              <input value={scUrl} onChange={e => setScUrl(e.target.value)} placeholder="https://soundcloud.com/you/sets/your-playlist" style={field} />
+            </label>
+            {scUrl.trim() && (
+              <div style={{ fontSize: 11, color: scValid ? '#4ADE80' : '#FF5555', marginTop: -8 }}>
+                {scValid ? '✓ Looks like a SoundCloud link' : '✗ That is not a soundcloud.com URL'}
+              </div>
+            )}
+            <label style={label}>Spotify playlist URL <span style={{ color: 'var(--color-text-disabled)' }}>(Current Rotation)</span>
+              <input value={spUrl} onChange={e => setSpUrl(e.target.value)} placeholder="https://open.spotify.com/playlist/…" style={field} />
+            </label>
+            {spUrl.trim() && (
+              <div style={{ fontSize: 11, color: spValid ? '#4ADE80' : '#FF5555', marginTop: -8 }}>
+                {spValid ? '✓ Looks like a Spotify playlist' : '✗ Use an open.spotify.com/playlist/… URL'}
+              </div>
+            )}
           </div>
         )}
       </div>

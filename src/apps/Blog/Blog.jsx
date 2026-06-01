@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useRepo } from '../../lib/repo/useRepo'
+import { useInitialItem } from '../../hooks/useInitialItem'
 import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
@@ -369,6 +370,15 @@ export default function Blog() {
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadPosts() }, [loadPosts])
+
+  // Deep-link: open a specific post when arriving from ChemFeed.
+  const initialItem = useInitialItem('blog')
+  useEffect(() => {
+    if (!initialItem || !posts.length) return
+    const p = posts.find(x => String(x.id) === String(initialItem))
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (p) setOpenPostId(p.id)
+  }, [initialItem, posts])
 
   const openPost = posts.find(p => p.id === openPostId)
 

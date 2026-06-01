@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { useInitialItem } from '../../hooks/useInitialItem'
 import { OwnerManager } from '../_shared/OwnerManager'
 import { UploadButton } from '../_shared/UploadButton'
 
@@ -78,12 +79,19 @@ function LockedSlide({ hint, onUnlock, expected, dark = true }) {
 // DESKTOP — Win95 File Browser with thumbnail grid
 // ══════════════════════════════════════════
 
-function DesktopPictures({ photos, loading }) {
+function DesktopPictures({ photos, loading, initialId }) {
   const [selected, setSelected] = useState(null)
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
   const [yearFilter, setYearFilter] = useState('all')
   const [unlocked, unlock] = useUnlocked(selected?.id)
+
+  useEffect(() => {
+    if (!initialId || !photos.length) return
+    const p = photos.find(x => String(x.id) === String(initialId))
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (p) { setSelected(p); setSlideIdx(0) }
+  }, [initialId, photos])
 
   const years = [...new Set(photos.map(p => new Date(p.created_at).getFullYear()))].sort((a, b) => b - a)
   const visible = photos
@@ -249,12 +257,19 @@ function DesktopPictures({ photos, loading }) {
 // MOBILE — Old iPhone Photo Gallery
 // ══════════════════════════════════════════
 
-function MobilePictures({ photos, loading }) {
+function MobilePictures({ photos, loading, initialId }) {
   const [selected, setSelected] = useState(null)
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
   const [yearFilter, setYearFilter] = useState('all')
   const [unlocked, unlock] = useUnlocked(selected?.id)
+
+  useEffect(() => {
+    if (!initialId || !photos.length) return
+    const p = photos.find(x => String(x.id) === String(initialId))
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (p) { setSelected(p); setSlideIdx(0) }
+  }, [initialId, photos])
 
   const years = [...new Set(photos.map(p => new Date(p.created_at).getFullYear()))].sort((a, b) => b - a)
   const visible = photos
@@ -391,6 +406,7 @@ export default function Pictures() {
   const repo = useRepo()
   const { node, isOwner } = useProfile()
   const canUpload = node.kind === 'member' && isOwner
+  const initialItem = useInitialItem('pictures')
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -405,7 +421,7 @@ export default function Pictures() {
 
   return (
     <>
-      {isMobile ? <MobilePictures photos={photos} loading={loading} /> : <DesktopPictures photos={photos} loading={loading} />}
+      {isMobile ? <MobilePictures photos={photos} loading={loading} initialId={initialItem} /> : <DesktopPictures photos={photos} loading={loading} initialId={initialItem} />}
       {canUpload && (
         <div style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 50 }}>
           <UploadButton

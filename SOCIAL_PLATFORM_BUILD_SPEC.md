@@ -326,3 +326,93 @@ A logged-in **visitor** on someone else's node never sees that owner's
 `owner`-visibility apps — those belong on the visitor's own node (`isOwner`, not
 merely "authed"). `flagshipOnly`/`memberOnly` remain as orthogonal node-kind
 constraints (Directory = flagship; Profile/Customize = member).
+
+---
+
+## 13. Activity feed + likes (ChemFeed v2)
+
+ChemFeed is a chronological stream of what the people you follow have done on
+their member nodes, with likes and deep-links into the item on its owner's node.
+
+### Activity model
+- `platform.activity (id, actor_id, kind, app, item_id, title, preview, created_at)`.
+  One row per member content item, written by a single SECURITY DEFINER trigger
+  (`on_content_activity`) on INSERT into the member content tables. Clients never
+  insert activity (no insert policy). RLS select = actor profile is_public AND no
+  block between actor and viewer. The `activity_feed` view adds the followee
+  filter + actor profile.
+- `kind -> app -> source table` mapping (one trigger, easy to extend):
+
+  | kind | app (APP_REGISTRY id) | source table | title / preview |
+  |---|---|---|---|
+  | blog | blog | members.posts | title / content snippet (published only) |
+  | photo | pictures | members.photos | title / url |
+  | review | reviews | members.reviews | title / poster |
+  | food | restaurants | members.food_items | name / icon |
+  | travel | trips | members.travel_log | destination / icon |
+  | carmod | carmods | members.car_mods | name / - |
+  | project | projects | members.projects | name / tagline |
+  | music | music | members.music_tracks | name / artist |
+  | digest | digest | members.digest_entries | title / note |
+  | wishlist | wishlist | members.wishlist_items | name / image |
+
+  Hidden rows (is_hidden) and unpublished posts are skipped.
+
+### Deep-link contract
+- URL: `/u/:handle?app=<APP_REGISTRY id>&item=<item_id>`.
+- Both shells, on load (and via the `ericOS:openApp` event whose `detail` may be
+  `{ app, itemId }`), stash the item with `setInitialItem(app, itemId)` then open
+  the app. Apps read it once via `useInitialItem(appId)` and open that item.
+  Wired for blog, pictures, reviews, restaurants, trips (others open to the app).
+
+### Likes
+- `platform.reactions (user_id, target_type, target_id, unique)`. RLS: own
+  insert/delete, open select. A SECURITY DEFINER trigger notifies the liked
+  activity's owner (`kind='like'`), respecting blocks and never self-notifying.
+
+### Limitations (deliberate)
+- Flagship (Eric, public.*) activity is not in the feed.
+- Comments are deferred until moderation/rate-limit maturity. Likes only.
+
+---
+
+## 14. Music integrations (Phase 6, embed-first)
+
+The Music app has three segments, driven by playlist URLs (embeds only, no API
+keys / OAuth / secrets):
+
+- **My Productions** — local list of Eric's own tracks (unchanged).
+- **My Music** — SoundCloud HTML5 widget for the owner's playlist, wrapped in
+  Napster (P2P client) chrome.
+- **Current Rotation** — Spotify embed for the owner's playlist, wrapped in
+  iTunes chrome (Name/Artist/Album/Time header + now-playing bar). Falls back to
+  a curated album list when no Spotify URL is set.
+
+### Per-node config
+- Migration adds `soundcloud_url` and `spotify_url` to `members.desktop_config`
+  (members set them in Customize → Music; validated for `soundcloud.com/` and
+  `open.spotify.com/playlist/`). Flagship URLs live in the `FLAGSHIP_MUSIC`
+  constant in the Music app (no public.* schema change). `memberRepo`/
+  `useDesktopConfig` already select `*`, so the columns flow through.
+
+### Expected embed URL formats
+- SoundCloud: any `soundcloud.com/<user>/sets/<playlist>` URL. Rendered via
+  `https://w.soundcloud.com/player/?url=<encoded>&visual=true`.
+- Spotify: `https://open.spotify.com/playlist/<id>` → `https://open.spotify.com/embed/playlist/<id>`.
+- Always use PLAYLIST links so the embed auto-syncs when the playlist is edited.
+  Single-track links would be static.
+
+### Behavior
+- Auto-sync: embeds load live from the providers, so editing a linked playlist
+  updates the app with no redeploy.
+- Spotify playback: previews for everyone, full tracks only for viewers logged
+  into Spotify Premium (expected; the iTunes UI is a styled shell).
+
+### Deferred: real "Current Rotation" via Spotify OAuth
+There is no public embed for "recently played." A true auto-pulled rotation
+would need: a Spotify app (client id/secret), an OAuth authorization-code flow
+so the owner links their Spotify account, secure server-side token storage +
+refresh (an Edge Function + a `members.spotify_tokens` table, RLS owner-only),
+and a server endpoint that calls the Spotify Web API (`/me/player/recently-played`
+or top tracks) on a schedule or on load. That is a separate phase (keys, OAuth,
+server pieces) deliberately out of scope here.
