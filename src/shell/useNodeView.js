@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { APP_REGISTRY } from '../apps/registry'
 import { useProfile } from '../context/ProfileContext'
 import { useDesktopConfig } from '../hooks/useDesktopConfig'
-import { themeStyle, wallpaperCss } from '../lib/customization'
+import { themeStyle, wallpaperCss, brandLabel } from '../lib/customization'
 
 // Node-kind scoping (orthogonal to visibility):
 //   flagshipOnly → only on `/`        (Directory)
@@ -69,8 +69,13 @@ export function useNodeView() {
     [node, isOwner, isAuthed, hasNode, config],
   )
 
-  const labelFor = (app) =>
-    (node.kind === 'member' && config?.app_labels?.[app.id]) || app.label
+  const labelFor = (app) => {
+    // A member's custom rename wins; otherwise re-brand "Chem…" apps to the
+    // node owner's handle (ChemTube -> BobTube) on member nodes.
+    const custom = node.kind === 'member' ? config?.app_labels?.[app.id] : null
+    if (custom) return custom
+    return node.kind === 'member' ? brandLabel(app.label, node) : app.label
+  }
 
   const isMember = node.kind === 'member'
   const themeVars = isMember ? themeStyle(config?.theme) : {}

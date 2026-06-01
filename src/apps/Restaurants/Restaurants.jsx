@@ -207,6 +207,11 @@ function MobileRestaurantDetail({ item, onBack }) {
             <div style={{ fontSize: 15, color: '#333', lineHeight: 1.6 }}>{item.why}</div>
           </div>
         )}
+        {item.link && (
+          <div style={{ padding: '12px 16px', borderTop: '0.5px solid #e5e5ea' }}>
+            <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-accent)', textDecoration: 'none' }}>Visit site ↗</a>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -351,6 +356,10 @@ function RestaurantsView({ data, loading }) {
                 <div className="text-xs font-bold mb-1" style={{ color: '#FF6B35' }}>Why I want to go:</div>
                 <div className="text-xs leading-relaxed" style={{ color: '#aaa' }}>{selected.why}</div>
               </div>
+            )}
+
+            {selected.link && (
+              <a href={selected.link} target="_blank" rel="noopener noreferrer" className="text-xs mt-3 inline-block" style={{ color: 'var(--color-accent)' }}>Visit site ↗</a>
             )}
           </div>
         )}

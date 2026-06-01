@@ -22,6 +22,25 @@ export const WALLPAPERS = [
   { key: 'mono', label: 'Mono', css: '#161616' },
 ]
 
+// Brand prefix for "Chem"-named apps (ChemTube, ChemFeed). The flagship hub is
+// Eric's, so it keeps "Chem" (from Chemwor). A member node uses the owner's
+// handle instead, capitalized — e.g. bob -> "BobTube", "BobFeed".
+export function brandPrefix(node) {
+  if (node?.kind === 'member' && node.handle) {
+    return node.handle.charAt(0).toUpperCase() + node.handle.slice(1)
+  }
+  return 'Chem'
+}
+
+// Apply the brand prefix to a "Chem…" label (ChemTube -> BobTube). Non-Chem
+// labels pass through unchanged.
+export function brandLabel(label, node) {
+  if (typeof label === 'string' && label.startsWith('Chem')) {
+    return brandPrefix(node) + label.slice(4)
+  }
+  return label
+}
+
 export function wallpaperCss(key) {
   // A custom uploaded wallpaper is stored as a URL; render it as a cover image.
   if (key && /^https?:\/\//.test(key)) return `url("${key}") center / cover no-repeat`

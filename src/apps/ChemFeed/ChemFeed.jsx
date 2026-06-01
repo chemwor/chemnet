@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { brandPrefix } from '../../lib/customization'
 
 // Feed of recent public posts from the people the current user follows.
 // Visibility is enforced by RLS / the platform.feed_posts view — the client
@@ -13,7 +14,7 @@ function Avatar({ p, size = 32 }) {
 
 export default function ChemFeed() {
   const repo = useRepo()
-  const { currentUser } = useProfile()
+  const { currentUser, node } = useProfile()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -39,7 +40,7 @@ export default function ChemFeed() {
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--color-surface)', color: 'var(--color-text-primary)', fontFamily: '"Courier Prime", "Courier New", monospace' }}>
-      <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--color-bevel-dark)', fontWeight: 'bold', fontSize: 13 }}>📡 ChemFeed</div>
+      <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--color-bevel-dark)', fontWeight: 'bold', fontSize: 13 }}>📡 {brandPrefix(node)}Feed</div>
       <div style={{ flex: 1, overflow: 'auto' }}>
         {loading ? (
           <div style={{ padding: 20, color: 'var(--color-text-secondary)', fontSize: 12 }}>Loading…</div>
