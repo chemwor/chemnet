@@ -10,15 +10,6 @@ const FLAGSHIP_MUSIC = {
   spotify: 'https://open.spotify.com/playlist/3o3g3Y7v8bgwn72UwSP4AL',
 }
 
-// Local "My Productions" list (Eric's own tracks).
-const PRODUCTIONS = [
-  { name: 'Late Night Sessions - Beat 01.mp3', size: '4.2 MB', date: '2026-03-10', description: 'Late night piano loop. Chopped and looped until it felt right. Lo-fi vibes.' },
-  { name: 'Nairobi Sunrise (Guitar).mp3', size: '3.8 MB', date: '2026-02-14', description: 'Fingerpicking piece inspired by early mornings in Nairobi. Clean tone, no effects.' },
-  { name: 'Demo - Untitled 003.mp3', size: '5.1 MB', date: '2026-01-28', description: 'Work in progress. Piano, bass, and a beat that is almost there but not quite.' },
-  { name: 'Guitar Loop - Am7 Progression.mp3', size: '2.1 MB', date: '2025-12-15', description: 'Simple chord loop I made for sampling. Am7, Dm9, G, Cmaj7.' },
-  { name: 'First Piano Recording.mp3', size: '3.4 MB', date: '2025-10-20', description: 'First thing I recorded when I got the keyboard. Rough but honest.' },
-]
-
 // Fallback "Current Rotation" albums shown when no Spotify playlist is linked.
 const ROTATION = [
   { artist: 'Kendrick Lamar', album: 'GNX', year: '2025' },
@@ -140,38 +131,13 @@ function ItunesPlayer({ url, isOwner }) {
   )
 }
 
-// ── My Productions (local tracks) ──
-function Productions() {
-  const [selected, setSelected] = useState(null)
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--color-desktop-bg)', fontFamily: '"Courier Prime", monospace' }}>
-      <div style={{ display: 'flex', padding: '3px 10px', fontSize: 11, fontWeight: 'bold', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-bevel-dark)', background: 'var(--color-titlebar-inactive)' }}>
-        <span style={{ flex: 1 }}>Name</span><span style={{ width: 70, textAlign: 'right' }}>Size</span><span style={{ width: 90, textAlign: 'right' }}>Date</span>
-      </div>
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        {PRODUCTIONS.map((t, i) => (
-          <div key={i} onClick={() => setSelected(selected === i ? null : i)} style={{ padding: '6px 10px', cursor: 'pointer', borderBottom: '1px solid var(--color-bevel-dark)', background: selected === i ? 'var(--color-accent)' : 'transparent', color: selected === i ? '#000' : 'var(--color-text-primary)' }}>
-            <div style={{ display: 'flex', fontSize: 12 }}>
-              <span style={{ flex: 1 }}>🎵 {t.name.replace('.mp3', '')}</span>
-              <span style={{ width: 70, textAlign: 'right', opacity: 0.8 }}>{t.size}</span>
-              <span style={{ width: 90, textAlign: 'right', opacity: 0.8 }}>{t.date}</span>
-            </div>
-            {selected === i && <div style={{ fontSize: 11, marginTop: 4, opacity: 0.85, lineHeight: 1.5 }}>{t.description}</div>}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 const SEGMENTS = [
-  { id: 'productions', label: 'My Productions' },
   { id: 'soundcloud', label: 'My Music' },
   { id: 'spotify', label: 'Current Rotation' },
 ]
 
 function MusicShell({ scUrl, spUrl, isOwner }) {
-  const [seg, setSeg] = useState('productions')
+  const [seg, setSeg] = useState('soundcloud')
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--color-surface)', color: 'var(--color-text-primary)', fontFamily: '"Courier Prime", "Courier New", monospace' }}>
       <div style={{ display: 'flex', gap: 2, padding: '5px 8px', borderBottom: '1px solid var(--color-bevel-dark)' }}>
@@ -180,7 +146,6 @@ function MusicShell({ scUrl, spUrl, isOwner }) {
         ))}
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
-        {seg === 'productions' && <Productions />}
         {seg === 'soundcloud' && <NapsterPlayer url={scUrl} isOwner={isOwner} />}
         {seg === 'spotify' && <ItunesPlayer url={spUrl} isOwner={isOwner} />}
       </div>

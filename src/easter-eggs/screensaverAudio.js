@@ -23,6 +23,22 @@ export function getScreensaverAudio() {
   return audio
 }
 
+// True if the page already has audio going, so the screensaver theme should
+// stay quiet and not talk over it. Covers same-page <audio>/<video> that are
+// actually playing, plus the presence of a Spotify / SoundCloud / YouTube embed
+// (cross-origin iframes — we can't read their play state, so we yield to them).
+// The screensaver's own theme uses a detached `new Audio()`, so it is never
+// matched by the element scan below.
+export function pageAudioActive() {
+  if (typeof document === 'undefined') return false
+  for (const el of document.querySelectorAll('audio, video')) {
+    if (!el.paused && !el.ended && el.currentTime > 0 && !el.muted && el.volume > 0) return true
+  }
+  return !!document.querySelector(
+    'iframe[src*="spotify.com"], iframe[src*="soundcloud.com"], iframe[src*="youtube.com"], iframe[src*="youtube-nocookie.com"]',
+  )
+}
+
 function unlock() {
   if (unlocked) return
   const a = getScreensaverAudio()

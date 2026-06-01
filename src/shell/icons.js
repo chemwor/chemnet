@@ -53,6 +53,12 @@ export const ICONS = {
   // Folder — classic yellow folder
   folder: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M1 4h5l1-2h7v1H7.5L6.5 5H1z" fill="#c90"/><rect x="1" y="4" width="14" height="10" rx="0" fill="#fc0" stroke="#a80" stroke-width=".5"/><rect x="1" y="4" width="14" height="2" fill="#fd2"/></svg>`,
 
+  // People — member directory (profile silhouette)
+  people: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3.2" fill="#A9C2E8"/><path d="M1.5 15c0-3.7 2.9-5.6 6.5-5.6s6.5 1.9 6.5 5.6z" fill="#A9C2E8"/></svg>`,
+
+  // Pager — notifications (dark body, green LCD strip, two buttons, antenna nub)
+  pager: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="11.3" y="0" width="1" height="2.6" fill="#888"/><rect x="3" y="1.5" width="10" height="13" rx="1.5" fill="#2b2f3a" stroke="#11131a" stroke-width=".6"/><rect x="4.4" y="3" width="7.2" height="4" rx=".4" fill="#9ae6b4" stroke="#2f6f4f" stroke-width=".4"/><rect x="5" y="4" width="6" height=".9" fill="#2f6f4f"/><rect x="5" y="5.4" width="4" height=".9" fill="#2f6f4f"/><circle cx="6" cy="10.6" r="1" fill="#c0c4cc"/><circle cx="10" cy="10.6" r="1" fill="#c0c4cc"/><rect x="7" y="12.4" width="2" height="1.2" rx=".3" fill="#c0c4cc"/></svg>`,
+
   // Blog — pen/paper
   blog: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="2" y="1" width="10" height="14" fill="#fff" stroke="#000" stroke-width=".7"/><line x1="4" y1="4" x2="10" y2="4" stroke="#aaa" stroke-width=".5"/><line x1="4" y1="6" x2="10" y2="6" stroke="#aaa" stroke-width=".5"/><line x1="4" y1="8" x2="10" y2="8" stroke="#aaa" stroke-width=".5"/><path d="M11 6l3-4 1 1-3 4z" fill="#c00"/><path d="M12 7l-1 2 2-1z" fill="#c00"/></svg>`,
 

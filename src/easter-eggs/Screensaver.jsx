@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { getScreensaverAudio } from './screensaverAudio'
+import { getScreensaverAudio, pageAudioActive } from './screensaverAudio'
 
 const STORAGE_BASE = 'https://cxbfuzqjlqipjyinhzqv.supabase.co/storage/v1/object/public/screensavers'
 
@@ -51,9 +51,11 @@ export function Screensaver({ onDismiss }) {
   const url = useMemo(getScreensaverUrl, [])
   const [loadFailed, setLoadFailed] = useState(false)
 
-  // Play the screensaver theme while active; stop on dismiss/unmount.
-  // Uses the shared element primed on first user gesture (see screensaverAudio).
+  // Play the screensaver theme while active; stop on dismiss/unmount. Skip it
+  // entirely if the page already has audio (Spotify/SoundCloud/a video) so we
+  // never talk over what the user is listening to.
   useEffect(() => {
+    if (pageAudioActive()) return
     const audio = getScreensaverAudio()
     audio.currentTime = 0
     audio.play().catch(() => {})

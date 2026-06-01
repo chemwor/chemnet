@@ -60,7 +60,7 @@ const IOS_GLYPHS = {
   arkanoid: '🧱', fighter: '🤖', snake: '🐍', '2048': '🔢',
   flappybird: '🐤', tetris: '▦', sudoku: '9', doodlejump: '↑',
   fruitninja: '🔪', admin: '⚙️', signup: '✨', customize: '⚙️',
-  profile: '👤', notifications: '🔔', chemfeed: '📡', directory: '🗂️',
+  profile: '👤', notifications: '📟', chemfeed: '📡', directory: '👥',
 }
 
 // ── App Icon (iOS 1 glossy rounded square) ──

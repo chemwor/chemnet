@@ -254,7 +254,7 @@ export const APP_REGISTRY = [
     // Your notifications (follows, guestbook signs, mail) — your own node only.
     id: 'notifications',
     label: 'Notifications',
-    icon: 'message',
+    icon: 'pager',
     component: () => import('./Notifications/Notifications.jsx'),
     defaultSize: { width: 460, height: 480 },
     defaultPosition: { x: 160, y: 50 },
@@ -284,7 +284,7 @@ export const APP_REGISTRY = [
     // Invite are the viewer's own).
     id: 'directory',
     label: 'Members',
-    icon: 'folder',
+    icon: 'people',
     component: () => import('./Directory/Directory.jsx'),
     defaultSize: { width: 480, height: 520 },
     defaultPosition: { x: 140, y: 60 },
