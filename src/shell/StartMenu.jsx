@@ -176,7 +176,7 @@ export function StartMenu({ onOpenApp, onClose, apps = APP_REGISTRY, labelFor = 
             icon="help"
             label="About ChemNet"
             onMouseEnter={() => setActiveSubmenu(null)}
-            onClick={() => handleOpen('about')}
+            onClick={() => handleOpen('aboutchemnet')}
           />
         </div>
       </motion.div>

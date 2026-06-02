@@ -15,6 +15,21 @@ export const APP_REGISTRY = [
     hideFromDesktop: true, // opens on boot; no need for a desktop icon
   },
   {
+    // "About ChemNet" — platform explainer opened from the Start Menu on every
+    // node. Hidden from desktop/menus/taskbar; only reachable via that item.
+    id: 'aboutchemnet',
+    label: 'About ChemNet',
+    icon: 'help',
+    component: () => import('./AboutChemNet/AboutChemNet.jsx'),
+    defaultSize: { width: 460, height: 420 },
+    defaultPosition: { x: 160, y: 80 },
+    openOnBoot: false,
+    pinned: false,
+    auth: false,
+    category: null,
+    hideFromDesktop: true,
+  },
+  {
     id: 'aboutme',
     label: 'About',
     icon: 'computer',

@@ -513,34 +513,6 @@ function MobileAbout() {
 const linkLabel = (url) => String(url).replace(/^https?:\/\//, '').replace(/\/+$/, '')
 const linkHref = (url) => (/^https?:\/\//.test(url) ? url : `https://${url}`)
 
-// Shared "About ChemNet" explainer — the default/empty state on every member
-// node's About. It describes the PLATFORM (never Eric's bio), so an empty
-// member profile reads as "this is a ChemNet node" rather than leaking the hub.
-const ABOUT_CHEMNET = {
-  heading: 'About ChemNet',
-  lines: [
-    'ChemNet is a personal retro-OS desktop on the web.',
-    'Everyone gets their own node at /u/their-handle — theme it, pick which apps show, and fill them with your own posts, photos, reviews, and links.',
-    'Want one? Open “Make Your Own” on the hub.',
-  ],
-}
-
-// Renders the explainer; the owner also gets a nudge to introduce themselves
-// (the Edit affordance lives in the header on both skins).
-function AboutChemnetEmpty({ isOwner, mobile }) {
-  const muted = mobile ? '#8e8e93' : 'var(--color-text-secondary)'
-  return (
-    <div style={{ padding: mobile ? '28px 24px' : 24, textAlign: 'center', maxWidth: 460, margin: '0 auto' }}>
-      <div style={{ fontSize: 30, marginBottom: 8 }}>🛰️</div>
-      <div style={{ fontWeight: 'bold', fontSize: mobile ? 17 : 15, marginBottom: 8, color: mobile ? '#fff' : 'var(--color-text-primary)' }}>{ABOUT_CHEMNET.heading}</div>
-      {ABOUT_CHEMNET.lines.map((l, i) => (
-        <p key={i} style={{ margin: '0 0 8px', fontSize: 13, lineHeight: 1.6, color: muted }}>{l}</p>
-      ))}
-      {isOwner && <p style={{ marginTop: 12, fontSize: 13, color: 'var(--color-accent, #0A84FF)' }}>This is your node — hit Edit to introduce yourself.</p>}
-    </div>
-  )
-}
-
 function MemberEdit({ profile, onSave, onCancel, saving, accentText }) {
   const [form, setForm] = useState({
     displayName: profile.display_name || '',
@@ -598,7 +570,9 @@ function MemberAboutDesktop({ profile, isOwner, onEdit }) {
           <DRow key={i} label={i === 0 ? 'Links' : ''}><a href={linkHref(l)} target="_blank" rel="noreferrer" style={{ color: 'var(--color-accent)' }}>{linkLabel(l)}</a></DRow>
         ))}
         {!profile.bio && !profile.location && !links.length && (
-          <AboutChemnetEmpty isOwner={isOwner} />
+          <div style={{ padding: 24, textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 13 }}>
+            {isOwner ? 'Your profile is empty. Hit Edit to add a bio, location, and links.' : `${name} hasn’t added an intro yet.`}
+          </div>
         )}
       </div>
     </div>
@@ -645,7 +619,9 @@ function MemberAboutMobile({ profile, isOwner, onEdit }) {
           </>
         )}
         {!profile.bio && !profile.location && !links.length && (
-          <AboutChemnetEmpty isOwner={isOwner} mobile />
+          <div style={{ padding: 28, textAlign: 'center', color: '#8e8e93', fontSize: 15 }}>
+            {isOwner ? 'Tap Edit to add a bio, location, and links.' : `${name} hasn’t added an intro yet.`}
+          </div>
         )}
         <div style={{ height: 40 }} />
       </div>
