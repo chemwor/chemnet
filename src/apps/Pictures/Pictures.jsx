@@ -79,7 +79,7 @@ function LockedSlide({ hint, onUnlock, expected, dark = true }) {
 // DESKTOP — Win95 File Browser with thumbnail grid
 // ══════════════════════════════════════════
 
-function DesktopPictures({ photos, loading, initialId }) {
+function DesktopPictures({ photos, loading, initialId, dir }) {
   const [selected, setSelected] = useState(null)
   const [slideIdx, setSlideIdx] = useState(0)
   const [sortDir, setSortDir] = useState('desc')
@@ -184,7 +184,7 @@ function DesktopPictures({ photos, loading, initialId }) {
       {/* Address bar */}
       <div className="px-3 py-1 shrink-0" style={{ background: '#12121a', borderBottom: '1px solid #2a2840' }}>
         <div className="text-xs px-2 py-0.5" style={{ background: '#fff', color: '#000', display: 'inline-block' }}>
-          C:\Eric\Pictures\
+          {dir}
         </div>
       </div>
 
@@ -419,9 +419,12 @@ export default function Pictures() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
+  // Retro address-bar path, scoped to whose pictures these are.
+  const dir = `C:\\${node.kind === 'member' ? node.handle : 'Eric'}\\Pictures\\`
+
   return (
     <>
-      {isMobile ? <MobilePictures photos={photos} loading={loading} initialId={initialItem} /> : <DesktopPictures photos={photos} loading={loading} initialId={initialItem} />}
+      {isMobile ? <MobilePictures photos={photos} loading={loading} initialId={initialItem} /> : <DesktopPictures photos={photos} loading={loading} initialId={initialItem} dir={dir} />}
       {canUpload && (
         <div style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 50 }}>
           <UploadButton
