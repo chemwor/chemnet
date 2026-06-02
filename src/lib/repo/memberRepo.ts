@@ -6,6 +6,7 @@
 import { supabase } from '../supabase'
 import { socialApi } from './social'
 import { storageApi } from './storage'
+import { parseVideoUrl } from '../videoEmbed'
 import type { Repo, Row, BoardThread } from './types'
 
 // All member content lives in the `members` Postgres schema. Requires
@@ -180,14 +181,26 @@ export function memberRepo(userId: string): Repo {
       },
     },
 
-    videos: {
-      ...write('videos'),
-      async list() {
-        const { data } = await m().from('videos').select('*').eq('user_id', userId)
-          .order('sort_order', { ascending: true }).order('created_at', { ascending: false })
-        return data || []
-      },
-    },
+    videos: (() => {
+      const w = write('videos')
+      // Stamp the detected provider + thumbnail from the pasted URL on write
+      // (the app also re-derives at render, so this is just persistence).
+      const stamp = (row: Row) => {
+        if (!row || row.url == null) return row
+        const meta = parseVideoUrl(row.url)
+        return { ...row, provider: meta.provider, thumbnail: meta.thumbnail || null }
+      }
+      return {
+        ...w,
+        create(row: Row) { return w.create(stamp(row)) },
+        update(id: string | number, patch: Row) { return w.update(id, stamp(patch)) },
+        async list() {
+          const { data } = await m().from('videos').select('*').eq('user_id', userId)
+            .order('sort_order', { ascending: true }).order('created_at', { ascending: false })
+          return data || []
+        },
+      }
+    })(),
 
     messages: {
       async listInbox() {

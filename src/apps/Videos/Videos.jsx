@@ -3,6 +3,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useProfile } from '../../context/ProfileContext'
 import { useRepo } from '../../lib/repo/useRepo'
 import { brandPrefix } from '../../lib/customization'
+import { parseVideoUrl } from '../../lib/videoEmbed'
 import { OwnerManager } from '../_shared/OwnerManager'
 
 const TABS = [
@@ -25,10 +26,38 @@ function groupVideos(rows) {
   return folders
 }
 
-function getYouTubeId(url) {
-  if (!url) return null
-  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&]+)/)
-  return m ? m[1] : null
+// Render any parsed video (YouTube/Vimeo/Drive iframe, or a direct/Storage
+// <video>) to fill a positioned 16:9 box the caller provides. Unknown URLs
+// fail gracefully instead of crashing.
+function VideoFrame({ item, title, autoplay }) {
+  const v = parseVideoUrl(item?.url)
+  if (v.kind === 'iframe') {
+    const src = autoplay && v.provider !== 'drive'
+      ? `${v.embedUrl}${v.embedUrl.includes('?') ? '&' : '?'}autoplay=1` : v.embedUrl
+    return (
+      <iframe
+        src={src} title={title || 'video'}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    )
+  }
+  if (v.kind === 'video') {
+    return <video src={v.embedUrl} controls playsInline autoPlay={!!autoplay} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#000' }} />
+  }
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: '#bbb', fontSize: 12, padding: 16 }}>
+      Couldn’t read that link. Paste a YouTube, Vimeo, Google Drive, or direct .mp4 URL.
+    </div>
+  )
+}
+
+// Poster thumbnail — derivable for YouTube; other providers show a play glyph.
+function Thumb({ url, alt }) {
+  const t = parseVideoUrl(url).thumbnail
+  if (t) return <img src={t} alt={alt || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+  return <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18 }}>▶</div>
 }
 
 const cleanTitle = (name) => name.replace(/\.(mp4|mov|m4v|webm)$/i, '')
@@ -104,19 +133,7 @@ function DesktopVideos({ brand, uploader, folders }) {
             <>
               <h2 style={{ fontSize: 17, margin: '0 0 8px', color: '#111' }}>{cleanTitle(selected.name)}</h2>
               <div style={{ position: 'relative', width: '100%', maxWidth: 640, aspectRatio: '16 / 9', background: '#000' }}>
-                {(() => {
-                  const id = getYouTubeId(selected.url)
-                  if (!id) return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 12 }}>Invalid URL</div>
-                  return (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${id}`}
-                      title={selected.name}
-                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )
-                })()}
+                <VideoFrame item={selected} title={selected.name} />
               </div>
 
               {/* Meta box */}
@@ -127,7 +144,7 @@ function DesktopVideos({ brand, uploader, folders }) {
                   <a style={linkStyle}>★ Favorite</a> <span style={{ color: '#ccc' }}>|</span>{' '}
                   <a style={linkStyle}>Share</a> <span style={{ color: '#ccc' }}>|</span>{' '}
                   <a style={linkStyle}>Add to Playlist</a> <span style={{ color: '#ccc' }}>|</span>{' '}
-                  <a href={selected.url} target="_blank" rel="noopener noreferrer" style={linkStyle}>Open on YouTube ↗</a>
+                  <a href={selected.url} target="_blank" rel="noopener noreferrer" style={linkStyle}>Open original ↗</a>
                 </div>
               </div>
 
@@ -150,7 +167,6 @@ function DesktopVideos({ brand, uploader, folders }) {
           {items.length === 0 ? (
             <div style={{ padding: 10, fontSize: 11, color: '#999' }}>Nothing here yet.</div>
           ) : items.map((item, i) => {
-            const id = getYouTubeId(item.url)
             return (
               <div
                 key={item.name}
@@ -158,7 +174,7 @@ function DesktopVideos({ brand, uploader, folders }) {
                 style={{ display: 'flex', gap: 8, padding: '8px 4px', borderBottom: '1px solid #eee', cursor: 'pointer', background: i === selectedIdx ? '#fffbe6' : 'transparent' }}
               >
                 <div style={{ width: 100, height: 56, background: '#000', flexShrink: 0, overflow: 'hidden' }}>
-                  {id && <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                  <Thumb url={item.url} />
                 </div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 12, color: '#2b6fb7', lineHeight: 1.25 }}>{cleanTitle(item.name)}</div>
@@ -189,26 +205,15 @@ function MobileVideos({ brand, uploader, folders }) {
   const items = folders[tab].items
 
   if (playing) {
-    const id = getYouTubeId(playing.url)
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif' }}>
         <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', background: '#000', flexShrink: 0 }}>
-          {id ? (
-            <iframe
-              src={`https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1`}
-              title={playing.name}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>Invalid URL</div>
-          )}
+          <VideoFrame item={playing} title={playing.name} autoplay />
         </div>
         <div style={{ padding: '12px 14px', borderBottom: '1px solid #e5e5e5' }}>
           <div style={{ fontSize: 16, fontWeight: 500, color: '#222', lineHeight: 1.35 }}>{cleanTitle(playing.name)}</div>
           <div style={{ fontSize: 12, color: '#767676', marginTop: 4 }}>{uploader}</div>
-          <a href={playing.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 10, fontSize: 12, color: '#cc0000', textDecoration: 'none', fontWeight: 500 }}>Open on YouTube ↗</a>
+          <a href={playing.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 10, fontSize: 12, color: '#cc0000', textDecoration: 'none', fontWeight: 500 }}>Open original ↗</a>
         </div>
         <button
           onClick={() => setPlaying(null)}
@@ -242,11 +247,10 @@ function MobileVideos({ brand, uploader, folders }) {
         {items.length === 0 ? (
           <div style={{ padding: '40px 20px', textAlign: 'center', color: '#767676', fontSize: 14 }}>No videos here yet.</div>
         ) : items.map(item => {
-          const id = getYouTubeId(item.url)
           return (
             <div key={item.name} onClick={() => setPlaying(item)} style={{ background: '#fff', marginBottom: 8, cursor: 'pointer' }}>
               <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', background: '#000' }}>
-                {id && <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt={cleanTitle(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+                <Thumb url={item.url} alt={cleanTitle(item.name)} />
                 <div aria-hidden style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 56, height: 56, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 22, paddingLeft: 4 }}>▶</div>
               </div>
               <div style={{ padding: '10px 12px 12px' }}>

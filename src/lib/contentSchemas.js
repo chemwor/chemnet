@@ -29,7 +29,7 @@ export const RESOURCE_SCHEMAS = {
     title: 'title',
     fields: [
       { key: 'title', label: 'Title', type: 'text' },
-      { key: 'url', label: 'YouTube URL', type: 'text' },
+      { key: 'url', label: 'Video URL (any provider)', type: 'text', hint: 'YouTube, Vimeo, Google Drive (shared “anyone with the link” — note Drive has daily view limits), or a direct .mp4 link.' },
       { key: 'description', label: 'Description', type: 'textarea' },
       { key: 'folder', label: 'Folder', type: 'select', options: ['my-videos', 'watching'] },
     ],

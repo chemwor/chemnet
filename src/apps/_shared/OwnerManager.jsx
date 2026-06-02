@@ -32,7 +32,12 @@ function Field({ field, value, onChange }) {
     return <label style={labelStyle}>{field.label}<select value={value} onChange={e => set(e.target.value)} style={fieldStyle}>{field.options.map(o => <option key={o} value={o}>{o}</option>)}</select></label>
   }
   const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'
-  return <label style={labelStyle}>{field.label}<input type={inputType} value={value} onChange={e => set(e.target.value)} style={fieldStyle} /></label>
+  return (
+    <label style={labelStyle}>{field.label}
+      <input type={inputType} value={value} onChange={e => set(e.target.value)} style={fieldStyle} />
+      {field.hint && <span style={{ display: 'block', color: 'var(--color-text-disabled)', fontSize: 10, marginTop: 3, lineHeight: 1.4 }}>{field.hint}</span>}
+    </label>
+  )
 }
 
 export function OwnerManager({ resource, onChange }) {
