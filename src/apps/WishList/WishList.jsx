@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useRepo } from '../../lib/repo/useRepo'
+import { useProfile } from '../../context/ProfileContext'
 import { OwnerManager } from '../_shared/OwnerManager'
 
 const CATEGORIES = [
@@ -31,7 +32,7 @@ function sortItems(items, sort) {
 // DESKTOP — Early 2000s Shopping Site
 // ══════════════════════════════════════════
 
-function DesktopWishList({ items }) {
+function DesktopWishList({ items, title }) {
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('priority')
   const [selectedId, setSelectedId] = useState(null)
@@ -48,7 +49,7 @@ function DesktopWishList({ items }) {
       {/* Top banner */}
       <div style={{ background: 'linear-gradient(to bottom, #232f3e, #131921)', padding: '6px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ color: '#fff', fontWeight: 'bold', fontSize: 14 }}>
-          ✨ Eric's Wish List
+          ✨ {title}
         </div>
         <div style={{ color: '#ccc', fontSize: 10 }}>
           {items.length} items · ${totalValue.toLocaleString()} total
@@ -192,7 +193,7 @@ function DesktopWishList({ items }) {
 
       {/* Footer */}
       <div style={{ background: '#232f3e', padding: '4px 12px', textAlign: 'center', fontSize: 9, color: '#999' }}>
-        Eric's Wish List · {items.length} items · Updated 2026
+        {title} · {items.length} items
       </div>
     </div>
   )
@@ -301,6 +302,7 @@ function MobileWishList({ items }) {
 export default function WishList() {
   const isMobile = useMediaQuery('(max-width: 768px)')
   const repo = useRepo()
+  const { node } = useProfile()
   const [items, setItems] = useState([])
 
   const load = useCallback(async () => {
@@ -311,9 +313,12 @@ export default function WishList() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
+  // Title is node-scoped: never label a member's list as Eric's.
+  const title = node.kind === 'member' ? `@${node.handle}'s Wish List` : "Eric's Wish List"
+
   return (
     <>
-      {isMobile ? <MobileWishList items={items} /> : <DesktopWishList items={items} />}
+      {isMobile ? <MobileWishList items={items} /> : <DesktopWishList items={items} title={title} />}
       <OwnerManager resource="wishlist" onChange={load} />
     </>
   )

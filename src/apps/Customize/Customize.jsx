@@ -30,6 +30,7 @@ export default function Customize() {
   const [labels, setLabels] = useState({})
   const [scUrl, setScUrl] = useState('')
   const [spUrl, setSpUrl] = useState('')
+  const [ytUrl, setYtUrl] = useState('')
   const [msg, setMsg] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -44,12 +45,14 @@ export default function Customize() {
       setLabels(c?.app_labels || {})
       setScUrl(c?.soundcloud_url || '')
       setSpUrl(c?.spotify_url || '')
+      setYtUrl(c?.youtube_url || '')
       setLoading(false)
     })
   }, [repo])
 
   const scValid = !scUrl.trim() || /soundcloud\.com\//.test(scUrl)
   const spValid = !spUrl.trim() || /open\.spotify\.com\/playlist\//.test(spUrl)
+  const ytValid = !ytUrl.trim() || /(youtube\.com\/|youtu\.be\/)/.test(ytUrl)
 
   const isEnabled = (id) => enabled.includes(id)
   const toggle = (id) => setEnabled(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -69,6 +72,7 @@ export default function Customize() {
       app_labels: labels,
       soundcloud_url: scUrl.trim() || null,
       spotify_url: spUrl.trim() || null,
+      youtube_url: ytUrl.trim() || null,
     }
     const res = await repo.desktopConfig.upsert(config)
     if (!res) { setMsg('Error saving — are you the owner of this node?'); return }
@@ -199,6 +203,14 @@ export default function Customize() {
             {spUrl.trim() && (
               <div style={{ fontSize: 11, color: spValid ? '#4ADE80' : '#FF5555', marginTop: -8 }}>
                 {spValid ? '✓ Looks like a Spotify playlist' : '✗ Use an open.spotify.com/playlist/… URL'}
+              </div>
+            )}
+            <label style={label}>YouTube playlist or video URL <span style={{ color: 'var(--color-text-disabled)' }}>(Videos)</span>
+              <input value={ytUrl} onChange={e => setYtUrl(e.target.value)} placeholder="https://youtube.com/playlist?list=… or a video URL" style={field} />
+            </label>
+            {ytUrl.trim() && (
+              <div style={{ fontSize: 11, color: ytValid ? '#4ADE80' : '#FF5555', marginTop: -8 }}>
+                {ytValid ? '✓ Looks like a YouTube link' : '✗ Use a youtube.com / youtu.be URL'}
               </div>
             )}
           </div>

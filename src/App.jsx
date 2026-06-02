@@ -7,7 +7,7 @@ import { MobileShell } from './shell/MobileShell'
 import { NodeNotFound } from './shell/NodeNotFound'
 import { ProfileProvider } from './context/ProfileProvider'
 import { useAuth } from './hooks/useAuth'
-import Signup from './apps/Signup/Signup'
+import Setup from './apps/Setup/Setup'
 import { supabase } from './lib/supabase'
 import './App.css'
 
@@ -85,17 +85,18 @@ function MemberNode() {
   )
 }
 
-// `/me` — redirect to the signed-in user's node, else the hub.
+// `/me` — the setup wizard. Sends finished users to their node and the hub
+// admin to the flagship; everyone else (signed out, or signed in without a
+// node) gets the guided first-run wizard.
 function MeRedirect() {
-  const { user, profile, loading, isAdmin } = useAuth()
+  const { profile, loading, isAdmin } = useAuth()
 
   if (loading) return <NodeLoading />
-  if (!user) return <Navigate to="/" replace />
-  // The hub admin (Eric) owns the flagship — never force a handle claim.
+  // The hub admin (Eric) owns the flagship — never run the member wizard.
   if (isAdmin) return <Navigate to="/" replace />
   if (profile?.handle) return <Navigate to={`/u/${profile.handle}`} replace />
-  // Signed in but no node yet → claim a handle (the Signup app's claim screen).
-  return <Signup />
+  // Signed out (welcome/sign-in step) or signed in without a node (claim → finish).
+  return <Setup />
 }
 
 export default function App() {

@@ -1,21 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { Monogram as Avatar } from '../_shared/Monogram'
 
-// Profile + social actions for the member node being viewed: owner identity,
-// follower/following counts and lists, and a Follow/Unfollow button (hidden on
-// your own node; prompts auth when logged out).
-function Avatar({ profile, size = 44 }) {
-  const initial = (profile?.display_name || profile?.handle || '?').charAt(0).toUpperCase()
-  if (profile?.avatar_url) {
-    return <img src={profile.avatar_url} alt="" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }} />
-  }
-  return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--color-accent)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: size * 0.45 }}>
-      {initial}
-    </div>
-  )
-}
+// Profile = the SOCIAL CARD for the member node being viewed: avatar/handle, a
+// one-line tagline, the Follow button, follower/following counts + lists, and
+// block/report. The DETAILED bio (bio text, location, links) lives in the
+// About app — clear division of labor, no overlap. Coherent for a logged-out
+// visitor: they see the identity + counts and a "Sign in to follow" button.
+// Avatars use the shared auto monogram until avatar upload lands (Phase 3).
 
 function PersonRow({ p }) {
   return (
@@ -146,7 +139,14 @@ export default function Profile() {
         )}
         {note && <div style={{ marginTop: 8, fontSize: 11, color: 'var(--color-accent)' }}>{note}</div>}
 
-        {owner?.bio && <div style={{ marginTop: 12, fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>{owner.bio}</div>}
+        {/* One-line tagline only — the full bio lives in the About app. */}
+        {owner?.tagline && <div style={{ marginTop: 12, fontSize: 13, color: 'var(--color-accent)', lineHeight: 1.5 }}>{owner.tagline}</div>}
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('ericOS:openApp', { detail: 'aboutme' }))}
+          style={{ marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 11, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
+        >
+          View full About →
+        </button>
 
         <div style={{ display: 'flex', gap: 18, marginTop: 16, borderTop: '1px solid var(--color-bevel-dark)', paddingTop: 12 }}>
           <button onClick={() => openList('followers')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-primary)', fontFamily: 'inherit' }}>

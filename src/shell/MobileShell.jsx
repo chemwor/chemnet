@@ -339,15 +339,19 @@ export function MobileShell({ windowManager }) {
       const d = e.detail
       const appId = typeof d === 'string' ? d : d?.app
       if (d && typeof d === 'object' && d.itemId) setInitialItem(d.app, d.itemId)
-      if (APP_REGISTRY.find(a => a.id === appId)) handleOpen(appId)
+      const app = APP_REGISTRY.find(a => a.id === appId)
+      // Don't open a flagship-only app on a member node (or vice-versa).
+      if (!app) return
+      if (app.flagshipOnly && node.kind !== 'flagship') return
+      if (app.memberOnly && node.kind !== 'member') return
+      handleOpen(appId)
     }
     window.addEventListener('ericOS:openApp', handler)
     return () => window.removeEventListener('ericOS:openApp', handler)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [node])
 
   // Deep-link on load: /u/:handle?app=<id>&item=<id> opens that app on the item.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
     const app = p.get('app'), item = p.get('item')
@@ -355,6 +359,7 @@ export function MobileShell({ windowManager }) {
       if (item) setInitialItem(app, item)
       handleOpen(app)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Land in edit mode: /u/:handle?edit=1 auto-opens Customize for the owner.
@@ -423,7 +428,7 @@ export function MobileShell({ windowManager }) {
 
         {/* iOS-style notification */}
         <AnimatePresence>
-          {showNotification && !activeApp && (
+          {showNotification && !activeApp && node.kind === 'flagship' && (
             <NotificationBanner
               onTap={() => { setShowNotification(false); handleOpen('about') }}
             />

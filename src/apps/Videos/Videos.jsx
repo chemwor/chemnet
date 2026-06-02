@@ -1,26 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useProfile } from '../../context/ProfileContext'
+import { useRepo } from '../../lib/repo/useRepo'
 import { brandPrefix } from '../../lib/customization'
-
-const FOLDERS = {
-  'my-videos': {
-    label: 'My Videos',
-    items: [
-      { name: 'SkyJump Las Vegas.mp4', type: 'youtube', url: 'https://youtu.be/6S7bkah5O0U', description: 'Jumping off the Stratosphere in Las Vegas.' },
-      { name: 'Spectrum Piano Cover.mp4', type: 'youtube', url: 'https://youtube.com/shorts/WSJFbDv7Aw8', description: 'A piano cover I recorded.' },
-    ],
-  },
-  watching: {
-    label: 'Interested In',
-    items: [],
-  },
-}
+import { OwnerManager } from '../_shared/OwnerManager'
 
 const TABS = [
   { id: 'my-videos', label: 'My Videos' },
   { id: 'watching', label: 'Interested In' },
 ]
+
+// Group repo rows ({ title, url, description, folder }) into the folder shape
+// the views render. Every node reads its own rows via repo.videos — flagship
+// gets Eric's (flagshipRepo), members get members.videos (empty if none).
+function groupVideos(rows) {
+  const folders = {
+    'my-videos': { label: 'My Videos', items: [] },
+    watching: { label: 'Interested In', items: [] },
+  }
+  for (const r of rows || []) {
+    const f = folders[r.folder] || folders['my-videos']
+    f.items.push({ name: r.title || 'Untitled', url: r.url, description: r.description })
+  }
+  return folders
+}
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -49,9 +52,9 @@ function Wordmark({ brand, size = 26 }) {
 
 const linkStyle = { color: '#2b6fb7', textDecoration: 'none', cursor: 'pointer' }
 
-function DesktopVideos({ brand, uploader }) {
+function DesktopVideos({ brand, uploader, folders }) {
   const [tab, setTab] = useState('my-videos')
-  const items = FOLDERS[tab].items
+  const items = folders[tab].items
   const [selectedIdx, setSelectedIdx] = useState(0)
   const selected = items[selectedIdx] || null
 
@@ -134,7 +137,7 @@ function DesktopVideos({ brand, uploader }) {
             </>
           ) : (
             <div style={{ color: '#767676', fontSize: 13, paddingTop: 30, textAlign: 'center' }}>
-              No videos in “{FOLDERS[tab].label}” yet.
+              No videos in “{folders[tab].label}” yet.
             </div>
           )}
         </div>
@@ -180,10 +183,10 @@ function DesktopVideos({ brand, uploader }) {
 // MOBILE — Old YouTube circa 2013-2014
 // ══════════════════════════════════════════
 
-function MobileVideos({ brand, uploader }) {
+function MobileVideos({ brand, uploader, folders }) {
   const [tab, setTab] = useState('my-videos')
   const [playing, setPlaying] = useState(null)
-  const items = FOLDERS[tab].items
+  const items = folders[tab].items
 
   if (playing) {
     const id = getYouTubeId(playing.url)
@@ -261,9 +264,25 @@ function MobileVideos({ brand, uploader }) {
 export default function Videos() {
   const isMobile = useMediaQuery('(max-width: 768px)')
   const { node } = useProfile()
+  const repo = useRepo()
+  const [folders, setFolders] = useState(() => groupVideos([]))
+
+  const load = useCallback(async () => {
+    const rows = await repo.videos.list()
+    setFolders(groupVideos(rows))
+  }, [repo])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
   const brand = brandPrefix(node)
   const uploader = node.kind === 'member' ? `@${node.handle}` : 'Eric Chemwor'
-  return isMobile
-    ? <MobileVideos brand={brand} uploader={uploader} />
-    : <DesktopVideos brand={brand} uploader={uploader} />
+  return (
+    <>
+      {isMobile
+        ? <MobileVideos brand={brand} uploader={uploader} folders={folders} />
+        : <DesktopVideos brand={brand} uploader={uploader} folders={folders} />}
+      <OwnerManager resource="videos" onChange={load} />
+    </>
+  )
 }

@@ -27,6 +27,12 @@ const FALLBACK_POSTS: Row[] = [
   },
 ]
 
+// Eric's videos for the flagship ChemTube (formerly hardcoded in Videos.jsx).
+const FLAGSHIP_VIDEOS: Row[] = [
+  { id: 'v1', title: 'SkyJump Las Vegas', url: 'https://youtu.be/6S7bkah5O0U', description: 'Jumping off the Stratosphere in Las Vegas.', folder: 'my-videos', sort_order: 0 },
+  { id: 'v2', title: 'Spectrum Piano Cover', url: 'https://youtube.com/shorts/WSJFbDv7Aw8', description: 'A piano cover I recorded.', folder: 'my-videos', sort_order: 1 },
+]
+
 // Mirror the 3s abort-or-fallback pattern the apps used inline.
 function withTimeout(ms: number) {
   const controller = new AbortController()
@@ -209,6 +215,13 @@ export const flagshipRepo: Repo = {
   carMods: { ...ro, async list() { return [] } },
   projects: { ...ro, async list() { return [] } },
   music: { ...ro, async list() { return [] } },
+
+  // Eric's videos (ChemTube). Hardcoded here so the Videos app can read every
+  // node through repo.videos; member nodes get their own members.videos rows.
+  videos: {
+    ...ro,
+    async list() { return FLAGSHIP_VIDEOS },
+  },
 
   // ChemMail on the flagship node is a static/fake client today (no DB).
   messages: {

@@ -8,6 +8,13 @@ import { useDesktopConfig } from '../../hooks/useDesktopConfig'
 const FLAGSHIP_MUSIC = {
   soundcloud: 'https://soundcloud.com/paradoxxedm',
   spotify: 'https://open.spotify.com/playlist/3o3g3Y7v8bgwn72UwSP4AL',
+  youtube: '',
+}
+
+const KIND_META = {
+  soundcloud: { icon: '☁️', name: 'SoundCloud' },
+  spotify: { icon: '🎧', name: 'Spotify' },
+  youtube: { icon: '📺', name: 'YouTube' },
 }
 
 // Fallback "Current Rotation" albums shown when no Spotify playlist is linked.
@@ -35,6 +42,15 @@ function spotifyEmbed(url) {
   const m = (url || '').match(/(playlist|album|track)\/([A-Za-z0-9]+)/)
   return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator` : null
 }
+// YouTube embed — supports a playlist (list=…), or a single video
+// (watch?v= / youtu.be / shorts/ / embed/). Channels have no direct embed, so
+// those fall through to null (the owner sees the "add a link" empty state).
+function youtubeEmbed(url) {
+  const list = (url || '').match(/[?&]list=([A-Za-z0-9_-]+)/)
+  if (list) return `https://www.youtube.com/embed/videoseries?list=${list[1]}`
+  const v = (url || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]+)/)
+  return v ? `https://www.youtube.com/embed/${v[1]}` : null
+}
 
 const IFRAME_SANDBOX = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation allow-forms'
 
@@ -43,15 +59,42 @@ function openCustomize() {
 }
 
 function EmptyState({ kind, isOwner }) {
+  const meta = KIND_META[kind] || KIND_META.spotify
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--color-text-secondary)', fontFamily: '"Courier Prime", monospace', padding: 20, textAlign: 'center' }}>
-      <div style={{ fontSize: 30 }}>{kind === 'soundcloud' ? '☁️' : '🎧'}</div>
+      <div style={{ fontSize: 30 }}>{meta.icon}</div>
       {isOwner
         ? <>
-            <div>No {kind === 'soundcloud' ? 'SoundCloud' : 'Spotify'} playlist linked yet.</div>
+            <div>No {meta.name} link added yet.</div>
             <button onClick={openCustomize} style={{ padding: '5px 12px', border: 'none', cursor: 'pointer', background: 'var(--color-accent)', color: '#000', fontWeight: 'bold', fontFamily: 'inherit', fontSize: 12 }}>Add it in Customize</button>
           </>
         : <div style={{ fontSize: 12 }}>Nothing here yet.</div>}
+    </div>
+  )
+}
+
+// ── YouTube → embedded channel/playlist, wrapped in ChemTube-ish chrome ──
+function YouTubePlayer({ url, isOwner }) {
+  const embed = youtubeEmbed(url)
+  if (!embed) return <EmptyState kind="youtube" isOwner={isOwner} />
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--color-surface)', fontFamily: 'Tahoma, "Courier Prime", monospace' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', background: 'var(--color-titlebar-active)', color: 'var(--color-titlebar-text)', fontWeight: 'bold', fontSize: 12 }}>
+        <span>📺 Videos</span>
+        <span style={{ opacity: 0.8, fontWeight: 'normal' }}>— from YouTube</span>
+      </div>
+      <div style={{ flex: 1, padding: 8, overflow: 'auto', background: 'var(--color-desktop-bg)' }}>
+        <iframe
+          title="YouTube"
+          src={embed}
+          width="100%" height="100%"
+          style={{ border: 'none', minHeight: 320 }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          sandbox={IFRAME_SANDBOX}
+          allowFullScreen
+          loading="lazy"
+        />
+      </div>
     </div>
   )
 }
@@ -134,20 +177,24 @@ function ItunesPlayer({ url, isOwner }) {
 const SEGMENTS = [
   { id: 'soundcloud', label: 'My Music' },
   { id: 'spotify', label: 'Current Rotation' },
+  { id: 'youtube', label: 'Videos' },
 ]
 
-function MusicShell({ scUrl, spUrl, isOwner }) {
+function MusicShell({ scUrl, spUrl, ytUrl, isOwner }) {
+  // Hide the YouTube tab when there's no link and the viewer can't add one.
+  const segments = SEGMENTS.filter(s => s.id !== 'youtube' || ytUrl || isOwner)
   const [seg, setSeg] = useState('soundcloud')
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--color-surface)', color: 'var(--color-text-primary)', fontFamily: '"Courier Prime", "Courier New", monospace' }}>
       <div style={{ display: 'flex', gap: 2, padding: '5px 8px', borderBottom: '1px solid var(--color-bevel-dark)' }}>
-        {SEGMENTS.map(s => (
+        {segments.map(s => (
           <button key={s.id} onClick={() => setSeg(s.id)} style={{ padding: '5px 12px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, background: seg === s.id ? 'var(--color-accent)' : 'transparent', color: seg === s.id ? '#000' : 'var(--color-text-secondary)' }}>{s.label}</button>
         ))}
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
         {seg === 'soundcloud' && <NapsterPlayer url={scUrl} isOwner={isOwner} />}
         {seg === 'spotify' && <ItunesPlayer url={spUrl} isOwner={isOwner} />}
+        {seg === 'youtube' && <YouTubePlayer url={ytUrl} isOwner={isOwner} />}
       </div>
     </div>
   )
@@ -158,5 +205,6 @@ export default function Music() {
   const { config } = useDesktopConfig()
   const scUrl = (node.kind === 'member' ? config?.soundcloud_url : FLAGSHIP_MUSIC.soundcloud) || ''
   const spUrl = (node.kind === 'member' ? config?.spotify_url : FLAGSHIP_MUSIC.spotify) || ''
-  return <MusicShell scUrl={scUrl} spUrl={spUrl} isOwner={isOwner} />
+  const ytUrl = (node.kind === 'member' ? config?.youtube_url : FLAGSHIP_MUSIC.youtube) || ''
+  return <MusicShell scUrl={scUrl} spUrl={spUrl} ytUrl={ytUrl} isOwner={isOwner} />
 }

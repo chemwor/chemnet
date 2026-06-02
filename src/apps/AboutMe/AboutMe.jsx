@@ -1,5 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { useProfile } from '../../context/ProfileContext'
+import { useRepo } from '../../lib/repo/useRepo'
+import { Monogram } from '../_shared/Monogram'
+
+// Eric's "system uptime" since birth — computed once at module load (calling
+// Date.now() during render is impure / flagged by react-hooks/purity).
+const ERIC_UPTIME_DAYS = Math.floor((Date.now() - new Date('1998-05-05').getTime()) / (1000 * 60 * 60 * 24)).toLocaleString()
 
 const TABS = [
   { id: 'general', label: 'General' },
@@ -252,7 +259,7 @@ function DesktopAbout() {
 
       {/* Footer */}
       <div style={{ padding: '4px 12px', background: '#1a1830', borderTop: '1px solid #4A4555', textAlign: 'center', fontSize: 9, color: '#555' }}>
-        System uptime: {Math.floor((Date.now() - new Date('1998-05-05').getTime()) / (1000 * 60 * 60 * 24)).toLocaleString()} days · Kernel: Kenyan-Welsh · Arch: INTJ
+        System uptime: {ERIC_UPTIME_DAYS} days · Kernel: Kenyan-Welsh · Arch: INTJ
       </div>
     </div>
   )
@@ -495,7 +502,210 @@ function MobileAbout() {
   )
 }
 
+// ══════════════════════════════════════════
+// MEMBER NODES — flexible per-person profile
+// ══════════════════════════════════════════
+// Eric's flagship About (above) stays bespoke. Member nodes get this template,
+// driven by platform.profiles (display_name, tagline, bio, location, links) +
+// an auto monogram. Empty fields hide. The owner can edit in place; writes go
+// through repo.social.updateMyProfile (RLS: own row only).
+
+const linkLabel = (url) => String(url).replace(/^https?:\/\//, '').replace(/\/+$/, '')
+const linkHref = (url) => (/^https?:\/\//.test(url) ? url : `https://${url}`)
+
+// Shared "About ChemNet" explainer — the default/empty state on every member
+// node's About. It describes the PLATFORM (never Eric's bio), so an empty
+// member profile reads as "this is a ChemNet node" rather than leaking the hub.
+const ABOUT_CHEMNET = {
+  heading: 'About ChemNet',
+  lines: [
+    'ChemNet is a personal retro-OS desktop on the web.',
+    'Everyone gets their own node at /u/their-handle — theme it, pick which apps show, and fill them with your own posts, photos, reviews, and links.',
+    'Want one? Open “Make Your Own” on the hub.',
+  ],
+}
+
+// Renders the explainer; the owner also gets a nudge to introduce themselves
+// (the Edit affordance lives in the header on both skins).
+function AboutChemnetEmpty({ isOwner, mobile }) {
+  const muted = mobile ? '#8e8e93' : 'var(--color-text-secondary)'
+  return (
+    <div style={{ padding: mobile ? '28px 24px' : 24, textAlign: 'center', maxWidth: 460, margin: '0 auto' }}>
+      <div style={{ fontSize: 30, marginBottom: 8 }}>🛰️</div>
+      <div style={{ fontWeight: 'bold', fontSize: mobile ? 17 : 15, marginBottom: 8, color: mobile ? '#fff' : 'var(--color-text-primary)' }}>{ABOUT_CHEMNET.heading}</div>
+      {ABOUT_CHEMNET.lines.map((l, i) => (
+        <p key={i} style={{ margin: '0 0 8px', fontSize: 13, lineHeight: 1.6, color: muted }}>{l}</p>
+      ))}
+      {isOwner && <p style={{ marginTop: 12, fontSize: 13, color: 'var(--color-accent, #0A84FF)' }}>This is your node — hit Edit to introduce yourself.</p>}
+    </div>
+  )
+}
+
+function MemberEdit({ profile, onSave, onCancel, saving, accentText }) {
+  const [form, setForm] = useState({
+    displayName: profile.display_name || '',
+    tagline: profile.tagline || '',
+    location: profile.location || '',
+    bio: profile.bio || '',
+    links: (profile.links || []).join('\n'),
+  })
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const field = { width: '100%', padding: '8px 10px', background: 'var(--color-desktop-bg)', color: 'var(--color-text-primary)', border: '1px solid var(--color-bevel-dark)', outline: 'none', fontFamily: 'inherit', fontSize: 13, marginTop: 2 }
+  const lbl = { display: 'block', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 8 }
+  return (
+    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, fontFamily: '"Courier Prime", monospace' }}>
+      <label style={lbl}>Display name<input value={form.displayName} onChange={e => set('displayName', e.target.value)} maxLength={40} style={field} /></label>
+      <label style={lbl}>Tagline<input value={form.tagline} onChange={e => set('tagline', e.target.value)} maxLength={80} style={field} /></label>
+      <label style={lbl}>Location<input value={form.location} onChange={e => set('location', e.target.value)} maxLength={60} style={field} /></label>
+      <label style={lbl}>Bio<textarea value={form.bio} onChange={e => set('bio', e.target.value)} rows={4} style={{ ...field, resize: 'vertical' }} /></label>
+      <label style={lbl}>Links (one per line)<textarea value={form.links} onChange={e => set('links', e.target.value)} rows={3} placeholder="https://…" style={{ ...field, resize: 'vertical' }} /></label>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <button onClick={() => onSave(form)} disabled={saving} style={{ background: 'var(--color-accent)', color: '#1a1207', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: 13, padding: '8px 14px', opacity: saving ? 0.6 : 1, fontFamily: 'inherit' }}>{saving ? 'Saving…' : 'Save'}</button>
+        <button onClick={onCancel} style={{ background: 'none', border: '1px solid var(--color-bevel-dark)', color: accentText, cursor: 'pointer', fontSize: 13, padding: '8px 14px', fontFamily: 'inherit' }}>Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+// Desktop — iOS-Settings-style list inside the OS window.
+function DRow({ label, children }) {
+  return (
+    <div style={{ display: 'flex', padding: '9px 14px', borderBottom: '1px solid var(--color-bevel-dark)', fontSize: 13 }}>
+      <span style={{ color: 'var(--color-text-secondary)', width: 110, flexShrink: 0 }}>{label}</span>
+      <span style={{ color: 'var(--color-text-primary)', flex: 1, wordBreak: 'break-word' }}>{children}</span>
+    </div>
+  )
+}
+
+function MemberAboutDesktop({ profile, isOwner, onEdit }) {
+  const name = profile.display_name || profile.handle
+  const links = profile.links || []
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--color-surface)', fontFamily: '"Courier Prime", monospace', color: 'var(--color-text-primary)' }}>
+      <div style={{ padding: '14px 16px', background: 'var(--color-titlebar-active)', display: 'flex', alignItems: 'center', gap: 14 }}>
+        <Monogram profile={profile} size={56} square />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 'bold', fontSize: 16 }}>{name}</div>
+          <div style={{ color: 'var(--color-text-secondary)', fontSize: 12 }}>@{profile.handle}</div>
+          {profile.tagline && <div style={{ color: 'var(--color-accent)', fontSize: 12, marginTop: 2 }}>{profile.tagline}</div>}
+        </div>
+        {isOwner && <button onClick={onEdit} style={{ marginLeft: 'auto', alignSelf: 'flex-start', background: 'var(--color-accent)', color: '#1a1207', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: 12, padding: '5px 10px', fontFamily: 'inherit' }}>Edit</button>}
+      </div>
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        {profile.bio && <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--color-bevel-dark)', fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{profile.bio}</div>}
+        {profile.location && <DRow label="Location">{profile.location}</DRow>}
+        {links.map((l, i) => (
+          <DRow key={i} label={i === 0 ? 'Links' : ''}><a href={linkHref(l)} target="_blank" rel="noreferrer" style={{ color: 'var(--color-accent)' }}>{linkLabel(l)}</a></DRow>
+        ))}
+        {!profile.bio && !profile.location && !links.length && (
+          <AboutChemnetEmpty isOwner={isOwner} />
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Mobile — Apple-ID-style header + grouped sections.
+function MemberAboutMobile({ profile, isOwner, onEdit }) {
+  const name = profile.display_name || profile.handle
+  const links = profile.links || []
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#000', fontFamily: '-apple-system, "Helvetica Neue", sans-serif', color: '#fff' }}>
+      {isOwner && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 16px 0' }}>
+          <button onClick={onEdit} style={{ background: 'none', border: 'none', color: 'var(--color-accent, #0A84FF)', fontSize: 16, fontFamily: 'inherit', cursor: 'pointer' }}>Edit</button>
+        </div>
+      )}
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 16px 24px', textAlign: 'center' }}>
+          <Monogram profile={profile} size={84} />
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 12 }}>{name}</div>
+          <div style={{ color: '#8e8e93', fontSize: 15 }}>@{profile.handle}</div>
+          {profile.tagline && <div style={{ color: 'var(--color-accent, #0A84FF)', fontSize: 15, marginTop: 6 }}>{profile.tagline}</div>}
+        </div>
+        {profile.bio && (
+          <>
+            <div style={{ padding: '20px 16px 6px', fontSize: 13, color: '#8e8e93', textTransform: 'uppercase' }}>Bio</div>
+            <div style={{ padding: '12px 16px', background: '#1c1c1e', color: '#ddd', fontSize: 15, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{profile.bio}</div>
+          </>
+        )}
+        {(profile.location || links.length > 0) && (
+          <>
+            <div style={{ padding: '20px 16px 6px', fontSize: 13, color: '#8e8e93', textTransform: 'uppercase' }}>Details</div>
+            {profile.location && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#1c1c1e', borderBottom: '0.5px solid #38383a', fontSize: 15 }}>
+                <span>Location</span><span style={{ color: '#8e8e93' }}>{profile.location}</span>
+              </div>
+            )}
+            {links.map((l, i) => (
+              <a key={i} href={linkHref(l)} target="_blank" rel="noreferrer" style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#1c1c1e', borderBottom: '0.5px solid #38383a', fontSize: 15, textDecoration: 'none', color: 'var(--color-accent, #0A84FF)' }}>
+                <span>{linkLabel(l)}</span><span>›</span>
+              </a>
+            ))}
+          </>
+        )}
+        {!profile.bio && !profile.location && !links.length && (
+          <AboutChemnetEmpty isOwner={isOwner} mobile />
+        )}
+        <div style={{ height: 40 }} />
+      </div>
+    </div>
+  )
+}
+
+function MemberAbout({ isMobile }) {
+  const { node, isOwner } = useProfile()
+  const repo = useRepo()
+  const [profile, setProfile] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  const load = useCallback(async () => {
+    const p = await repo.social.directory.resolveHandle(node.handle)
+    setProfile(p)
+  }, [repo, node.handle])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load() }, [load])
+
+  const save = async (form) => {
+    setSaving(true)
+    await repo.social.updateMyProfile({
+      display_name: form.displayName.trim() || null,
+      tagline: form.tagline.trim() || null,
+      location: form.location.trim() || null,
+      bio: form.bio.trim() || null,
+      links: form.links.split(/[\n,]+/).map(s => s.trim()).filter(Boolean),
+    })
+    setSaving(false)
+    setEditing(false)
+    load()
+  }
+
+  if (!profile) {
+    return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isMobile ? '#000' : 'var(--color-surface)', color: 'var(--color-text-secondary)', fontFamily: '"Courier Prime", monospace', fontSize: 13 }}>Loading profile…</div>
+  }
+
+  if (editing) {
+    const frame = isMobile
+      ? { position: 'absolute', inset: 0, background: '#000', color: '#fff', overflow: 'auto' }
+      : { position: 'absolute', inset: 0, background: 'var(--color-surface)', color: 'var(--color-text-primary)', overflow: 'auto' }
+    return (
+      <div style={frame}>
+        <MemberEdit profile={profile} onSave={save} onCancel={() => setEditing(false)} saving={saving} accentText={isMobile ? '#fff' : 'var(--color-text-primary)'} />
+      </div>
+    )
+  }
+
+  return isMobile
+    ? <MemberAboutMobile profile={profile} isOwner={isOwner} onEdit={() => setEditing(true)} />
+    : <MemberAboutDesktop profile={profile} isOwner={isOwner} onEdit={() => setEditing(true)} />
+}
+
 export default function AboutMe() {
   const isMobile = useMediaQuery('(max-width: 768px)')
+  const { node } = useProfile()
+  // Flagship keeps Eric's bespoke About; member nodes get the flexible template.
+  if (node.kind === 'member') return <MemberAbout isMobile={isMobile} />
   return isMobile ? <MobileAbout /> : <DesktopAbout />
 }

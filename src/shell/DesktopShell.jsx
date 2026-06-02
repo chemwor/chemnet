@@ -60,10 +60,13 @@ export function DesktopShell({ windowManager }) {
     bootedRef.current = true
     const hasVisited = (() => { try { return localStorage.getItem('ericOS_visited') === '1' } catch { return false } })()
     if (!hasVisited) {
-      APP_REGISTRY.filter(a => a.openOnBoot).forEach(a => openApp(a.id))
+      // Boot only the node-scoped apps (useNodeView already drops flagship-only
+      // apps like README.sh on member nodes — so Eric's boot greeting never
+      // auto-opens on /u/:handle).
+      apps.filter(a => a.openOnBoot).forEach(a => openApp(a.id))
       try { localStorage.setItem('ericOS_visited', '1') } catch {}
     }
-  }, [openApp])
+  }, [openApp, apps])
 
   // Land in edit mode: /u/:handle?edit=1 auto-opens Customize for the owner.
   useEffect(() => {
@@ -83,11 +86,18 @@ export function DesktopShell({ windowManager }) {
       const d = e.detail
       const appId = typeof d === 'string' ? d : d?.app
       if (d && typeof d === 'object' && d.itemId) setInitialItem(d.app, d.itemId)
-      if (APP_REGISTRY.find(a => a.id === appId)) openApp(appId)
+      const app = APP_REGISTRY.find(a => a.id === appId)
+      // Never honor a request to open a flagship-only app on a member node
+      // (or a member-only app on the flagship) — that would surface Eric's
+      // bespoke apps (README.sh, Terminal…) on /u/:handle.
+      if (!app) return
+      if (app.flagshipOnly && node.kind !== 'flagship') return
+      if (app.memberOnly && node.kind !== 'member') return
+      openApp(appId)
     }
     window.addEventListener('ericOS:openApp', handler)
     return () => window.removeEventListener('ericOS:openApp', handler)
-  }, [openApp])
+  }, [openApp, node])
 
   // Deep-link on load: /u/:handle?app=<id>&item=<id> opens that app on the item.
   useEffect(() => {
@@ -224,7 +234,7 @@ export function DesktopShell({ windowManager }) {
       </AnimatePresence>
 
       <AnimatePresence>
-        {idle && <Screensaver onDismiss={resetIdle} />}
+        {idle && node.kind === 'flagship' && <Screensaver onDismiss={resetIdle} />}
       </AnimatePresence>
 
       {konamiActive && <KonamiOverlay />}

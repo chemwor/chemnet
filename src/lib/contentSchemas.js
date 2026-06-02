@@ -11,6 +11,9 @@ export const RESOURCE_SCHEMAS = {
       { key: 'raw', label: 'Raw draft', type: 'textarea' },
       { key: 'note', label: 'Note', type: 'text' },
       { key: 'category', label: 'Category', type: 'select', options: ['general', 'tech', 'culture', 'personal'] },
+      { key: 'mood', label: 'Mood (optional)', type: 'text' },
+      { key: 'now_playing', label: 'Now playing (optional)', type: 'text' },
+      { key: 'tags', label: 'Tags (comma-sep)', type: 'csv' },
       { key: 'published', label: 'Published', type: 'bool', def: true },
     ],
   },
@@ -20,6 +23,15 @@ export const RESOURCE_SCHEMAS = {
       { key: 'title', label: 'Title', type: 'text' },
       { key: 'url', label: 'Image URL', type: 'text' },
       { key: 'caption', label: 'Caption', type: 'textarea' },
+    ],
+  },
+  videos: {
+    title: 'title',
+    fields: [
+      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'url', label: 'YouTube URL', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'folder', label: 'Folder', type: 'select', options: ['my-videos', 'watching'] },
     ],
   },
   reviews: {

@@ -211,7 +211,7 @@ export const socialApi: SocialApi = {
     },
     async resolveHandle(handle) {
       const { data } = await platform().from('profiles')
-        .select('id, handle, display_name, bio, avatar_url, is_public, created_at')
+        .select('id, handle, display_name, bio, avatar_url, location, tagline, links, is_public, created_at')
         .eq('handle', String(handle || '').trim().toLowerCase())
         .maybeSingle()
       return data || null

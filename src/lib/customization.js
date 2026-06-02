@@ -12,6 +12,32 @@ export const THEME_FIELDS = [
   { var: '--color-taskbar-bg', label: 'Taskbar', def: '#221F2E' },
 ]
 
+// Named theme palettes for the setup wizard + Customize quick-picks. Each maps
+// the full THEME_FIELDS var set; "Warm Slate" mirrors the defaults. Members
+// pick one in the wizard; it's written verbatim to desktop_config.theme.
+export const THEME_PRESETS = [
+  { key: 'warm-slate', label: 'Warm Slate', theme: {
+    '--color-accent': '#FF6B35', '--color-desktop-bg': '#1E1C28', '--color-surface': '#2C2A35',
+    '--color-titlebar-active': '#3D2B1F', '--color-text-primary': '#F0EBE1', '--color-taskbar-bg': '#221F2E',
+  } },
+  { key: 'vapor', label: 'Vapor', theme: {
+    '--color-accent': '#FF6AD5', '--color-desktop-bg': '#1A1033', '--color-surface': '#2A1A4A',
+    '--color-titlebar-active': '#3A1F5C', '--color-text-primary': '#F0E6FF', '--color-taskbar-bg': '#170D2E',
+  } },
+  { key: 'forest', label: 'Forest', theme: {
+    '--color-accent': '#5FBF6A', '--color-desktop-bg': '#0F1F15', '--color-surface': '#16291C',
+    '--color-titlebar-active': '#1D3A26', '--color-text-primary': '#E6F0E6', '--color-taskbar-bg': '#0C1A11',
+  } },
+  { key: 'grape', label: 'Grape', theme: {
+    '--color-accent': '#A06BFF', '--color-desktop-bg': '#1A1426', '--color-surface': '#281F3A',
+    '--color-titlebar-active': '#34264F', '--color-text-primary': '#ECE6F5', '--color-taskbar-bg': '#150F20',
+  } },
+  { key: 'crimson', label: 'Crimson', theme: {
+    '--color-accent': '#E2475E', '--color-desktop-bg': '#20141A', '--color-surface': '#301D26',
+    '--color-titlebar-active': '#45222E', '--color-text-primary': '#F5E6EA', '--color-taskbar-bg': '#190F14',
+  } },
+]
+
 // Preset wallpapers — CSS background values (no uploads).
 export const WALLPAPERS = [
   { key: 'warm-slate', label: 'Warm Slate', css: 'radial-gradient(circle at 30% 20%, #2a2535, #1E1C28)' },

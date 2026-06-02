@@ -88,6 +88,10 @@ export interface MusicRepo extends Writable {
   list(): Promise<Row[]>
 }
 
+export interface VideosRepo extends Writable {
+  list(): Promise<Row[]>
+}
+
 export interface MessagesRepo {
   listInbox(): Promise<Row[]>
   send(input: { recipientId?: string; subject?: string; body?: string }): Promise<Row | null>
@@ -112,6 +116,7 @@ export interface Repo {
   carMods: CarModsRepo
   projects: ProjectsRepo
   music: MusicRepo
+  videos: VideosRepo
   messages: MessagesRepo
   desktopConfig: DesktopConfigRepo
   // Platform-wide social graph (same on every node — keyed by the current user)

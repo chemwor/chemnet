@@ -180,6 +180,15 @@ export function memberRepo(userId: string): Repo {
       },
     },
 
+    videos: {
+      ...write('videos'),
+      async list() {
+        const { data } = await m().from('videos').select('*').eq('user_id', userId)
+          .order('sort_order', { ascending: true }).order('created_at', { ascending: false })
+        return data || []
+      },
+    },
+
     messages: {
       async listInbox() {
         const { data: { user } } = await supabase.auth.getUser()

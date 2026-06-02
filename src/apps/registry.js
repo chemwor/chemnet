@@ -4,6 +4,7 @@ export const APP_REGISTRY = [
     id: 'about',
     label: 'README.sh',
     icon: 'terminal',
+    flagshipOnly: true,            // Eric's bespoke boot greeting — flagship hub only
     component: () => import('./About/About.jsx'),
     defaultSize: { width: 600, height: 450 },
     defaultPosition: { x: Math.max(0, Math.floor((typeof window !== 'undefined' ? window.innerWidth : 1200) / 2 - 300)), y: Math.max(0, Math.floor((typeof window !== 'undefined' ? window.innerHeight : 800) / 2 - 250)) },
@@ -29,6 +30,7 @@ export const APP_REGISTRY = [
     id: 'projects',
     label: 'Projects',
     icon: 'folder',
+    flagshipOnly: true,            // Eric's portfolio (file-backed) — flagship hub only
     component: () => import('./Projects/Projects.jsx'),
     defaultSize: { width: 560, height: 420 },
     defaultPosition: { x: 120, y: 80 },
@@ -139,6 +141,7 @@ export const APP_REGISTRY = [
     id: 'carmods',
     label: 'Car Mods',
     icon: 'car',
+    flagshipOnly: true,            // Eric's Camaro build (file-backed) — flagship hub only
     component: () => import('./CarMods/CarMods.jsx'),
     defaultSize: { width: 480, height: 440 },
     defaultPosition: { x: 120, y: 50 },
@@ -187,6 +190,7 @@ export const APP_REGISTRY = [
     id: 'manifestations',
     label: 'Manifestations',
     icon: 'cookie',
+    flagshipOnly: true,            // Eric's curated quotes (file-backed) — flagship hub only
     component: () => import('./Manifestations/Manifestations.jsx'),
     defaultSize: { width: 520, height: 420 },
     defaultPosition: { x: 150, y: 70 },
@@ -213,6 +217,7 @@ export const APP_REGISTRY = [
     id: 'terminal',
     label: 'Terminal',
     icon: 'terminal',
+    flagshipOnly: true,            // shell access is Eric's hub only — not on member nodes
     component: () => import('./Terminal/Terminal.jsx'),
     defaultSize: { width: 500, height: 340 },
     defaultPosition: { x: 200, y: 140 },
