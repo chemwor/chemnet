@@ -101,6 +101,14 @@ button[class*="sc-"]:active {
   border-right-color: var(--color-bevel-light) !important;
 }
 
+/* Mobile: track the *dynamic* viewport so the dock + app panel sit above
+   Safari's collapsing toolbar / the home indicator (iOS 100vh runs behind it).
+   Pairs with viewport-fit=cover + env(safe-area-inset-*) padding on the bars. */
+.mobile-dvh {
+  height: 100vh;   /* fallback for browsers without dvh */
+  height: 100dvh;  /* iOS Safari: the real visible height */
+}
+
 /* Split-flap (Solari) tile flip — used by the Travel Log departures board. */
 @keyframes flapIn {
   0%   { transform: rotateX(-90deg); opacity: 0; }

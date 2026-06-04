@@ -20,14 +20,15 @@ export function MobilePanel({ app, onClose }) {
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', damping: 30, stiffness: 350 }}
-      className="fixed inset-0 flex flex-col"
+      className="fixed left-0 right-0 top-0 flex flex-col mobile-dvh"
       style={{ zIndex: 50, background: 'var(--color-surface)' }}
     >
-      {/* iOS-style header bar */}
+      {/* iOS-style header bar — grows by the top inset so "‹ Back" clears the notch */}
       <div
         className="flex items-center justify-between px-3 shrink-0"
         style={{
-          height: 44,
+          height: 'calc(44px + env(safe-area-inset-top, 0px))',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           background: 'rgba(30,28,40,0.95)',
           backdropFilter: 'blur(10px)',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
@@ -63,7 +64,7 @@ export function MobilePanel({ app, onClose }) {
       {/* App content — uses calc to guarantee height. position: relative so apps that
           use `position: absolute; inset: 0` stay inside this box and don't cover the
           back button in the header above. */}
-      <div style={{ height: 'calc(100% - 44px)', overflow: 'hidden', position: 'relative' }}>
+      <div style={{ height: 'calc(100% - 44px - env(safe-area-inset-top, 0px))', overflow: 'hidden', position: 'relative' }}>
         <Suspense fallback={
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)' }}>
             Loading...

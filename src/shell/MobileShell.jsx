@@ -27,7 +27,9 @@ function StatusBar() {
     <div
       className="flex items-center justify-between px-3 shrink-0"
       style={{
-        height: 20,
+        minHeight: 20,
+        // Clear the notch on devices that report a top inset (0 elsewhere).
+        paddingTop: 'env(safe-area-inset-top, 0px)',
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.3))',
         color: '#fff',
         fontSize: 11,
@@ -250,11 +252,13 @@ function Dock({ onTap, apps, labelFor }) {
   const dockApps = apps.filter(a => a.pinned)
   return (
     <div
-      className="flex items-center justify-center gap-4 px-3 py-2 shrink-0"
+      className="flex items-center justify-center gap-4 px-3 pt-2 shrink-0"
       style={{
         background: 'linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0.08))',
         borderTop: '1px solid rgba(255,255,255,0.15)',
         backdropFilter: 'blur(10px)',
+        // Float the dock above the home indicator / Safari toolbar (0 elsewhere).
+        paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
       }}
     >
       {dockApps.map(app => (
@@ -408,7 +412,7 @@ export function MobileShell({ windowManager }) {
   const isMember = node.kind === 'member'
 
   return (
-    <div className="flex flex-col w-full h-full" style={{ background: '#000', ...themeVars }}>
+    <div className="flex flex-col w-full mobile-dvh" style={{ background: '#000', ...themeVars }}>
       {/* Wallpaper — member nodes use their chosen preset */}
       {isMember ? (
         <div style={{ position: 'absolute', inset: 0, background: wallpaper }} />
