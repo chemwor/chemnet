@@ -4,10 +4,13 @@ import { useProfile } from '../../context/ProfileContext'
 import { Monogram as Avatar } from '../_shared/Monogram'
 
 // Profile = the SOCIAL CARD for the member node being viewed: avatar/handle, a
-// one-line tagline, the Follow button, follower/following counts + lists, and
-// block/report. The DETAILED bio (bio text, location, links) lives in the
-// About app — clear division of labor, no overlap. Coherent for a logged-out
-// visitor: they see the identity + counts and a "Sign in to follow" button.
+// one-line tagline, follower/following counts + lists, block/report, and the
+// two social actions side by side:
+//   • Follow — one-way; their posts show up in your ChemFeed (no approval).
+//   • Add friend — mutual; they accept, then you're in each other's friends
+//     list (managed in the Directory). Both reachable here so the difference
+//     is visible in one place.
+// The DETAILED bio lives in the About app — clear division of labor.
 // Avatars use the shared auto monogram until avatar upload lands (Phase 3).
 
 function PersonRow({ p }) {
@@ -28,6 +31,7 @@ export default function Profile() {
   const [owner, setOwner] = useState(null)
   const [counts, setCounts] = useState({ followers: 0, following: 0 })
   const [following, setFollowing] = useState(false)
+  const [friendStatus, setFriendStatus] = useState('none')  // none | outgoing | incoming | accepted
   const [tab, setTab] = useState(null)          // null | 'followers' | 'following'
   const [people, setPeople] = useState([])
   const [busy, setBusy] = useState(false)
@@ -45,12 +49,18 @@ export default function Profile() {
     setOwner(prof)
     setCounts(c)
     if (currentUser && currentUser.id !== userId) {
-      const [f, b] = await Promise.all([
+      const [f, b, rel] = await Promise.all([
         repo.social.follows.isFollowing(userId),
         repo.social.blocks.isBlocked(userId),
+        repo.social.friends.relationships(),
       ])
       setFollowing(f)
       setBlocked(b)
+      setFriendStatus(
+        rel.accepted.includes(userId) ? 'accepted'
+          : rel.incoming.includes(userId) ? 'incoming'
+            : rel.outgoing.includes(userId) ? 'outgoing' : 'none',
+      )
     }
   }, [repo, node, userId, currentUser])
 
@@ -77,6 +87,23 @@ export default function Profile() {
     setFollowing(!following)
     load()
   }
+
+  const friendAction = async () => {
+    if (!currentUser) { promptAuth(); return }
+    if (friendStatus === 'accepted' && !window.confirm('Remove this friend?')) return
+    setBusy(true)
+    const res = friendStatus === 'incoming' ? await repo.social.friends.accept(userId)
+      : (friendStatus === 'accepted' || friendStatus === 'outgoing') ? await repo.social.friends.unfriend(userId)
+        : await repo.social.friends.request(userId)
+    setBusy(false)
+    if (res?.error) { setNote('Could not update friendship.'); return }
+    setNote(friendStatus === 'none' ? 'Friend request sent.' : friendStatus === 'incoming' ? "You're now friends." : '')
+    load()
+  }
+  const friendLabel = !currentUser ? '+ Add friend'
+    : friendStatus === 'accepted' ? '✓ Friends'
+      : friendStatus === 'incoming' ? 'Accept request'
+        : friendStatus === 'outgoing' ? 'Requested' : '+ Add friend'
 
   const toggleBlock = async () => {
     if (!currentUser) { promptAuth(); return }
@@ -112,20 +139,34 @@ export default function Profile() {
             <div style={{ fontSize: 16, fontWeight: 'bold' }}>{owner?.display_name || node.handle}</div>
             <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>@{node.handle}</div>
           </div>
-          {showFollow && (
-            <button
-              onClick={toggleFollow}
-              disabled={busy}
-              style={{
-                padding: '6px 14px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 'bold', fontSize: 12,
-                background: following ? 'var(--color-titlebar-inactive)' : 'var(--color-accent)',
-                color: following ? 'var(--color-text-primary)' : '#000',
-              }}
-            >
-              {!currentUser ? 'Sign in to follow' : following ? 'Following ✓' : '+ Follow'}
-            </button>
-          )}
         </div>
+
+        {/* Social actions — Follow (one-way feed) + Add friend (mutual), side by side. */}
+        {showFollow && (
+          <>
+            <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+              <button
+                onClick={toggleFollow}
+                disabled={busy}
+                style={{ padding: '6px 14px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 'bold', fontSize: 12, background: following ? 'var(--color-titlebar-inactive)' : 'var(--color-accent)', color: following ? 'var(--color-text-primary)' : '#000' }}
+              >
+                {!currentUser ? 'Sign in to follow' : following ? 'Following ✓' : '+ Follow'}
+              </button>
+              <button
+                onClick={friendAction}
+                disabled={busy}
+                style={{ padding: '6px 14px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 'bold', fontSize: 12, background: friendStatus === 'incoming' ? 'var(--color-accent)' : 'transparent', color: friendStatus === 'incoming' ? '#000' : 'var(--color-accent)', border: '1px solid var(--color-accent)' }}
+              >
+                {friendLabel}
+              </button>
+            </div>
+            {currentUser && (
+              <div style={{ fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 6, lineHeight: 1.5 }}>
+                Follow to see their posts in your feed. Friend to connect — they accept, then you both appear in each other's friends list.
+              </div>
+            )}
+          </>
+        )}
 
         {showFollow && currentUser && (
           <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
