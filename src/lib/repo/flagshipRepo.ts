@@ -96,8 +96,9 @@ export const flagshipRepo: Repo = {
     },
   },
 
+  // The Food List is DB-backed on the flagship (public.restaurants, RLS public
+  // read / admin write). Eric edits inline as the flagship owner.
   foodItems: {
-    ...ro,
     async list() {
       try {
         const t = withTimeout(3000)
@@ -108,6 +109,28 @@ export const flagshipRepo: Repo = {
       } catch {
         return []
       }
+    },
+    async get(id) {
+      const { data } = await supabase.from('restaurants').select('*').eq('id', id).maybeSingle()
+      return data || null
+    },
+    async create(row) {
+      const { data, error } = await supabase.from('restaurants').insert(row).select().single()
+      return error ? null : data
+    },
+    async update(id, patch) {
+      const { data, error } = await supabase.from('restaurants').update(patch).eq('id', id).select().single()
+      return error ? null : data
+    },
+    async remove(id) {
+      const { error } = await supabase.from('restaurants').delete().eq('id', id)
+      return !error
+    },
+    async addPhoto(id, url) {
+      const { data: row } = await supabase.from('restaurants').select('photo_urls').eq('id', id).maybeSingle()
+      const next = [...(row?.photo_urls || []), url]
+      const { data, error } = await supabase.from('restaurants').update({ photo_urls: next }).eq('id', id).select().single()
+      return error ? null : data
     },
   },
 

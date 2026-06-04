@@ -68,6 +68,16 @@ export function memberRepo(userId: string): Repo {
         const { data } = await m().from('food_items').select('*').eq('user_id', userId).order('name')
         return data || []
       },
+      async get(id: string | number) {
+        const { data } = await m().from('food_items').select('*').eq('id', id).eq('user_id', userId).maybeSingle()
+        return data || null
+      },
+      async addPhoto(id: string | number, url: string) {
+        const { data: row } = await m().from('food_items').select('photo_urls').eq('id', id).eq('user_id', userId).maybeSingle()
+        const next = [...(row?.photo_urls || []), url]
+        const { data, error } = await m().from('food_items').update({ photo_urls: next }).eq('id', id).eq('user_id', userId).select().single()
+        return error ? null : data
+      },
     },
 
     guestbook: {

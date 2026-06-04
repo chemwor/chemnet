@@ -44,6 +44,8 @@ export interface ReviewsRepo extends Writable {
 
 export interface FoodItemsRepo extends Writable {
   list(): Promise<Row[]>
+  get(id: string | number): Promise<Row | null>
+  addPhoto(id: string | number, url: string): Promise<Row | null>
 }
 
 export interface GuestbookRepo {
