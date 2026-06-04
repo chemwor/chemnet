@@ -122,6 +122,9 @@ export const ICONS = {
   // Profile card — generic "About" identity (no "EC"; per-person on every node)
   profilecard: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="1.5" fill="#dfe6ee" stroke="#7a8696" stroke-width=".6"/><rect x="1" y="2" width="14" height="3" rx="1.5" fill="#4a6fa5"/><circle cx="5" cy="9" r="2" fill="#7a8696"/><path d="M2.5 13.2c0-1.7 1.1-2.6 2.5-2.6s2.5.9 2.5 2.6z" fill="#7a8696"/><rect x="8.5" y="7.5" width="5" height="1.2" rx=".3" fill="#9aa6b4"/><rect x="8.5" y="9.6" width="5" height="1.2" rx=".3" fill="#b6c0cc"/><rect x="8.5" y="11.7" width="3.2" height="1.2" rx=".3" fill="#b6c0cc"/></svg>`,
 
+  // Profile — single-person account avatar (social card; no "EC")
+  profileuser: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#4a6fa5" stroke="#2f4a73" stroke-width=".6"/><circle cx="8" cy="6.2" r="2.4" fill="#eef3f8"/><path d="M3.6 13.4c0-2.5 2-3.9 4.4-3.9s4.4 1.4 4.4 3.9z" fill="#eef3f8"/></svg>`,
+
   // Robot — rock'em sock'em
   robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="4" y="3" width="8" height="6" rx="1" fill="#c00" stroke="#000" stroke-width=".5"/><rect x="5" y="4" width="2" height="2" fill="#ff0"/><rect x="9" y="4" width="2" height="2" fill="#ff0"/><rect x="6" y="7" width="4" height="1" fill="#666"/><rect x="5" y="9" width="6" height="4" fill="#c00" stroke="#000" stroke-width=".5"/><rect x="2" y="5" width="2" height="4" fill="#c00"/><rect x="12" y="5" width="2" height="4" fill="#c00"/><rect x="7" y="1" width="2" height="2" fill="#888"/></svg>`,
 

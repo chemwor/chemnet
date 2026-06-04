@@ -259,7 +259,7 @@ export const APP_REGISTRY = [
     // Profile + follow/unfollow + follower/following — member nodes.
     id: 'profile',
     label: 'Profile',
-    icon: 'computer',
+    icon: 'profileuser',
     component: () => import('./Profile/Profile.jsx'),
     defaultSize: { width: 420, height: 480 },
     defaultPosition: { x: 150, y: 60 },
