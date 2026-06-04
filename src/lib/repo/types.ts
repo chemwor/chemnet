@@ -74,6 +74,9 @@ export interface WishlistRepo extends Writable {
 
 export interface TravelLogRepo extends Writable {
   list(): Promise<Row[]>
+  get(id: string | number): Promise<Row | null>
+  addPhoto(id: string | number, url: string): Promise<Row | null>
+  setPlanItems(id: string | number, items: Row[]): Promise<Row | null>
 }
 
 export interface CarModsRepo extends Writable {

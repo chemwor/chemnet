@@ -149,8 +149,22 @@ export function memberRepo(userId: string): Repo {
       ...write('travel_log'),
       async list() {
         const { data } = await m().from('travel_log').select('*').eq('user_id', userId)
-          .order('sort_order', { ascending: true })
+          .order('sort_order', { ascending: true }).order('created_at', { ascending: true })
         return data || []
+      },
+      async get(id: string | number) {
+        const { data } = await m().from('travel_log').select('*').eq('id', id).eq('user_id', userId).maybeSingle()
+        return data || null
+      },
+      async addPhoto(id: string | number, url: string) {
+        const { data: row } = await m().from('travel_log').select('photo_urls').eq('id', id).eq('user_id', userId).maybeSingle()
+        const next = [...(row?.photo_urls || []), url]
+        const { data, error } = await m().from('travel_log').update({ photo_urls: next }).eq('id', id).eq('user_id', userId).select().single()
+        return error ? null : data
+      },
+      async setPlanItems(id: string | number, items: Row[]) {
+        const { data, error } = await m().from('travel_log').update({ plan_items: items }).eq('id', id).eq('user_id', userId).select().single()
+        return error ? null : data
       },
     },
 

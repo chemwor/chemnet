@@ -207,11 +207,45 @@ export const flagshipRepo: Repo = {
     },
   },
 
+  // Travel Log is DB-backed on the flagship too (new public.travel_log table,
+  // RLS: public read / admin write). Eric edits inline as the flagship owner.
+  travelLog: {
+    async list() {
+      const { data } = await supabase.from('travel_log').select('*')
+        .order('sort_order', { ascending: true }).order('created_at', { ascending: true })
+      return data || []
+    },
+    async get(id) {
+      const { data } = await supabase.from('travel_log').select('*').eq('id', id).maybeSingle()
+      return data || null
+    },
+    async create(row) {
+      const { data, error } = await supabase.from('travel_log').insert(row).select().single()
+      return error ? null : data
+    },
+    async update(id, patch) {
+      const { data, error } = await supabase.from('travel_log').update(patch).eq('id', id).select().single()
+      return error ? null : data
+    },
+    async remove(id) {
+      const { error } = await supabase.from('travel_log').delete().eq('id', id)
+      return !error
+    },
+    async addPhoto(id, url) {
+      const { data: row } = await supabase.from('travel_log').select('photo_urls').eq('id', id).maybeSingle()
+      const next = [...(row?.photo_urls || []), url]
+      const { data, error } = await supabase.from('travel_log').update({ photo_urls: next }).eq('id', id).select().single()
+      return error ? null : data
+    },
+    async setPlanItems(id, items) {
+      const { data, error } = await supabase.from('travel_log').update({ plan_items: items }).eq('id', id).select().single()
+      return error ? null : data
+    },
+  },
+
   // ── File/inline-backed apps NOT wired to the repo on flagship ──
-  // Trips, CarMods (mod list), Projects and Music render their inline data on
-  // the flagship node (unchanged). memberRepo implements these against
-  // members.* for /u/:handle.
-  travelLog: { ...ro, async list() { return [] } },
+  // CarMods (mod list), Projects and Music render their inline data on the
+  // flagship node (unchanged). memberRepo implements these against members.*.
   carMods: { ...ro, async list() { return [] } },
   projects: { ...ro, async list() { return [] } },
   music: { ...ro, async list() { return [] } },

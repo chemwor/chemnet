@@ -100,3 +100,14 @@ button[class*="sc-"]:active {
   border-bottom-color: var(--color-bevel-light) !important;
   border-right-color: var(--color-bevel-light) !important;
 }
+
+/* Split-flap (Solari) tile flip — used by the Travel Log departures board. */
+@keyframes flapIn {
+  0%   { transform: rotateX(-90deg); opacity: 0; }
+  60%  { transform: rotateX(10deg);  opacity: 1; }
+  100% { transform: rotateX(0deg);   opacity: 1; }
+}
+.flap-tile { transform-origin: center top; backface-visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .flap-tile { animation: none !important; }
+}
