@@ -80,4 +80,7 @@ export const WISHLIST_ITEMS = [
 
   // ── Mauvais ──
   { id: 53, name: 'Mauvais Eivissa Relaxed Fit Shirt in Taupe', category: 'fashion', price: 75, priority: 'medium', link: 'https://us.mauvais.co.uk/products/eivissa-relaxed-fit-shirt-in-taupe', image: 'https://us.mauvais.co.uk/cdn/shop/files/EIVISS_4.jpg?v=1771034514&width=600', notes: 'Lightweight crinkle fabric shirt with added stretch. Revere collar, button-down, relaxed fit in taupe. Poolside to evening.', acquired: false },
+
+  // ── Kitchen ──
+  { id: 54, name: 'Ninja Luxe Café Premier Espresso Machine', category: 'home', price: 600, priority: 'medium', link: 'https://www.sharkninja.com/ninja-luxe-cafe-premier-series-espresso-machine-drip-coffee-maker-cold-brew-machine/ES601.html?dwvar_ES601_color=d2d7dd', image: 'https://assets.sharkninja.com/image/upload/f_auto/q_auto/SharkNinja-NA/ES601_01.jpg', notes: '3-in-1 system: espresso, drip coffee, and cold brew. Barista Assist guided brewing with hands-free microfoam frothing.', acquired: false },
 ]
