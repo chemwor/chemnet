@@ -14,6 +14,9 @@ export const ICONS = {
   // Reviews — TV set
   reviews: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="9" rx="1" fill="#333" stroke="#888" stroke-width=".6"/><rect x="2" y="5" width="12" height="7" fill="#1a3a5a"/><path d="M5 1l3 3M11 1L8 4" stroke="#888" stroke-width=".7" fill="none"/><rect x="5" y="14" width="6" height="1" fill="#888"/><rect x="4" y="14.5" width="8" height=".5" fill="#666"/><path d="M6 8l5 0M6 10l3 0" stroke="#4af" stroke-width=".5"/></svg>`,
 
+  // The Video Store — VHS tape (Blockbuster-era)
+  videostore: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="1" fill="#1a1a22" stroke="#000" stroke-width=".6"/><rect x="2" y="4" width="12" height="5" fill="#2b2b3a"/><circle cx="6" cy="6.5" r="1.6" fill="#c0c0c0" stroke="#666" stroke-width=".4"/><circle cx="10" cy="6.5" r="1.6" fill="#c0c0c0" stroke="#666" stroke-width=".4"/><circle cx="6" cy="6.5" r=".5" fill="#333"/><circle cx="10" cy="6.5" r=".5" fill="#333"/><rect x="3" y="10" width="10" height="2.3" fill="#fff"/><rect x="3" y="10" width="10" height=".8" fill="#0033A0"/><rect x="3" y="10.8" width="10" height=".5" fill="#FFD200"/><line x1="4" y1="11.7" x2="11" y2="11.7" stroke="#888" stroke-width=".4"/></svg>`,
+
   // Restaurant — cake
   restaurant: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="2" y="8" width="12" height="6" rx="1" fill="#f5c542" stroke="#c99a2e" stroke-width=".5"/><rect x="2" y="8" width="12" height="2" fill="#e8a0b0"/><rect x="3" y="6" width="10" height="3" rx="1" fill="#fff0f5" stroke="#d88" stroke-width=".4"/><circle cx="5" cy="6" r="1" fill="#f00"/><circle cx="8" cy="5.5" r="1" fill="#f80"/><circle cx="11" cy="6" r="1" fill="#f00"/><rect x="7.5" y="2" width="1" height="4" fill="#c99a2e"/><ellipse cx="8" cy="2" rx="1.5" ry="1" fill="#ff6b35"/></svg>`,
 

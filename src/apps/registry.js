@@ -130,8 +130,8 @@ export const APP_REGISTRY = [
   },
   {
     id: 'reviews',
-    label: 'Reviews',
-    icon: 'reviews',
+    label: 'The Video Store',
+    icon: 'videostore',
     component: () => import('./Reviews/Reviews.jsx'),
     defaultSize: { width: 520, height: 440 },
     defaultPosition: { x: 110, y: 50 },

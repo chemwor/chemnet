@@ -139,44 +139,77 @@ function StarRating({ rating, size = 11 }) {
   )
 }
 
-function ReviewCard({ item, isSelected, onClick, onDoubleClick }) {
+// ── Video-store browse pieces (poster cases on shelves) ──
+const MEMBERSHIP = 'MEMBER NO. 0 4815 162342'
+const CASE_GRADIENTS = [
+  ['#3a2c5a', '#171026'], ['#5a2c2c', '#26110f'], ['#2c4a5a', '#0f1f26'],
+  ['#5a4a2c', '#261d0f'], ['#2c5a3a', '#0f261a'], ['#4a2c5a', '#1d0f26'],
+]
+// Deterministic cover gradient (so emoji cases vary but stay stable across renders).
+function colorFor(key) {
+  let h = 0
+  const s = String(key || '')
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
+  const [a, b] = CASE_GRADIENTS[h % CASE_GRADIENTS.length]
+  return `linear-gradient(150deg, ${a}, ${b})`
+}
+
+// Round rating sticker — gold with the score once rated, neutral "NR" at 0.
+function RatingSticker({ rating }) {
+  const rated = (rating || 0) > 0
   return (
-    <div
-      className="flex items-start gap-2 px-3 py-2 cursor-pointer"
-      style={{
-        background: isSelected ? '#1a1a3a' : 'transparent',
-        borderBottom: '1px solid #1a1a2a',
-      }}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-    >
-      {item.image ? (
-        <img src={item.image} alt="" style={{ width: 36, height: 52, borderRadius: 3, objectFit: 'cover', shrink: 0 }} />
-      ) : (
-        <span className="text-2xl shrink-0">{item.poster}</span>
-      )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-sm truncate" style={{ color: '#F0EBE1' }}>{item.title}</span>
-          <span className="text-xs shrink-0" style={{ color: '#555' }}>{item.year}</span>
-        </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          {item.status === 'watched' ? (
-            <StarRating rating={item.rating} />
-          ) : (
-            <span className="text-xs px-1.5 py-0.5" style={{ background: '#2a2a4a', color: '#8888FF', fontSize: 9 }}>WATCHLIST</span>
-          )}
-          {item.analysis && (
-            <span className="text-xs px-1" style={{ background: '#2a1a0a', color: '#FF6B35', fontSize: 8 }}>IN-DEPTH</span>
-          )}
-        </div>
-        <div className="flex gap-1 mt-1">
-          {(item.tags || []).map(t => (
-            <span key={t} className="text-xs px-1" style={{ background: '#1a1a30', color: '#666', fontSize: 9 }}>{t}</span>
-          ))}
-        </div>
-        {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-xs mt-1 block" style={{ color: '#4A90D9', fontSize: 9 }}>IMDb ↗</a>}
+    <div style={{ position: 'absolute', top: 6, right: 6, width: 30, height: 30, borderRadius: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', transform: 'rotate(8deg)', background: rated ? 'radial-gradient(circle at 35% 30%, #FFE36B, #F5B800)' : '#cfc7b6', color: '#3a2a00', border: '2px solid #fff', boxShadow: '0 1px 3px rgba(0,0,0,0.4)', fontFamily: 'monospace' }}>
+      <span style={{ fontSize: rated ? 13 : 9, fontWeight: 800, lineHeight: 1 }}>{rated ? rating : 'NR'}</span>
+      {rated && <span style={{ fontSize: 6, fontWeight: 700, letterSpacing: 0.5 }}>/10</span>}
+    </div>
+  )
+}
+
+function NewTag() {
+  return (
+    <div style={{ position: 'absolute', top: 8, left: -2, background: '#e10600', color: '#fff', fontFamily: 'monospace', fontWeight: 800, fontSize: 10, letterSpacing: 1, padding: '2px 9px 2px 6px', boxShadow: '0 1px 3px rgba(0,0,0,0.4)', clipPath: 'polygon(0 0, 100% 0, 88% 50%, 100% 100%, 0 100%)' }}>NEW</div>
+  )
+}
+
+// A rental case: poster cover + rating sticker (watched) or NEW tag (watchlist),
+// title strip below. Click opens the unchanged review detail page.
+function PosterCase({ item, onOpen }) {
+  const watched = item.status === 'watched'
+  return (
+    <button className="vhs-case" onClick={() => onOpen(item.id)} title={item.title} style={{ display: 'block', textAlign: 'left', padding: 0, border: 'none', cursor: 'pointer', background: 'transparent', width: '100%' }}>
+      <div style={{ position: 'relative', aspectRatio: '2 / 3', background: item.image ? '#000' : colorFor(item.title), border: '2px solid #0a0a0a', borderRadius: 3, overflow: 'hidden', boxShadow: 'inset 4px 0 6px rgba(0,0,0,0.4)' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, background: 'linear-gradient(90deg, rgba(255,255,255,0.18), transparent)' }} />
+        {item.image
+          ? <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.6em' }}>{item.poster}</div>}
+        {watched ? <RatingSticker rating={item.rating} /> : <NewTag />}
       </div>
+      <div style={{ background: '#0c0c12', padding: '4px 6px', borderRadius: '0 0 3px 3px', borderTop: '1px solid #FFD200' }}>
+        <div style={{ color: '#F0EBE1', fontFamily: 'monospace', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>
+        <div style={{ color: '#7a7a8a', fontFamily: 'monospace', fontSize: 9 }}>{item.year}{item.analysis ? ' · IN-DEPTH' : ''}</div>
+      </div>
+    </button>
+  )
+}
+
+// Blockbuster-style marquee band (blue + yellow).
+function Marquee({ count }) {
+  return (
+    <div className="shrink-0" style={{ background: 'linear-gradient(#0033A0, #00237a)', borderBottom: '3px solid #FFD200', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ color: '#FFD200', fontFamily: '"Arial Black", Impact, sans-serif', fontWeight: 900, fontSize: 18, letterSpacing: 1, textShadow: '1px 1px 0 #001a52', lineHeight: 1 }}>THE VIDEO STORE</div>
+        <div style={{ color: '#bcd0ff', fontFamily: 'monospace', fontSize: 10, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>be kind, rewind · {MEMBERSHIP}</div>
+      </div>
+      <div style={{ color: '#fff', fontFamily: 'monospace', fontSize: 10, textAlign: 'right', opacity: 0.9 }}>{count} on the shelf</div>
+    </div>
+  )
+}
+
+function EmptyStore({ aisle }) {
+  return (
+    <div style={{ textAlign: 'center', padding: '40px 20px', color: '#8a8a9a', fontFamily: 'monospace' }}>
+      <div style={{ fontSize: 40, marginBottom: 8 }}>📼</div>
+      <div style={{ fontSize: 13 }}>{aisle ? 'No titles in this aisle yet.' : 'The shelves are empty — add your first title.'}</div>
     </div>
   )
 }
@@ -263,31 +296,6 @@ function FullReview({ item, onBack }) {
 // MOBILE VIEW — IMDb/streaming app style
 // ══════════════════════════════════════════
 
-function MobileReviewCard({ item, onTap }) {
-  return (
-    <div onClick={() => onTap(item.id)} style={{ padding: '12px 16px', background: '#fff', borderBottom: '0.5px solid #e5e5ea', display: 'flex', gap: 12, alignItems: 'center', fontFamily: '-apple-system, sans-serif' }}>
-      {item.image ? (
-        <img src={item.image} alt="" style={{ width: 40, height: 58, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
-      ) : (
-        <div style={{ width: 40, height: 58, borderRadius: 4, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{item.poster}</div>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 15, fontWeight: 600, color: '#000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>
-        <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 2 }}>
-          {item.year} · {(item.tags || []).join(', ')}
-        </div>
-        {item.status === 'watched' && (
-          <div style={{ fontSize: 11, color: '#FF9500', marginTop: 2 }}>{'★'.repeat(Math.round(item.rating / 2))}{'☆'.repeat(5 - Math.round(item.rating / 2))} {item.rating}/10</div>
-        )}
-        {item.status === 'watchlist' && (
-          <div style={{ fontSize: 11, color: '#007AFF', marginTop: 2 }}>Watchlist</div>
-        )}
-      </div>
-      <span style={{ color: '#c7c7cc', fontSize: 16 }}>›</span>
-    </div>
-  )
-}
-
 function MobileReviewDetail({ item, onBack }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
@@ -342,19 +350,26 @@ function MobileReviews({ data }) {
   if (openItem) return <MobileReviewDetail item={openItem} onBack={() => setOpenId(null)} />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f2f2f7', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
-      {/* Segmented control */}
-      <div style={{ padding: '8px 16px', background: '#f2f2f7' }}>
-        <div style={{ display: 'flex', background: '#e5e5ea', borderRadius: 8, padding: 2 }}>
-          {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setCategory(c.id)} className="flex-1 border-none cursor-pointer" style={{ padding: '6px 0', borderRadius: 6, fontSize: 13, fontWeight: 500, fontFamily: 'inherit', background: category === c.id ? '#fff' : 'transparent', color: '#000', boxShadow: category === c.id ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
-              {c.label}
-            </button>
-          ))}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#14141c', fontFamily: '-apple-system, "Helvetica Neue", sans-serif' }}>
+      {/* Sticky marquee + segmented control */}
+      <div className="shrink-0" style={{ position: 'sticky', top: 0, zIndex: 2 }}>
+        <Marquee count={filtered.length} />
+        <div style={{ padding: '8px 12px', background: '#101018' }}>
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: 2 }}>
+            {CATEGORIES.map(c => (
+              <button key={c.id} onClick={() => setCategory(c.id)} className="flex-1 border-none cursor-pointer" style={{ padding: '6px 0', borderRadius: 6, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', background: category === c.id ? '#FFD200' : 'transparent', color: category === c.id ? '#001a52' : '#cfcfe0', boxShadow: category === c.id ? '0 1px 2px rgba(0,0,0,0.3)' : 'none' }}>
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="flex-1 overflow-auto">
-        {filtered.map(item => <MobileReviewCard key={item.id} item={item} onTap={setOpenId} />)}
+      <div className="flex-1 overflow-auto" style={{ padding: 12 }}>
+        {items.length === 0 ? <EmptyStore /> : filtered.length === 0 ? <EmptyStore aisle /> : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            {filtered.map(item => <PosterCase key={item.id} item={item} onOpen={setOpenId} />)}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -371,7 +386,6 @@ function ReviewsView({ data, loading }) {
   const isMobile = useMediaQuery('(max-width: 768px)')
   const [category, setCategory] = useState('movies')
   const [filter, setFilter] = useState('all')
-  const [selectedId, setSelectedId] = useState(null)
   const [openId, setOpenId] = useState(null)
 
   // Deep-link: open a specific review when arriving from ChemFeed.
@@ -384,7 +398,7 @@ function ReviewsView({ data, loading }) {
   }, [initialItem, data])
 
   if (loading) {
-    return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f1a', color: '#555', fontFamily: 'monospace' }}>Loading...</div>
+    return <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#14141c', color: '#888', fontFamily: 'monospace' }}>Loading…</div>
   }
 
   if (isMobile) return <MobileReviews data={data} />
@@ -397,123 +411,50 @@ function ReviewsView({ data, loading }) {
       return (b.rating || 0) - (a.rating || 0)
     })
 
-  const selected = data.find(r => r.id === selectedId)
   const openItem = data.find(r => r.id === openId)
-
   if (openItem) {
     return <FullReview item={openItem} onBack={() => setOpenId(null)} />
   }
 
-  return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#0f0f1a', fontFamily: 'monospace', color: '#F0EBE1' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 shrink-0" style={{ background: '#1a1a30', borderBottom: '1px solid #2a2a4a' }}>
-        <div className="flex items-center gap-1">
-          <span className="text-sm">🎬</span>
-          <span className="font-bold text-sm">What I've Been Watching</span>
-        </div>
-      </div>
+  // Keep the all/watched/watchlist filter, framed as the store's sections.
+  const FILTERS = [{ id: 'all', label: 'All' }, { id: 'watched', label: 'In Store' }, { id: 'watchlist', label: 'New Releases' }]
 
-      {/* Category tabs + filter */}
-      <div className="flex items-center gap-2 px-3 py-1 shrink-0" style={{ background: '#12121f', borderBottom: '1px solid #2a2a4a' }}>
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#14141c', fontFamily: 'monospace', color: '#F0EBE1' }}>
+      <Marquee count={filtered.length} />
+
+      {/* Aisle tabs + section filter */}
+      <div className="flex items-center gap-2 px-3 py-1.5 shrink-0 flex-wrap" style={{ background: '#101018', borderBottom: '1px solid #2a2a3a' }}>
         {CATEGORIES.map(c => (
           <button
             key={c.id}
-            onClick={() => { setCategory(c.id); setSelectedId(null) }}
-            className="px-2 py-0.5 text-xs border-none cursor-pointer"
-            style={{
-              background: category === c.id ? '#FF6B35' : 'transparent',
-              color: category === c.id ? '#000' : '#888',
-              fontFamily: 'inherit',
-            }}
+            onClick={() => setCategory(c.id)}
+            className="px-2.5 py-0.5 text-xs border-none cursor-pointer"
+            style={{ background: category === c.id ? '#FFD200' : 'transparent', color: category === c.id ? '#001a52' : '#9a9aae', fontFamily: 'inherit', fontWeight: 700, borderRadius: 3 }}
           >
             {c.label}
           </button>
         ))}
-        <div style={{ width: 1, height: 14, background: '#2a2a4a', margin: '0 4px' }} />
-        {['all', 'watched', 'watchlist'].map(f => (
+        <div style={{ width: 1, height: 14, background: '#2a2a3a', margin: '0 4px' }} />
+        {FILTERS.map(f => (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
+            key={f.id}
+            onClick={() => setFilter(f.id)}
             className="px-1.5 py-0.5 text-xs border-none cursor-pointer"
-            style={{
-              background: 'transparent',
-              color: filter === f ? '#FF6B35' : '#555',
-              fontFamily: 'inherit',
-              textDecoration: filter === f ? 'underline' : 'none',
-            }}
+            style={{ background: 'transparent', color: filter === f.id ? '#FFD200' : '#666', fontFamily: 'inherit', textDecoration: filter === f.id ? 'underline' : 'none' }}
           >
-            {f}
+            {f.label}
           </button>
         ))}
-        <span className="ml-auto text-xs" style={{ color: '#444' }}>{filtered.length} titles</span>
       </div>
 
-      {/* Content */}
-      <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-        {/* List */}
-        <div className="flex-1 overflow-auto">
-          {filtered.map(item => (
-            <ReviewCard
-              key={item.id}
-              item={item}
-              isSelected={selectedId === item.id}
-              onClick={() => setSelectedId(item.id)}
-              onDoubleClick={() => { if (item.status === 'watched') setOpenId(item.id) }}
-            />
-          ))}
-        </div>
-
-        {/* Detail panel */}
-        {selected && (
-          <div className="shrink-0 overflow-auto p-3" style={{ width: 220, background: '#12121f', borderLeft: '1px solid #2a2a4a' }}>
-            <div className="text-center text-4xl mb-2">{selected.poster}</div>
-            <div className="font-bold text-sm text-center mb-1">{selected.title}</div>
-            <div className="text-center text-xs mb-2" style={{ color: '#666' }}>{selected.year}</div>
-
-            {selected.status === 'watched' ? (
-              <>
-                <div className="text-center mb-3">
-                  <StarRating rating={selected.rating} />
-                  <div className="text-xs mt-0.5" style={{ color: '#888' }}>{selected.rating}/10</div>
-                </div>
-                <div className="text-xs leading-relaxed" style={{ color: '#aaa' }}>
-                  {selected.review}
-                </div>
-                {selected.analysis && (
-                  <button
-                    onClick={() => setOpenId(selected.id)}
-                    className="mt-3 w-full px-2 py-1 text-xs border-none cursor-pointer"
-                    style={{ background: '#2a2a4a', color: '#FF6B35', fontFamily: 'inherit' }}
-                  >
-                    Read Full Analysis →
-                  </button>
-                )}
-              </>
-            ) : (
-              <div className="text-center text-xs" style={{ color: '#555' }}>
-                On the watchlist — haven't seen it yet.
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-1 mt-3 justify-center">
-              {selected.tags.map(t => (
-                <span key={t} className="text-xs px-1.5 py-0.5" style={{ background: '#1a1a30', color: '#666' }}>{t}</span>
-              ))}
-            </div>
-
-            {selected.status === 'watched' && (
-              <div className="text-center mt-3 text-xs" style={{ color: '#333' }}>
-                Double-click to open full review
-              </div>
-            )}
+      {/* Poster wall */}
+      <div className="flex-1 overflow-auto" style={{ padding: 14 }}>
+        {data.length === 0 ? <EmptyStore /> : filtered.length === 0 ? <EmptyStore aisle /> : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(118px, 1fr))', gap: 14, alignContent: 'start' }}>
+            {filtered.map(item => <PosterCase key={item.id} item={item} onOpen={setOpenId} />)}
           </div>
         )}
-      </div>
-
-      {/* Status */}
-      <div className="px-3 py-0.5 text-xs shrink-0" style={{ background: '#1a1a30', borderTop: '1px solid #2a2a4a', color: '#444' }}>
-        {selected ? `${selected.title} — double-click for full review` : 'Click a title for details · Double-click for full review'}
       </div>
     </div>
   )

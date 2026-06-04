@@ -109,6 +109,14 @@ button[class*="sc-"]:active {
   height: 100dvh;  /* iOS Safari: the real visible height */
 }
 
+/* Video-store poster cases — subtle lift on hover, disabled for reduced motion. */
+.vhs-case { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.vhs-case:hover { transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.55); }
+@media (prefers-reduced-motion: reduce) {
+  .vhs-case { transition: none; }
+  .vhs-case:hover { transform: none; }
+}
+
 /* Split-flap (Solari) tile flip — used by the Travel Log departures board. */
 @keyframes flapIn {
   0%   { transform: rotateX(-90deg); opacity: 0; }
