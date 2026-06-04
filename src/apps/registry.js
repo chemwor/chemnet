@@ -32,7 +32,7 @@ export const APP_REGISTRY = [
   {
     id: 'aboutme',
     label: 'About',
-    icon: 'computer',
+    icon: 'profilecard',
     component: () => import('./AboutMe/AboutMe.jsx'),
     defaultSize: { width: 560, height: 480 },
     defaultPosition: { x: 140, y: 60 },

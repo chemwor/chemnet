@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
 import { brandPrefix } from '../../lib/customization'
+import { Monogram } from '../_shared/Monogram'
 
 // ChemFeed v2 — a chronological activity stream of what the people you follow
 // have done across their member nodes, with likes and deep-links into the item
@@ -53,10 +54,9 @@ function bucketOf(ts) {
   return 'Earlier'
 }
 
+// Shared per-person monogram (initials from display_name → handle, theme-colored).
 function Avatar({ a, size = 30 }) {
-  const initial = (a.display_name || a.handle || '?').charAt(0).toUpperCase()
-  if (a.avatar_url) return <img src={a.avatar_url} alt="" style={{ width: size, height: size, borderRadius: 4, objectFit: 'cover' }} />
-  return <div style={{ width: size, height: size, borderRadius: 4, background: 'var(--color-accent)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: size * 0.45 }}>{initial}</div>
+  return <Monogram profile={a} size={size} square />
 }
 
 function Preview({ a }) {

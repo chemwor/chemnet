@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
 import { usePresence } from '../../hooks/usePresence'
+import { Monogram } from '../_shared/Monogram'
 
 // AOL-style Member Directory (the hub's "find people" surface).
 //   • Members — search everyone, online/offline dots, ★ friends, add/accept.
@@ -10,10 +11,9 @@ import { usePresence } from '../../hooks/usePresence'
 //   • Invite — your personal invite code + redeem someone else's.
 // Friendships are mutual + accepted (distinct from follows). RLS-scoped.
 
+// Shared per-person monogram (initials from display_name → handle, theme-colored).
 function Avatar({ p, size = 28 }) {
-  const initial = (p?.display_name || p?.handle || '?').charAt(0).toUpperCase()
-  if (p?.avatar_url) return <img src={p.avatar_url} alt="" style={{ width: size, height: size, borderRadius: 4, objectFit: 'cover' }} />
-  return <div style={{ width: size, height: size, borderRadius: 4, background: 'var(--color-accent)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: size * 0.45 }}>{initial}</div>
+  return <Monogram profile={p} size={size} square />
 }
 
 const tabBtn = (active) => ({

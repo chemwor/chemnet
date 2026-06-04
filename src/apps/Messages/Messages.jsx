@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRepo } from '../../lib/repo/useRepo'
 import { useProfile } from '../../context/ProfileContext'
+import { Monogram } from '../_shared/Monogram'
 
 // Messages — 1:1 AOL-style instant messenger over members.messages.
 //   • Owner: a buddy-list of all conversations.
@@ -8,10 +9,9 @@ import { useProfile } from '../../context/ProfileContext'
 //   • Logged out: a "sign in to chat" prompt.
 // RLS guarantees you only ever load your own messages; the UI just shapes them.
 
+// Shared per-person monogram (initials from display_name → handle, theme-colored).
 function Avatar({ p, size = 28 }) {
-  const initial = (p?.display_name || p?.handle || '?').charAt(0).toUpperCase()
-  if (p?.avatar_url) return <img src={p.avatar_url} alt="" style={{ width: size, height: size, borderRadius: 4, objectFit: 'cover' }} />
-  return <div style={{ width: size, height: size, borderRadius: 4, background: 'var(--color-accent)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: size * 0.45 }}>{initial}</div>
+  return <Monogram profile={p} size={size} square />
 }
 
 function ChatWindow({ otherId, otherLabel }) {
