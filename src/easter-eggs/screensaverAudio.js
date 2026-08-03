@@ -39,6 +39,35 @@ export function pageAudioActive() {
   )
 }
 
+// Play the theme for as long as the screensaver is up AND this tab is the
+// selected one. A background tab keeps running, so without the visibility gate
+// the theme would keep playing into a tab nobody is looking at. Pausing (not
+// stopping) keeps our place, so switching back picks up where it left off.
+// `pageAudioActive` is re-checked on every resume, not just at start, so we
+// still yield if the user started a Spotify/SoundCloud embed in the meantime.
+// Returns a stop function.
+export function playThemeWhileVisible() {
+  const audio = getScreensaverAudio()
+  let stopped = false
+
+  const sync = () => {
+    if (stopped) return
+    if (document.visibilityState === 'hidden') audio.pause()
+    else if (!pageAudioActive()) audio.play().catch(() => {})
+  }
+
+  audio.currentTime = 0
+  sync()
+  document.addEventListener('visibilitychange', sync)
+
+  return () => {
+    stopped = true
+    document.removeEventListener('visibilitychange', sync)
+    audio.pause()
+    audio.currentTime = 0
+  }
+}
+
 function unlock() {
   if (unlocked) return
   const a = getScreensaverAudio()
